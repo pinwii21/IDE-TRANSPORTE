@@ -2,9 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Editor de GeoJSON de Personas</title>
+  <title>Editor de GeoJSON de Personas - Filtro Mejorado</title>
 
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -39,22 +38,30 @@
       margin-top: 20px;
     }
 
-    input[type="text"] {
+    input[type="text"], select {
       padding: 6px;
-      margin: 10px 0;
-      width: 250px;
+      margin: 10px 10px 10px 0;
+      width: 180px;
     }
 
     button {
       padding: 6px 12px;
-      margin: 5px 10px 5px 0;
+      margin: 10px 0 10px 0;
     }
   </style>
 </head>
 <body>
   <h1>Editor GeoJSON de Personas</h1>
 
-  <input type="text" id="searchInput" placeholder="Buscar por código o nombre..." />
+  <label for="filterField">Filtrar por:</label>
+  <select id="filterField">
+    <option value="CODIGO">Código</option>
+    <option value="NOMBRE" selected>Nombre</option>
+    <!-- Puedes agregar más campos aquí -->
+  </select>
+
+  <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
+
   <button id="downloadBtn">Descargar GeoJSON</button>
 
   <div id="map"></div>
@@ -154,9 +161,11 @@
       }
     }
 
-    // Buscar por código o nombre
-    document.getElementById('searchInput').addEventListener('input', function () {
-      const filtro = this.value.trim().toLowerCase();
+    // Filtrar datos
+    function filtrarDatos() {
+      const campo = document.getElementById('filterField').value;
+      const filtro = document.getElementById('searchInput').value.trim().toLowerCase();
+
       if (!geojsonData || filtro === "") {
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
@@ -164,15 +173,16 @@
       }
 
       const filtrados = geojsonData.features.filter(f => {
-        const props = f.properties;
-        const codigo = String(props.codigo || "").toLowerCase();
-        const nombre = String(props.nombre || "").toLowerCase();
-        return codigo.includes(filtro) || nombre.includes(filtro);
+        const valor = String(f.properties[campo] || "").toLowerCase();
+        return valor.includes(filtro);
       });
 
       mostrarTabla({ features: filtrados });
       mostrarMapa({ features: filtrados, type: "FeatureCollection" });
-    });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filtrarDatos);
+    document.getElementById('filterField').addEventListener('change', filtrarDatos);
 
     // Descargar archivo GeoJSON editado
     document.getElementById('downloadBtn').addEventListener('click', () => {
