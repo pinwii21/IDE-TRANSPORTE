@@ -2,44 +2,86 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Editor y Mapa GeoJSON</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Editor de GeoJSON de Personas</title>
 
-    <!-- Leaflet CSS -->
+    <!-- Estilos -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        td[contenteditable="true"] {
+            background-color: #f0f8ff;
+        }
+
         #map {
             height: 400px;
             margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 6px;
+            margin: 10px 0;
+            width: 250px;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <h1>Editor GeoJSON de Personas</h1>
+
+    <button id="loadFromGitHub">Cargar GeoJSON desde GitHub</button>
     <input type="file" id="fileInput" accept=".geojson,.json" />
+    <br /><br />
+
+    <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
+    <button id="downloadBtn">Descargar GeoJSON</button>
+
     <div id="map"></div>
     <div id="tableContainer"></div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     <script>
         let geojsonData = null;
-        let map = L.map('map').setView([0, 0], 2); // Vista global inicial
+        let map = L.map('map').setView([0, 0], 2);
         let geojsonLayer = null;
 
-        // Añadir mapa base
+        // Mapa base
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Manejo de archivo
-        document.getElementById('fileInput').addEventListener('change', function(event) {
+        // Subida manual
+        document.getElementById('fileInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     geojsonData = JSON.parse(e.target.result);
                     mostrarTabla(geojsonData);
@@ -51,6 +93,23 @@
             reader.readAsText(file);
         });
 
+        // Carga desde GitHub
+        document.getElementById('loadFromGitHub').addEventListener('click', () => {
+            const url = "https://raw.githubusercontent.com/kevinpilliza/BASE_DATOS_TRANSPORTE_2025/main/personas.geojson";
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error("No se pudo cargar el archivo desde GitHub");
+                    return response.json();
+                })
+                .then(data => {
+                    geojsonData = data;
+                    mostrarTabla(geojsonData);
+                    mostrarMapa(geojsonData);
+                })
+                .catch(error => alert("Error al cargar GeoJSON: " + error));
+        });
+
+        // Mostrar tabla
         function mostrarTabla(data) {
             const contenedor = document.getElementById('tableContainer');
             if (!data.features || data.features.length === 0) {
@@ -84,6 +143,7 @@
             });
         }
 
+        // Mostrar mapa
         function mostrarMapa(data) {
             if (geojsonLayer) {
                 map.removeLayer(geojsonLayer);
@@ -115,6 +175,38 @@
                 map.setView([0, 0], 2);
             }
         }
+
+        // Buscar personas
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const filtro = this.value.toLowerCase();
+            if (!geojsonData) return;
+
+            const filtrados = geojsonData.features.filter(f =>
+                Object.values(f.properties).some(val =>
+                    String(val).toLowerCase().includes(filtro)
+                )
+            );
+
+            mostrarTabla({ features: filtrados });
+            mostrarMapa({ features: filtrados, type: "FeatureCollection" });
+        });
+
+        // Descargar archivo
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!geojsonData) {
+                alert("No hay datos cargados.");
+                return;
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "personas_editado.geojson");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            document.body.removeChild(dlAnchor);
+        });
     </script>
 </body>
 </html>
+
