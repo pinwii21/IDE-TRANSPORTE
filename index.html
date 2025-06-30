@@ -2,17 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Editor GeoJSON de Personas - Completo</title>
-
+  <title>Editor GeoJSON de Personas</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     h1, h2 { font-weight: 600; }
     form label { margin-right: 10px; display: inline-block; margin-bottom: 6px; }
     input[type="text"], input[type="number"], select { padding: 5px; margin-left: 5px; width: 180px; }
-    form button { padding: 6px 15px; margin-left: 10px; vertical-align: bottom; }
+    form button { padding: 6px 15px; margin-top: 10px; }
     table { border-collapse: collapse; width: 100%; margin-top: 15px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     td[contenteditable="true"] { background-color: #f0f8ff; }
@@ -25,10 +23,10 @@
 
   <h2>Agregar nuevo personal</h2>
   <form id="addForm">
-    <label>NOMBRE: <input type="text" id="newNombre" required /></label>
-    <label>CODIGO: <input type="text" id="newCodigo" required /></label>
-    <label>LATITUD: <input type="number" step="any" id="newLat" required /></label>
-    <label>LONGITUD: <input type="number" step="any" id="newLng" required /></label>
+    <label>Nombre: <input type="text" id="newNombre" required /></label>
+    <label>Código: <input type="text" id="newCodigo" required /></label>
+    <label>Latitud: <input type="number" step="any" id="newLat" required /></label>
+    <label>Longitud: <input type="number" step="any" id="newLng" required /></label>
     <br/>
     <label>Teléfono: <input type="text" id="newTelefono" /></label>
     <label>Dirección: <input type="text" id="newDireccion" /></label>
@@ -44,14 +42,12 @@
     <select id="filterField">
       <option value="CODIGO">Código</option>
       <option value="NOMBRE" selected>Nombre</option>
-      <option value=TELEFONO">Teléfono</option>
+      <option value="TELEFONO">Teléfono</option>
       <option value="DIRECCION">Dirección</option>
       <option value="HORARIO">Horario de trabajo</option>
-      <option value="LUGAR TRABAJO">Lugar de trabajo</option>
+      <option value="LUGAR">Lugar de trabajo</option>
     </select>
-
     <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
-
     <button id="downloadBtn">Descargar GeoJSON</button>
   </div>
 
@@ -71,45 +67,28 @@
       const url = "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson";
 
       fetch(url)
-        .then(response => {
-          if (!response.ok) throw new Error("No se pudo cargar el archivo desde GitHub");
-          return response.json();
-        })
+        .then(res => res.json())
         .then(data => {
           geojsonData = data;
           mostrarTabla(geojsonData);
           mostrarMapa(geojsonData);
         })
-        .catch(error => alert("Error al cargar GeoJSON: " + error));
+        .catch(err => alert("Error cargando GeoJSON: " + err));
     });
 
     function mostrarTabla(data) {
       const contenedor = document.getElementById('tableContainer');
-      if (!data.features || data.features.length === 0) {
-        contenedor.innerHTML = "<p>No hay datos.</p>";
-        return;
-      }
-
-      const atributos = ["nombre","codigo","latitud","longitud","telefono","direccion","horario","lugar"];
-      const propsExistentes = Object.keys(data.features[0].properties);
-      propsExistentes.forEach(p => {
-        if(!atributos.includes(p)) atributos.push(p);
-      });
-
+      const atributos = ["NOMBRE", "CODIGO", "LATITUD", "LONGITUD", "TELEFONO", "DIRECCION", "HORARIO", "LUGAR"];
       let html = "<table><thead><tr><th>#</th>";
-      atributos.forEach(attr => html += `<th>${attr.charAt(0).toUpperCase()+attr.slice(1)}</th>`);
+      atributos.forEach(c => html += `<th>${c}</th>`);
       html += "</tr></thead><tbody>";
 
-      data.features.forEach((feature, i) => {
+      data.features.forEach((f, i) => {
         html += `<tr><td>${i + 1}</td>`;
         atributos.forEach(attr => {
-          let valor = feature.properties[attr] ?? "";
-          if(attr === "latitud" && !feature.properties.latitud) {
-            valor = feature.geometry?.coordinates ? feature.geometry.coordinates[1] : "";
-          }
-          if(attr === "longitud" && !feature.properties.longitud) {
-            valor = feature.geometry?.coordinates ? feature.geometry.coordinates[0] : "";
-          }
+          let valor = f.properties[attr] || "";
+          if (attr === "LATITUD") valor = f.geometry?.coordinates[1] ?? "";
+          if (attr === "LONGITUD") valor = f.geometry?.coordinates[0] ?? "";
           html += `<td contenteditable="true" data-feature="${i}" data-attr="${attr}">${valor}</td>`;
         });
         html += "</tr>";
@@ -120,25 +99,24 @@
 
       contenedor.querySelectorAll('td[contenteditable="true"]').forEach(td => {
         td.addEventListener('input', e => {
-          const fila = e.target.getAttribute('data-feature');
-          const atributo = e.target.getAttribute('data-attr');
-          let valor = e.target.textContent;
+          const fila = e.target.dataset.feature;
+          const attr = e.target.dataset.attr;
+          let valor = e.target.textContent.trim();
 
-          if (atributo === "latitud" || atributo === "longitud") {
-            valor = parseFloat(valor);
-            if (isNaN(valor)) {
-              alert("Latitud y longitud deben ser números válidos.");
-              return;
+          if (attr === "LATITUD" || attr === "LONGITUD") {
+            const num = parseFloat(valor);
+            if (!isNaN(num)) {
+              if (!geojsonData.features[fila].geometry)
+                geojsonData.features[fila].geometry = { type: "Point", coordinates: [0, 0] };
+              const coords = geojsonData.features[fila].geometry.coordinates;
+              if (attr === "LATITUD") coords[1] = num;
+              else coords[0] = num;
+              geojsonData.features[fila].geometry.coordinates = coords;
+              geojsonData.features[fila].properties[attr] = num;
             }
-            if (!geojsonData.features[fila].geometry) geojsonData.features[fila].geometry = {type:"Point", coordinates: [0,0]};
-            let coords = geojsonData.features[fila].geometry.coordinates;
-            if (!coords) coords = [0,0];
-            if (atributo === "longitud") coords[0] = valor;
-            else coords[1] = valor;
-            geojsonData.features[fila].geometry.coordinates = coords;
-            geojsonData.features[fila].properties[atributo] = valor;
           } else {
-            geojsonData.features[fila].properties[atributo] = valor;
+            geojsonData.features[fila].properties[attr] = valor.toUpperCase();
+            e.target.textContent = valor.toUpperCase();
           }
         });
       });
@@ -150,43 +128,30 @@
       geojsonLayer = L.geoJSON(data, {
         onEachFeature: (feature, layer) => {
           let contenido = "";
-          for (const [key, value] of Object.entries(feature.properties)) {
-            contenido += `<strong>${key}:</strong> ${value}<br>`;
-          }
+          for (const [key, val] of Object.entries(feature.properties))
+            contenido += `<strong>${key}:</strong> ${val}<br>`;
           layer.bindPopup(contenido);
         },
-        pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-          radius: 6,
-          fillColor: "#0074D9",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+          radius: 6, fillColor: "#0074D9", color: "#000", weight: 1,
+          opacity: 1, fillOpacity: 0.8
         })
       }).addTo(map);
 
-      try {
-        map.fitBounds(geojsonLayer.getBounds());
-      } catch {
-        map.setView([0, 0], 2);
-      }
+      try { map.fitBounds(geojsonLayer.getBounds()); } catch { map.setView([0, 0], 2); }
     }
 
     function filtrarDatos() {
       const campo = document.getElementById('filterField').value;
-      const filtro = document.getElementById('searchInput').value.trim().toLowerCase();
-
-      if (!geojsonData || filtro === "") {
+      const texto = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!texto) {
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
         return;
       }
-
       const filtrados = geojsonData.features.filter(f => {
-        const valor = String(f.properties[campo] || "").toLowerCase();
-        return valor.includes(filtro);
+        return String(f.properties[campo] || "").toLowerCase().includes(texto);
       });
-
       mostrarTabla({ features: filtrados });
       mostrarMapa({ features: filtrados, type: "FeatureCollection" });
     }
@@ -196,30 +161,31 @@
 
     document.getElementById('addForm').addEventListener('submit', e => {
       e.preventDefault();
-
-      const nombre = document.getElementById('newNombre').value.trim();
-      const codigo = document.getElementById('newCodigo').value.trim();
+      const nombre = document.getElementById('newNombre').value;
+      const codigo = document.getElementById('newCodigo').value;
       const lat = parseFloat(document.getElementById('newLat').value);
       const lng = parseFloat(document.getElementById('newLng').value);
-      const telefono = document.getElementById('newTelefono').value.trim();
-      const direccion = document.getElementById('newDireccion').value.trim();
-      const horario = document.getElementById('newHorario').value.trim();
-      const lugar = document.getElementById('newLugar').value.trim();
+      const telefono = document.getElementById('newTelefono').value;
+      const direccion = document.getElementById('newDireccion').value;
+      const horario = document.getElementById('newHorario').value;
+      const lugar = document.getElementById('newLugar').value;
 
       if (isNaN(lat) || isNaN(lng)) {
-        alert("Latitud y longitud deben ser números válidos.");
+        alert("Latitud y longitud deben ser válidas.");
         return;
       }
 
-      const nuevaFeature = {
+      const nueva = {
         type: "Feature",
         properties: {
-          nombre,
-          codigo,
-          telefono,
-          direccion,
-          horario,
-          lugar
+          NOMBRE: nombre.toUpperCase(),
+          CODIGO: codigo.toUpperCase(),
+          LATITUD: lat,
+          LONGITUD: lng,
+          TELEFONO: telefono.toUpperCase(),
+          DIRECCION: direccion.toUpperCase(),
+          HORARIO: horario.toUpperCase(),
+          LUGAR: lugar.toUpperCase()
         },
         geometry: {
           type: "Point",
@@ -227,30 +193,21 @@
         }
       };
 
-      geojsonData.features.push(nuevaFeature);
-
+      geojsonData.features.push(nueva);
       mostrarTabla(geojsonData);
       mostrarMapa(geojsonData);
-
       e.target.reset();
     });
 
     document.getElementById('downloadBtn').addEventListener('click', () => {
-      if (!geojsonData) {
-        alert("No hay datos cargados.");
-        return;
-      }
-
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData, null, 2));
-      const dlAnchor = document.createElement('a');
-      dlAnchor.setAttribute("href", dataStr);
-      dlAnchor.setAttribute("download", "BASE_DATOS_TRANSPORTE_2025_editado.geojson");
-      document.body.appendChild(dlAnchor);
-      dlAnchor.click();
-      document.body.removeChild(dlAnchor);
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", "BASE_DATOS_TRANSPORTE_2025_editado.geojson");
+      document.body.appendChild(dl);
+      dl.click();
+      document.body.removeChild(dl);
     });
   </script>
 </body>
 </html>
-
-
