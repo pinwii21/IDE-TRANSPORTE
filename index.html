@@ -52,10 +52,6 @@
 <body>
     <h1>Editor GeoJSON de Personas</h1>
 
-    <button id="loadFromGitHub">Cargar GeoJSON desde GitHub</button>
-    <input type="file" id="fileInput" accept=".geojson,.json" />
-    <br /><br />
-
     <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
     <button id="downloadBtn">Descargar GeoJSON</button>
 
@@ -75,27 +71,10 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Subida manual
-        document.getElementById('fileInput').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    geojsonData = JSON.parse(e.target.result);
-                    mostrarTabla(geojsonData);
-                    mostrarMapa(geojsonData);
-                } catch (error) {
-                    alert("Archivo no válido.");
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        // Carga desde GitHub
-        document.getElementById('loadFromGitHub').addEventListener('click', () => {
+        // Cargar desde GitHub automáticamente
+        window.addEventListener('DOMContentLoaded', () => {
             const url = "https://raw.githubusercontent.com/kevinpilliza/BASE_DATOS_TRANSPORTE_2025/main/personas.geojson";
+
             fetch(url)
                 .then(response => {
                     if (!response.ok) throw new Error("No se pudo cargar el archivo desde GitHub");
@@ -209,4 +188,3 @@
     </script>
 </body>
 </html>
-
