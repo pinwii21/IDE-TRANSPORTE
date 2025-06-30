@@ -2,51 +2,53 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Editor GeoJSON de Personas</title>
+  <title>Editor GeoJSON de Personal</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1, h2 { font-weight: 600; }
-    form label { margin-right: 10px; display: inline-block; margin-bottom: 6px; }
-    input[type="text"], input[type="number"], select { padding: 5px; margin-left: 5px; width: 180px; }
-    form button { padding: 6px 15px; margin-top: 10px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+    h1, h2 { font-weight: 600; color: #333; }
+    form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    form label { margin-right: 10px; display: inline-block; margin-bottom: 10px; }
+    input[type="text"], input[type="number"], select { padding: 6px; margin: 4px 0; width: 200px; border-radius: 4px; border: 1px solid #ccc; }
+    form button { padding: 8px 20px; margin-top: 10px; background-color: #0074D9; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    form button:hover { background-color: #005fa3; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background-color: #0074D9; color: white; }
     td[contenteditable="true"] { background-color: #f0f8ff; }
-    #map { height: 400px; margin-top: 20px; }
-    #controls { margin-top: 15px; }
+    #map { height: 400px; margin-top: 20px; border-radius: 8px; overflow: hidden; }
+    #controls { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
-  <h1>Editor GeoJSON de Personas</h1>
+  <h1>Editor GeoJSON de Personal</h1>
 
-  <h2>Agregar nuevo personal</h2>
   <form id="addForm">
-    <label>Nombre: <input type="text" id="newNombre" required /></label>
-    <label>Código: <input type="text" id="newCodigo" required /></label>
-    <label>Latitud: <input type="number" step="any" id="newLat" required /></label>
-    <label>Longitud: <input type="number" step="any" id="newLng" required /></label>
-    <br/>
-    <label>Teléfono: <input type="text" id="newTelefono" /></label>
-    <label>Dirección: <input type="text" id="newDireccion" /></label>
-    <br/>
-    <label>Horario de trabajo: <input type="text" id="newHorario" /></label>
-    <label>Lugar de trabajo: <input type="text" id="newLugar" /></label>
-    <br/>
-    <button type="submit">Agregar</button>
+    <h2>Agregar nuevo personal</h2>
+    <label>CODIGO: <input type="text" id="CODIGO" required /></label>
+    <label>NOMBRE: <input type="text" id="NOMBRE" required /></label>
+    <label>RUTA: <input type="text" id="RUTA" /></label>
+    <label>CEDULA: <input type="text" id="CEDULA" /></label><br>
+    <label>TELEFONO: <input type="text" id="TELEFONO" /></label>
+    <label>DISCAPACIDAD: <input type="text" id="DISCAPACIDAD" /></label>
+    <label>TIPO HORARIO: <input type="text" id="TIPO_HORARIO" /></label>
+    <label>CARGO: <input type="text" id="CARGO" /></label><br>
+    <label>AREA: <input type="text" id="AREA" /></label>
+    <label>MODALIDAD DE CONTRATO: <input type="text" id="MODALIDAD_DE_CONTRATO" /></label>
+    <label>DIRECCION: <input type="text" id="DIRECCION" /></label>
+    <label>HORARIO: <input type="text" id="HORARIO" /></label><br>
+    <label>LUGAR TRABAJO: <input type="text" id="LUGAR_TRABAJO" /></label>
+    <label>LONGITUD: <input type="number" step="any" id="LONGITUD" required /></label>
+    <label>LATITUD: <input type="number" step="any" id="LATITUD" required /></label><br>
+    <label>CONTRATO LUZ: <input type="text" id="CONTRATO_LUZ" /></label>
+    <label>TRANSPORTE: <input type="text" id="TRANSPORTE" /></label>
+    <br><button type="submit">Agregar</button>
   </form>
 
   <div id="controls">
     <label for="filterField">Filtrar por:</label>
-    <select id="filterField">
-      <option value="CODIGO">Código</option>
-      <option value="NOMBRE" selected>Nombre</option>
-      <option value="TELEFONO">Teléfono</option>
-      <option value="DIRECCION">Dirección</option>
-      <option value="HORARIO">Horario de trabajo</option>
-      <option value="LUGAR">Lugar de trabajo</option>
-    </select>
+    <select id="filterField"></select>
     <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
     <button id="downloadBtn">Descargar GeoJSON</button>
   </div>
@@ -55,7 +57,8 @@
   <div id="tableContainer"></div>
 
   <script>
-    let geojsonData = null;
+    const campos = ["CODIGO","NOMBRE","RUTA","CEDULA","TELEFONO","DISCAPACIDAD","TIPO HORARIO","CARGO","AREA","MODALIDAD DE CONTRATO","DIRECCION","HORARIO","LUGAR TRABAJO","LONGITUD","LATITUD","CONTRATO LUZ","TRANSPORTE"];
+    let geojsonData = { type: "FeatureCollection", features: [] };
     let map = L.map('map').setView([0, 0], 2);
     let geojsonLayer = null;
 
@@ -63,151 +66,91 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const url = "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson";
-
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          geojsonData = data;
-          mostrarTabla(geojsonData);
-          mostrarMapa(geojsonData);
-        })
-        .catch(err => alert("Error cargando GeoJSON: " + err));
-    });
-
-    function mostrarTabla(data) {
-      const contenedor = document.getElementById('tableContainer');
-      const atributos = ["NOMBRE", "CODIGO", "LATITUD", "LONGITUD", "TELEFONO", "DIRECCION", "HORARIO", "LUGAR"];
-      let html = "<table><thead><tr><th>#</th>";
-      atributos.forEach(c => html += `<th>${c}</th>`);
-      html += "</tr></thead><tbody>";
-
-      data.features.forEach((f, i) => {
-        html += `<tr><td>${i + 1}</td>`;
-        atributos.forEach(attr => {
-          let valor = f.properties[attr] || "";
-          if (attr === "LATITUD") valor = f.geometry?.coordinates[1] ?? "";
-          if (attr === "LONGITUD") valor = f.geometry?.coordinates[0] ?? "";
-          html += `<td contenteditable="true" data-feature="${i}" data-attr="${attr}">${valor}</td>`;
-        });
-        html += "</tr>";
+    fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
+      .then(r => r.json())
+      .then(data => {
+        geojsonData = data;
+        mostrarTabla(geojsonData);
+        mostrarMapa(geojsonData);
+        cargarCamposFiltro();
       });
 
-      html += "</tbody></table>";
-      contenedor.innerHTML = html;
+    function cargarCamposFiltro() {
+      const select = document.getElementById("filterField");
+      campos.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        select.appendChild(opt);
+      });
+    }
 
-      contenedor.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-        td.addEventListener('input', e => {
+    function mostrarTabla(data) {
+      const cont = document.getElementById("tableContainer");
+      let html = `<table><thead><tr><th>#</th>` + campos.map(c => `<th>${c}</th>`).join("") + `</tr></thead><tbody>`;
+      data.features.forEach((f, i) => {
+        html += `<tr><td>${i+1}</td>` + campos.map(c => `<td contenteditable="true" data-feature="${i}" data-attr="${c}">${f.properties[c] || ""}</td>`).join("") + `</tr>`;
+      });
+      html += `</tbody></table>`;
+      cont.innerHTML = html;
+      cont.querySelectorAll("td[contenteditable='true']").forEach(td => {
+        td.addEventListener("input", e => {
           const fila = e.target.dataset.feature;
           const attr = e.target.dataset.attr;
-          let valor = e.target.textContent.trim();
-
-          if (attr === "LATITUD" || attr === "LONGITUD") {
-            const num = parseFloat(valor);
-            if (!isNaN(num)) {
-              if (!geojsonData.features[fila].geometry)
-                geojsonData.features[fila].geometry = { type: "Point", coordinates: [0, 0] };
-              const coords = geojsonData.features[fila].geometry.coordinates;
-              if (attr === "LATITUD") coords[1] = num;
-              else coords[0] = num;
-              geojsonData.features[fila].geometry.coordinates = coords;
-              geojsonData.features[fila].properties[attr] = num;
-            }
-          } else {
-            geojsonData.features[fila].properties[attr] = valor.toUpperCase();
-            e.target.textContent = valor.toUpperCase();
-          }
+          const valor = e.target.textContent.trim().toUpperCase();
+          geojsonData.features[fila].properties[attr] = valor;
         });
       });
     }
 
     function mostrarMapa(data) {
       if (geojsonLayer) map.removeLayer(geojsonLayer);
-
       geojsonLayer = L.geoJSON(data, {
-        onEachFeature: (feature, layer) => {
-          let contenido = "";
-          for (const [key, val] of Object.entries(feature.properties))
-            contenido += `<strong>${key}:</strong> ${val}<br>`;
-          layer.bindPopup(contenido);
+        onEachFeature: (f, layer) => {
+          let popup = "";
+          for (let k in f.properties) popup += `<strong>${k}</strong>: ${f.properties[k]}<br>`;
+          layer.bindPopup(popup);
         },
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
-          radius: 6, fillColor: "#0074D9", color: "#000", weight: 1,
-          opacity: 1, fillOpacity: 0.8
-        })
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#0074D9", color: "#000", weight: 1, opacity: 1, fillOpacity: 0.8 })
       }).addTo(map);
-
       try { map.fitBounds(geojsonLayer.getBounds()); } catch { map.setView([0, 0], 2); }
     }
 
-    function filtrarDatos() {
-      const campo = document.getElementById('filterField').value;
-      const texto = document.getElementById('searchInput').value.trim().toLowerCase();
-      if (!texto) {
-        mostrarTabla(geojsonData);
-        mostrarMapa(geojsonData);
-        return;
-      }
-      const filtrados = geojsonData.features.filter(f => {
-        return String(f.properties[campo] || "").toLowerCase().includes(texto);
-      });
-      mostrarTabla({ features: filtrados });
-      mostrarMapa({ features: filtrados, type: "FeatureCollection" });
-    }
-
-    document.getElementById('searchInput').addEventListener('input', filtrarDatos);
-    document.getElementById('filterField').addEventListener('change', filtrarDatos);
-
-    document.getElementById('addForm').addEventListener('submit', e => {
+    document.getElementById("addForm").addEventListener("submit", e => {
       e.preventDefault();
-      const nombre = document.getElementById('newNombre').value;
-      const codigo = document.getElementById('newCodigo').value;
-      const lat = parseFloat(document.getElementById('newLat').value);
-      const lng = parseFloat(document.getElementById('newLng').value);
-      const telefono = document.getElementById('newTelefono').value;
-      const direccion = document.getElementById('newDireccion').value;
-      const horario = document.getElementById('newHorario').value;
-      const lugar = document.getElementById('newLugar').value;
-
-      if (isNaN(lat) || isNaN(lng)) {
-        alert("Latitud y longitud deben ser válidas.");
-        return;
-      }
-
-      const nueva = {
-        type: "Feature",
-        properties: {
-          NOMBRE: nombre.toUpperCase(),
-          CODIGO: codigo.toUpperCase(),
-          LATITUD: lat,
-          LONGITUD: lng,
-          TELEFONO: telefono.toUpperCase(),
-          DIRECCION: direccion.toUpperCase(),
-          HORARIO: horario.toUpperCase(),
-          LUGAR: lugar.toUpperCase()
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [lng, lat]
-        }
-      };
-
+      const nueva = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
+      campos.forEach(c => {
+        const val = document.getElementById(c.replace(/ /g,"_")).value.trim().toUpperCase();
+        nueva.properties[c] = val;
+        if (c === "LATITUD") nueva.geometry.coordinates[1] = parseFloat(val);
+        if (c === "LONGITUD") nueva.geometry.coordinates[0] = parseFloat(val);
+      });
       geojsonData.features.push(nueva);
       mostrarTabla(geojsonData);
       mostrarMapa(geojsonData);
       e.target.reset();
     });
 
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData, null, 2));
-      const dl = document.createElement('a');
-      dl.setAttribute("href", dataStr);
-      dl.setAttribute("download", "BASE_DATOS_TRANSPORTE_2025_editado.geojson");
-      document.body.appendChild(dl);
-      dl.click();
-      document.body.removeChild(dl);
+    document.getElementById("searchInput").addEventListener("input", () => {
+      const campo = document.getElementById("filterField").value;
+      const texto = document.getElementById("searchInput").value.trim().toLowerCase();
+      const filtrados = geojsonData.features.filter(f => (f.properties[campo] || "").toLowerCase().includes(texto));
+      mostrarTabla({ features: filtrados });
+      mostrarMapa({ type: "FeatureCollection", features: filtrados });
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "BASE_DATOS_TRANSPORTE_2025_EDITADO.geojson";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
   </script>
 </body>
 </html>
+
