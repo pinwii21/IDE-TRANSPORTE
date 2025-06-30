@@ -1,190 +1,195 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>Editor de GeoJSON de Personas</title>
+  <meta charset="UTF-8" />
+  <title>Editor de GeoJSON de Personas</title>
 
-    <!-- Estilos -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-        h1 {
-            font-size: 24px;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 15px;
-        }
+    h1 {
+      font-size: 24px;
+    }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
 
-        td[contenteditable="true"] {
-            background-color: #f0f8ff;
-        }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
 
-        #map {
-            height: 400px;
-            margin-top: 20px;
-        }
+    td[contenteditable="true"] {
+      background-color: #f0f8ff;
+    }
 
-        input[type="text"] {
-            padding: 6px;
-            margin: 10px 0;
-            width: 250px;
-        }
+    #map {
+      height: 400px;
+      margin-top: 20px;
+    }
 
-        button {
-            padding: 6px 12px;
-            margin: 5px;
-        }
-    </style>
+    input[type="text"] {
+      padding: 6px;
+      margin: 10px 0;
+      width: 250px;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 5px 10px 5px 0;
+    }
+  </style>
 </head>
 <body>
-    <h1>Editor GeoJSON de Personas</h1>
+  <h1>Editor GeoJSON de Personas</h1>
 
-    <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
-    <button id="downloadBtn">Descargar GeoJSON</button>
+  <input type="text" id="searchInput" placeholder="Buscar por código o nombre..." />
+  <button id="downloadBtn">Descargar GeoJSON</button>
 
-    <div id="map"></div>
-    <div id="tableContainer"></div>
+  <div id="map"></div>
+  <div id="tableContainer"></div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    let geojsonData = null;
+    let map = L.map('map').setView([0, 0], 2);
+    let geojsonLayer = null;
 
-    <script>
-        let geojsonData = null;
-        let map = L.map('map').setView([0, 0], 2);
-        let geojsonLayer = null;
+    // Mapa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        // Mapa base
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+    // Cargar archivo desde GitHub automáticamente
+    window.addEventListener('DOMContentLoaded', () => {
+      const url = "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson";
 
-        // Cargar desde GitHub automáticamente
-        window.addEventListener('DOMContentLoaded', () => {
-            const url = "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson";
+      fetch(url)
+        .then(response => {
+          if (!response.ok) throw new Error("No se pudo cargar el archivo desde GitHub");
+          return response.json();
+        })
+        .then(data => {
+          geojsonData = data;
+          mostrarTabla(geojsonData);
+          mostrarMapa(geojsonData);
+        })
+        .catch(error => alert("Error al cargar GeoJSON: " + error));
+    });
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error("No se pudo cargar el archivo desde GitHub");
-                    return response.json();
-                })
-                .then(data => {
-                    geojsonData = data;
-                    mostrarTabla(geojsonData);
-                    mostrarMapa(geojsonData);
-                })
-                .catch(error => alert("Error al cargar GeoJSON: " + error));
+    // Mostrar tabla
+    function mostrarTabla(data) {
+      const contenedor = document.getElementById('tableContainer');
+      if (!data.features || data.features.length === 0) {
+        contenedor.innerHTML = "<p>No hay datos.</p>";
+        return;
+      }
+
+      const atributos = Object.keys(data.features[0].properties);
+      let html = "<table><thead><tr><th>#</th>";
+      atributos.forEach(attr => html += `<th>${attr}</th>`);
+      html += "</tr></thead><tbody>";
+
+      data.features.forEach((feature, i) => {
+        html += `<tr><td>${i + 1}</td>`;
+        atributos.forEach(attr => {
+          const valor = feature.properties[attr] ?? "";
+          html += `<td contenteditable="true" data-feature="${i}" data-attr="${attr}">${valor}</td>`;
         });
+        html += "</tr>";
+      });
 
-        // Mostrar tabla
-        function mostrarTabla(data) {
-            const contenedor = document.getElementById('tableContainer');
-            if (!data.features || data.features.length === 0) {
-                contenedor.innerHTML = "<p>No hay datos.</p>";
-                return;
-            }
+      html += "</tbody></table>";
+      contenedor.innerHTML = html;
 
-            const atributos = Object.keys(data.features[0].properties);
-            let html = "<table><thead><tr><th>#</th>";
-            atributos.forEach(attr => html += `<th>${attr}</th>`);
-            html += "</tr></thead><tbody>";
+      contenedor.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+        td.addEventListener('input', (e) => {
+          const fila = e.target.getAttribute('data-feature');
+          const atributo = e.target.getAttribute('data-attr');
+          geojsonData.features[fila].properties[atributo] = e.target.textContent;
+        });
+      });
+    }
 
-            data.features.forEach((feature, i) => {
-                html += `<tr><td>${i + 1}</td>`;
-                atributos.forEach(attr => {
-                    const valor = feature.properties[attr] ?? "";
-                    html += `<td contenteditable="true" data-feature="${i}" data-attr="${attr}">${valor}</td>`;
-                });
-                html += "</tr>";
-            });
+    // Mostrar mapa
+    function mostrarMapa(data) {
+      if (geojsonLayer) {
+        map.removeLayer(geojsonLayer);
+      }
 
-            html += "</tbody></table>";
-            contenedor.innerHTML = html;
-
-            contenedor.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-                td.addEventListener('input', (e) => {
-                    const fila = e.target.getAttribute('data-feature');
-                    const atributo = e.target.getAttribute('data-attr');
-                    geojsonData.features[fila].properties[atributo] = e.target.textContent;
-                });
-            });
+      geojsonLayer = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          let contenido = "";
+          for (const [key, value] of Object.entries(feature.properties)) {
+            contenido += `<strong>${key}:</strong> ${value}<br>`;
+          }
+          layer.bindPopup(contenido);
+        },
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 6,
+            fillColor: "#0074D9",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+          });
         }
+      }).addTo(map);
 
-        // Mostrar mapa
-        function mostrarMapa(data) {
-            if (geojsonLayer) {
-                map.removeLayer(geojsonLayer);
-            }
+      try {
+        map.fitBounds(geojsonLayer.getBounds());
+      } catch {
+        map.setView([0, 0], 2);
+      }
+    }
 
-            geojsonLayer = L.geoJSON(data, {
-                onEachFeature: function (feature, layer) {
-                    let contenido = "";
-                    for (const [key, value] of Object.entries(feature.properties)) {
-                        contenido += `<strong>${key}:</strong> ${value}<br>`;
-                    }
-                    layer.bindPopup(contenido);
-                },
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, {
-                        radius: 6,
-                        fillColor: "#0074D9",
-                        color: "#000",
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    });
-                }
-            }).addTo(map);
+    // Buscar por código o nombre
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const filtro = this.value.trim().toLowerCase();
+      if (!geojsonData || filtro === "") {
+        mostrarTabla(geojsonData);
+        mostrarMapa(geojsonData);
+        return;
+      }
 
-            try {
-                map.fitBounds(geojsonLayer.getBounds());
-            } catch {
-                map.setView([0, 0], 2);
-            }
-        }
+      const filtrados = geojsonData.features.filter(f => {
+        const props = f.properties;
+        const codigo = String(props.codigo || "").toLowerCase();
+        const nombre = String(props.nombre || "").toLowerCase();
+        return codigo.includes(filtro) || nombre.includes(filtro);
+      });
 
-        // Buscar personas
-        document.getElementById('searchInput').addEventListener('input', function () {
-            const filtro = this.value.toLowerCase();
-            if (!geojsonData) return;
+      mostrarTabla({ features: filtrados });
+      mostrarMapa({ features: filtrados, type: "FeatureCollection" });
+    });
 
-            const filtrados = geojsonData.features.filter(f =>
-                Object.values(f.properties).some(val =>
-                    String(val).toLowerCase().includes(filtro)
-                )
-            );
+    // Descargar archivo GeoJSON editado
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      if (!geojsonData) {
+        alert("No hay datos cargados.");
+        return;
+      }
 
-            mostrarTabla({ features: filtrados });
-            mostrarMapa({ features: filtrados, type: "FeatureCollection" });
-        });
-
-        // Descargar archivo
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            if (!geojsonData) {
-                alert("No hay datos cargados.");
-                return;
-            }
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", "personas_editado.geojson");
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            document.body.removeChild(dlAnchor);
-        });
-    </script>
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", "BASE_DATOS_TRANSPORTE_2025_editado.geojson");
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      document.body.removeChild(dlAnchor);
+    });
+  </script>
 </body>
 </html>
+
