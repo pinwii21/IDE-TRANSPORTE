@@ -2,20 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Editor de GeoJSON</title>
+    <title>Editor y Mapa GeoJSON</title>
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 400px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Editor de GeoJSON de Personas</h1>
+    <h1>Editor GeoJSON de Personas</h1>
     <input type="file" id="fileInput" accept=".geojson,.json" />
+    <div id="map"></div>
     <div id="tableContainer"></div>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const tableContainer = document.getElementById('tableContainer');
         let geojsonData = null;
+        let map = L.map('map').setView([0, 0], 2); // Vista global inicial
+        let geojsonLayer = null;
 
-        fileInput.addEventListener('change', (event) => {
+        // Añadir mapa base
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Manejo de archivo
+        document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -24,22 +43,23 @@
                 try {
                     geojsonData = JSON.parse(e.target.result);
                     mostrarTabla(geojsonData);
+                    mostrarMapa(geojsonData);
                 } catch (error) {
-                    alert("Archivo no es un GeoJSON válido");
+                    alert("Archivo no válido.");
                 }
             };
             reader.readAsText(file);
         });
 
         function mostrarTabla(data) {
+            const contenedor = document.getElementById('tableContainer');
             if (!data.features || data.features.length === 0) {
-                tableContainer.innerHTML = "<p>No se encontraron features en el GeoJSON.</p>";
+                contenedor.innerHTML = "<p>No hay datos.</p>";
                 return;
             }
 
             const atributos = Object.keys(data.features[0].properties);
-            let html = "<table><thead><tr>";
-            html += "<th>#</th>";
+            let html = "<table><thead><tr><th>#</th>";
             atributos.forEach(attr => html += `<th>${attr}</th>`);
             html += "</tr></thead><tbody>";
 
@@ -53,15 +73,47 @@
             });
 
             html += "</tbody></table>";
-            tableContainer.innerHTML = html;
+            contenedor.innerHTML = html;
 
-            tableContainer.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+            contenedor.querySelectorAll('td[contenteditable="true"]').forEach(td => {
                 td.addEventListener('input', (e) => {
                     const fila = e.target.getAttribute('data-feature');
                     const atributo = e.target.getAttribute('data-attr');
                     geojsonData.features[fila].properties[atributo] = e.target.textContent;
                 });
             });
+        }
+
+        function mostrarMapa(data) {
+            if (geojsonLayer) {
+                map.removeLayer(geojsonLayer);
+            }
+
+            geojsonLayer = L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    let contenido = "";
+                    for (const [key, value] of Object.entries(feature.properties)) {
+                        contenido += `<strong>${key}:</strong> ${value}<br>`;
+                    }
+                    layer.bindPopup(contenido);
+                },
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 6,
+                        fillColor: "#0074D9",
+                        color: "#000",
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    });
+                }
+            }).addTo(map);
+
+            try {
+                map.fitBounds(geojsonLayer.getBounds());
+            } catch {
+                map.setView([0, 0], 2);
+            }
         }
     </script>
 </body>
