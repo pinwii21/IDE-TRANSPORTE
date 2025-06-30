@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Editor de GeoJSON</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>Editor de GeoJSON de Personas</h1>
+    <input type="file" id="fileInput" accept=".geojson,.json" />
+    <div id="tableContainer"></div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const tableContainer = document.getElementById('tableContainer');
+        let geojsonData = null;
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    geojsonData = JSON.parse(e.target.result);
+                    mostrarTabla(geojsonData);
+                } catch (error) {
+                    alert("Archivo no es un GeoJSON válido");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function mostrarTabla(data) {
+            if (!data.features || data.features.length === 0) {
+                tableContainer.innerHTML = "<p>No se encontraron features en el GeoJSON.</p>";
+                return;
+            }
+
+            const atributos = Object.keys(data.features[0].properties);
+            let html = "<table><thead><tr>";
+            html += "<th>#</th>";
+            atributos.forEach(attr => html += `<th>${attr}</th>`);
+            html += "</tr></thead><tbody>";
+
+            data.features.forEach((feature, i) => {
+                html += `<tr><td>${i + 1}</td>`;
+                atributos.forEach(attr => {
+                    const valor = feature.properties[attr] ?? "";
+                    html += `<td contenteditable="true" data-feature="${i}" data-attr="${attr}">${valor}</td>`;
+                });
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+            tableContainer.innerHTML = html;
+
+            tableContainer.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+                td.addEventListener('input', (e) => {
+                    const fila = e.target.getAttribute('data-feature');
+                    const atributo = e.target.getAttribute('data-attr');
+                    geojsonData.features[fila].properties[atributo] = e.target.textContent;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
