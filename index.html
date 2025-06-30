@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Editor de GeoJSON de Personas - Filtro Mejorado</title>
+  <title>Editor de GeoJSON de Personas - Añadir y Filtrar</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -13,8 +13,26 @@
       margin: 20px;
     }
 
-    h1 {
-      font-size: 24px;
+    h1, h2 {
+      font-weight: 600;
+    }
+
+    form label {
+      margin-right: 15px;
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"], input[type="number"], select {
+      padding: 5px;
+      margin-left: 5px;
+      width: 150px;
+    }
+
+    form button {
+      padding: 6px 15px;
+      margin-left: 10px;
+      vertical-align: bottom;
     }
 
     table {
@@ -38,31 +56,42 @@
       margin-top: 20px;
     }
 
-    input[type="text"], select {
-      padding: 6px;
-      margin: 10px 10px 10px 0;
-      width: 180px;
-    }
-
-    button {
-      padding: 6px 12px;
-      margin: 10px 0 10px 0;
+    #controls {
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
   <h1>Editor GeoJSON de Personas</h1>
 
-  <label for="filterField">Filtrar por:</label>
-  <select id="filterField">
-    <option value="CODIGO">Código</option>
-    <option value="NOMBRE" selected>Nombre</option>
-    <!-- Puedes agregar más campos aquí -->
-  </select>
+  <h2>Agregar nuevo personal</h2>
+  <form id="addForm">
+    <label for="newCodigo">Código:
+      <input type="text" id="newCodigo" required />
+    </label>
+    <label for="newNombre">Nombre:
+      <input type="text" id="newNombre" required />
+    </label>
+    <label for="newLat">Latitud:
+      <input type="number" step="any" id="newLat" required />
+    </label>
+    <label for="newLng">Longitud:
+      <input type="number" step="any" id="newLng" required />
+    </label>
+    <button type="submit">Agregar</button>
+  </form>
 
-  <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
+  <div id="controls">
+    <label for="filterField">Filtrar por:</label>
+    <select id="filterField">
+      <option value="codigo">Código</option>
+      <option value="nombre" selected>Nombre</option>
+    </select>
 
-  <button id="downloadBtn">Descargar GeoJSON</button>
+    <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
+
+    <button id="downloadBtn">Descargar GeoJSON</button>
+  </div>
 
   <div id="map"></div>
   <div id="tableContainer"></div>
@@ -94,7 +123,7 @@
         .catch(error => alert("Error al cargar GeoJSON: " + error));
     });
 
-    // Mostrar tabla
+    // Mostrar tabla editable
     function mostrarTabla(data) {
       const contenedor = document.getElementById('tableContainer');
       if (!data.features || data.features.length === 0) {
@@ -128,7 +157,7 @@
       });
     }
 
-    // Mostrar mapa
+    // Mostrar mapa con puntos
     function mostrarMapa(data) {
       if (geojsonLayer) {
         map.removeLayer(geojsonLayer);
@@ -161,7 +190,7 @@
       }
     }
 
-    // Filtrar datos
+    // Función para filtrar datos según campo y texto
     function filtrarDatos() {
       const campo = document.getElementById('filterField').value;
       const filtro = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -181,8 +210,45 @@
       mostrarMapa({ features: filtrados, type: "FeatureCollection" });
     }
 
+    // Eventos para filtro
     document.getElementById('searchInput').addEventListener('input', filtrarDatos);
     document.getElementById('filterField').addEventListener('change', filtrarDatos);
+
+    // Evento para añadir nuevo personal
+    document.getElementById('addForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const codigo = document.getElementById('newCodigo').value.trim();
+      const nombre = document.getElementById('newNombre').value.trim();
+      const lat = parseFloat(document.getElementById('newLat').value);
+      const lng = parseFloat(document.getElementById('newLng').value);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        alert("Latitud y longitud deben ser números válidos.");
+        return;
+      }
+
+      const nuevaFeature = {
+        type: "Feature",
+        properties: {
+          codigo: codigo,
+          nombre: nombre
+          // Aquí puedes añadir más atributos si deseas
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [lng, lat]
+        }
+      };
+
+      geojsonData.features.push(nuevaFeature);
+
+      // Actualizar tabla y mapa con el nuevo dato
+      mostrarTabla(geojsonData);
+      mostrarMapa(geojsonData);
+
+      this.reset();
+    });
 
     // Descargar archivo GeoJSON editado
     document.getElementById('downloadBtn').addEventListener('click', () => {
