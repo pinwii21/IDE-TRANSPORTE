@@ -1,5 +1,3 @@
-// app.js
-
 // 1. Configuración de usuarios y campos
 const usuarios = {
   admin: "1234",
@@ -12,7 +10,9 @@ const campos = [
 ];
 
 // 2. Variables globales
-let geojsonData = null;
+let geojsonData = null;      // Personal
+let rutasLayer = null;       // Rutas
+let capasOverlay = {};       // Para compatibilidad con la lógica de rutas
 let usuarioLogueado = false;
 let geojsonLayer = null;
 
@@ -22,8 +22,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 4. Cargar GeoJSON de personal desde GitHub
-fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
+// 4. Cargar personal (entrada)
+fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/entrada/index.json')
   .then(res => res.json())
   .then(data => {
     data.features.forEach((f, i) => f._id = i);
@@ -33,9 +33,51 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     mostrarMapa(data);
     centrarMapa(data);
     actualizarListaPersonas(data.features);
+    document.getElementById('addForm').style.display = usuarioLogueado ? 'block' : 'none';
   });
 
-// 5. Crear formulario de alta
+// 5. Cargar rutas (salida)
+fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/salida/index.json')
+  .then(res => res.json())
+  .then(data => {
+    rutasLayer = L.geoJSON(data, {
+      style: {
+        color: "#009944",
+        weight: 4,
+        opacity: 0.7
+      }
+    }).addTo(map);
+    capasOverlay['rutas'] = rutasLayer;
+  });
+
+// 6. Login/logout
+document.getElementById('loginBtn').onclick = function() {
+  const user = document.getElementById('usuario').value.trim();
+  const pass = document.getElementById('clave').value.trim();
+  if (usuarios[user] && usuarios[user] === pass) {
+    usuarioLogueado = true;
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = '';
+    document.getElementById('usuario').disabled = true;
+    document.getElementById('clave').disabled = true;
+    document.getElementById('addForm').style.display = 'block';
+    mostrarTabla(geojsonData); // hacer la tabla editable
+  } else {
+    alert('Usuario o clave incorrectos');
+  }
+};
+
+document.getElementById('logoutBtn').onclick = function() {
+  usuarioLogueado = false;
+  document.getElementById('loginBtn').style.display = '';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('usuario').disabled = false;
+  document.getElementById('clave').disabled = false;
+  document.getElementById('addForm').style.display = 'none';
+  mostrarTabla(geojsonData); // deshabilitar edición
+};
+
+// 7. Crear formulario de alta
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -51,7 +93,7 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. Mostrar tabla editable
+// 8. Mostrar tabla editable
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -75,7 +117,7 @@ function mostrarTabla(data) {
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 7. Asignar edición en celdas
+// 9. Asignar edición en celdas
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -99,7 +141,7 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. Mostrar puntos en el mapa
+// 10. Mostrar puntos en el mapa
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -121,7 +163,7 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 9. Centrar el mapa según datos
+// 11. Centrar el mapa según datos
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -131,7 +173,7 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. Filtrar datos
+// 12. Filtrar datos
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -148,7 +190,7 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados); // ← actualizar el select también
 }
 
-// 11. Lista desplegable de personas
+// 13. Lista desplegable de personas
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -164,7 +206,7 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. Buscar y mostrar ruta más cercana al clickar en "Calcular"
+// 14. Buscar y mostrar ruta más cercana al clickar en "Calcular"
 document.getElementById("findRouteBtn").addEventListener("click", () => {
   const select = document.getElementById("personSelect");
   const selectedId = parseInt(select.value);
@@ -178,24 +220,21 @@ document.getElementById("findRouteBtn").addEventListener("click", () => {
   let distanciaMinima = Infinity;
   let rutaMasCercana = null;
 
-  Object.values(capasOverlay).forEach(grupo => {
-    grupo.eachLayer(layer => {
-      if (layer instanceof L.GeoJSON) {
-        layer.eachLayer(featureLayer => {
-          if (featureLayer.getLatLngs) {
-            const coords = featureLayer.getLatLngs().flat();
-            coords.forEach(coord => {
-              const d = punto.distanceTo(coord);
-              if (d < distanciaMinima) {
-                distanciaMinima = d;
-                rutaMasCercana = featureLayer;
-              }
-            });
+  // Recorrer todas las rutas cargadas
+  if (capasOverlay['rutas']) {
+    capasOverlay['rutas'].eachLayer(featureLayer => {
+      if (typeof featureLayer.getLatLngs === 'function') {
+        const coords = featureLayer.getLatLngs().flat();
+        coords.forEach(coord => {
+          const d = punto.distanceTo(coord);
+          if (d < distanciaMinima) {
+            distanciaMinima = d;
+            rutaMasCercana = featureLayer;
           }
         });
       }
     });
-  });
+  }
 
   if (rutaMasCercana) {
     rutaMasCercana.setStyle({ color: "#ff9900", weight: 6 });
@@ -206,3 +245,24 @@ document.getElementById("findRouteBtn").addEventListener("click", () => {
   }
 });
 
+// 15. Agregar personal
+document.getElementById('addForm').onsubmit = function(e) {
+  e.preventDefault();
+  const nuevo = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
+  campos.forEach(campo => {
+    const val = document.getElementById(campo).value.trim().toUpperCase();
+    nuevo.properties[campo] = val;
+  });
+  const lat = parseFloat(nuevo.properties["LATITUD"]);
+  const lng = parseFloat(nuevo.properties["LONGITUD"]);
+  if (!isNaN(lat) && !isNaN(lng)) {
+    nuevo.geometry.coordinates = [lng, lat];
+  }
+  nuevo._id = geojsonData.features.length;
+  geojsonData.features.push(nuevo);
+  mostrarTabla(geojsonData);
+  mostrarMapa(geojsonData);
+  centrarMapa(geojsonData);
+  actualizarListaPersonas(geojsonData.features);
+  this.reset();
+};
