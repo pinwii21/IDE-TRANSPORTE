@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Editor GeoJSON de Personal</title>
+  <title>IDE TRANSPORTE PERSONA</title>
   <!-- Carga estilos y librería Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -46,12 +46,18 @@
     h2 {
       color: #2c3e50;
     }
-    form {
+    details {
       background: #ffffff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+    }
+    details summary {
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
     }
     form label {
       display: block;
@@ -149,7 +155,14 @@
     </nav>
   </header>
   <main>
-  <h1>Editor GeoJSON de Personal</h1>
+    <!-- Sección de formulario desplegable -->
+    <details open>
+      <summary><i class="fas fa-user-plus"></i> Agregar nuevo personal</summary>
+      <form id="addForm">
+        <!-- Los campos del formulario van aquí -->
+      </form>
+    </details>
+
 
   <!-- Formulario para añadir nuevo personal -->
   <form id="addForm">
