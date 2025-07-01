@@ -12,6 +12,9 @@
       --accent-color: #27ae60;
       --light-bg: #f4f6f8;
       --form-bg: #ffffff;
+      --table-header-bg: #34495e;
+      --table-row-hover: #eaeaea;
+      --editable-bg: #fefbd8;
     }
 
     body {
@@ -20,6 +23,9 @@
       padding: 0;
       background-color: var(--light-bg);
       color: var(--main-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
@@ -27,6 +33,7 @@
       color: white;
       padding: 20px;
       text-align: center;
+      flex-shrink: 0;
     }
 
     header h1 {
@@ -36,22 +43,77 @@
 
     .container {
       max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-      display: grid;
+      margin: 20px auto;
+      padding: 0 15px;
+      display: flex;
       gap: 20px;
+      flex-wrap: wrap;
+      flex-grow: 1;
+      min-height: 0;
     }
 
+    /* Mapa y tabla lado a lado */
+    #map {
+      flex: 0 0 55%;
+      height: 600px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    #tabla {
+      flex: 0 0 43%;
+      max-height: 600px;
+      overflow: auto;
+      background: var(--form-bg);
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      padding: 10px;
+    }
+
+    /* Tabla */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 700px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: var(--table-header-bg);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tr:hover {
+      background-color: var(--table-row-hover);
+    }
+
+    td[contenteditable="true"] {
+      background-color: var(--editable-bg);
+      cursor: text;
+    }
+
+    /* Formularios y controles */
     .card {
       background: var(--form-bg);
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
     }
 
     label {
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 600;
+      margin-bottom: 6px;
       display: block;
     }
 
@@ -62,18 +124,23 @@
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
 
     button {
       background-color: var(--accent-color);
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-      transition: background 0.2s;
+      font-weight: 700;
+      font-size: 14px;
+      transition: background-color 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     button:hover {
@@ -84,55 +151,71 @@
       background-color: #c0392b;
     }
 
-    #map {
-      height: 500px;
-      border-radius: 10px;
-      overflow: hidden;
+    .btn-danger:hover {
+      background-color: #962d22;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      text-align: left;
-    }
-
-    th {
-      background-color: var(--main-color);
-      color: white;
-    }
-
-    td[contenteditable="true"] {
-      background-color: #fefbd8;
-      outline: none;
-    }
-
-    #controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
+    /* Login section */
+    #loginSection {
+      max-width: 420px;
+      margin: 0 auto 30px;
     }
 
     .form-inline {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
+      flex-wrap: wrap;
       align-items: center;
+      margin-top: 10px;
     }
 
-    .hidden {
-      display: none;
+    /* Controls (filter + download) */
+    #controls {
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      padding: 10px 15px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--form-bg);
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     }
 
-    @media (max-width: 768px) {
+    #filterField {
+      width: auto;
+      min-width: 150px;
+      font-size: 14px;
+    }
+
+    #searchInput {
+      flex: 1 1 auto;
+      min-width: 180px;
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+      }
+      #map, #tabla {
+        flex: 1 1 100%;
+        max-height: 400px;
+        height: 400px;
+      }
+      table {
+        min-width: 100%;
+      }
       #controls {
         flex-direction: column;
+        align-items: stretch;
+      }
+      #searchInput {
+        flex-grow: 1;
+        min-width: unset;
       }
     }
   </style>
@@ -143,35 +226,35 @@
     <h1><i class="fa-solid fa-map-location-dot"></i> Editor GeoJSON de Personal</h1>
   </header>
 
-  <div class="container">
-    <div class="card" id="loginSection">
-      <label>Usuario: <input type="text" id="usuario" /></label>
-      <label>Clave: <input type="password" id="clave" /></label>
-      <div class="form-inline">
-        <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</button>
-        <button id="logoutBtn" class="btn-danger hidden"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
-      </div>
+  <section id="loginSection" class="card">
+    <label>Usuario: <input type="text" id="usuario" autocomplete="username" /></label>
+    <label>Clave: <input type="password" id="clave" autocomplete="current-password" /></label>
+    <div class="form-inline">
+      <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</button>
+      <button id="logoutBtn" class="btn-danger" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
     </div>
+  </section>
 
-    <form id="addForm" class="card hidden">
-      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-      <div id="camposForm"></div>
-      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-    </form>
+  <form id="addForm" class="card" style="display:none">
+    <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+    <div id="camposForm"></div>
+    <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+  </form>
 
-    <div class="card" id="controls">
-      <label for="filterField">Filtrar por:</label>
-      <select id="filterField">
-        <option value="CODIGO">Código</option>
-        <option value="NOMBRE" selected>Nombre</option>
-      </select>
-      <input type="text" id="searchInput" placeholder="Buscar..." />
-      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar GeoJSON</button>
-    </div>
+  <section id="controls">
+    <label for="filterField">Filtrar por:</label>
+    <select id="filterField">
+      <option value="CODIGO">Código</option>
+      <option value="NOMBRE" selected>Nombre</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Buscar..." />
+    <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar GeoJSON</button>
+  </section>
 
-    <div id="map" class="card"></div>
-    <div id="tabla" class="card"></div>
-  </div>
+  <main class="container" style="flex-grow:1; min-height:600px;">
+    <div id="map"></div>
+    <div id="tabla"></div>
+  </main>
 
   <script>
     const usuarios = {
@@ -208,10 +291,10 @@
       const clave = document.getElementById("clave").value.trim();
       if (usuarios[usuario] && usuarios[usuario] === clave) {
         usuarioLogueado = true;
-        document.getElementById("addForm").classList.remove("hidden");
-        document.getElementById("logoutBtn").classList.remove("hidden");
+        document.getElementById("addForm").style.display = "block";
+        document.getElementById("logoutBtn").style.display = "inline-block";
         alert("¡Bienvenido!");
-        mostrarTabla(geojsonData); // Refrescar tabla con edición habilitada
+        mostrarTabla(geojsonData);
       } else {
         alert("Credenciales incorrectas");
       }
@@ -225,7 +308,7 @@
       const cont = document.getElementById("camposForm");
       cont.innerHTML = "";
       campos.forEach(campo => {
-        cont.innerHTML += `<label>${campo.replace(/_/g, " ")}: <input type="text" id="${campo}" /></label>`;
+        cont.innerHTML += `<label>${campo.replace(/_/g, " ")}: <input type="text" id="${campo}" autocomplete="off" /></label>`;
       });
     }
 
@@ -253,17 +336,13 @@
       }
     }
 
-    // Función para asignar listeners a celdas editables y actualizar mapa
     function asignarEventosEdicion(){
       const tdsEditables = document.querySelectorAll('td[contenteditable="true"]');
-      // Limpiar listeners anteriores para evitar duplicados (opcional)
       tdsEditables.forEach(td => {
-        td.oninput = null;
+        td.oninput = null; // eliminar si había
       });
 
-      // Debounce para evitar actualizaciones excesivas del mapa
       let timeoutId = null;
-
       tdsEditables.forEach(td => {
         td.addEventListener('input', () => {
           const fila = td.dataset.feature;
@@ -283,7 +362,7 @@
             if(timeoutId) clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
               mostrarMapa(geojsonData);
-            }, 300); // actualiza mapa 300ms después de dejar de escribir
+            }, 300);
           }
         });
       });
@@ -365,3 +444,4 @@
 
 </body>
 </html>
+
