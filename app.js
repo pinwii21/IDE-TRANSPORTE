@@ -55,21 +55,21 @@ function crearCamposFormulario() {
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
-  let html = <table><thead><tr><th>#</th>;
-  campos.forEach(c => html += <th>${c}</th>);
-  html += </tr></thead><tbody>;
+  let html = `<table><thead><tr><th>#</th>`;
+  campos.forEach(c => html += `<th>${c}</th>`);
+  html += `</tr></thead><tbody>`;
 
   data.features.forEach((f, i) => {
-    html += <tr><td>${i+1}</td>;
+    html += `<tr><td>${i+1}</td>`;
     campos.forEach(campo => {
       let val = f.properties[campo] || '';
       if (campo === "LATITUD") val = f.geometry?.coordinates[1] || '';
       if (campo === "LONGITUD") val = f.geometry?.coordinates[0] || '';
-      html += <td ${usuarioLogueado ? 'contenteditable="true"' : ''} data-feature-id="${f._id}" data-attr="${campo}">${val}</td>;
+      html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ''} data-feature-id="${f._id}" data-attr="${campo}">${val}</td>`;
     });
-    html += </tr>;
+    html += `</tr>`;
   });
-  html += </tbody></table>;
+  html += `</tbody></table>`;
   cont.innerHTML = html;
 
   if (usuarioLogueado) asignarEventosEdicion();
@@ -114,7 +114,7 @@ function mostrarMapa(data) {
     onEachFeature: (f, layer) => {
       let popup = '';
       for (const k in f.properties) {
-        popup += <b>${k}:</b> ${f.properties[k]}<br>;
+        popup += `<b>${k}:</b> ${f.properties[k]}<br>`;
       }
       layer.bindPopup(popup);
     }
@@ -159,58 +159,9 @@ function actualizarListaPersonas(lista) {
     const value = f._id;
     const option = document.createElement("option");
     option.value = value;
-    option.textContent = ${nombre} (${codigo});
+    option.textContent = `${nombre} (${codigo})`;
     select.appendChild(option);
   });
-}
-// 13. Cargar capas de rutas desde carpetas con index.json
-const carpetas = [
-  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
-  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
-];
-
-const capasOverlay = {};
-
-async function cargarIndexYCapas() {
-  for (const { dir, name, color } of carpetas) {
-    try {
-      const indexUrl = https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json;
-      const idxRes = await fetch(indexUrl);
-      if (!idxRes.ok) throw new Error(No se pudo cargar: ${indexUrl});
-
-      const lista = await idxRes.json();
-      const grupo = L.layerGroup();
-
-      for (const fichero of lista) {
-        const geojsonUrl = https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero};
-        try {
-          const r = await fetch(geojsonUrl);
-          if (!r.ok) throw new Error(Error al cargar: ${geojsonUrl});
-          const data = await r.json();
-
-          L.geoJSON(data, {
-            style: { color, weight: 3 },
-            onEachFeature: (feature, layer) => {
-              let popup = <b>${fichero}</b><br>;
-              for (const k in feature.properties) {
-                popup += <b>${k}:</b> ${feature.properties[k]}<br>;
-              }
-              layer.bindPopup(popup);
-            }
-          }).addTo(grupo);
-        } catch (err) {
-          console.warn("GeoJSON inválido o no accesible:", err.message);
-        }
-      }
-
-      capasOverlay[name] = grupo;
-      grupo.addTo(map);
-    } catch (err) {
-      console.error(Error en carpeta ${dir}:, err.message);
-    }
-  }
-
-  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
 // 12. Buscar y mostrar ruta más cercana al clickar en "Calcular"
