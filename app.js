@@ -163,6 +163,55 @@ function actualizarListaPersonas(lista) {
     select.appendChild(option);
   });
 }
+// 13. Cargar capas de rutas desde carpetas con index.json
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
+];
+
+const capasOverlay = {};
+
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const idxRes = await fetch(indexUrl);
+      if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
+
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
+
+      for (const fichero of lista) {
+        const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+        try {
+          const r = await fetch(geojsonUrl);
+          if (!r.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
+          const data = await r.json();
+
+          L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          }).addTo(grupo);
+        } catch (err) {
+          console.warn("GeoJSON inválido o no accesible:", err.message);
+        }
+      }
+
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
+    } catch (err) {
+      console.error(`Error en carpeta ${dir}:`, err.message);
+    }
+  }
+
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+}
 
 // 12. Buscar y mostrar ruta más cercana al clickar en "Calcular"
 document.getElementById("findRouteBtn").addEventListener("click", () => {
