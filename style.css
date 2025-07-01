@@ -1,35 +1,267 @@
-#panelDerecho {
+
+:root {
+  --color-primario: #004d99;
+  --color-secundario: #007acc;
+  --color-fondo: #f8f9fa;
+  --color-texto: #212529;
+  --color-blanco: #fff;
+  --color-gris-claro: #e9ecef;
+  --color-gris-medio: #adb5bd;
+  --color-error: #dc3545;
+  --color-exito: #28a745;
+  --color-hover: #005bb5;
+  --borde-radio: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+body, html {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: var(--color-primario);
+  color: var(--color-blanco);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+header h1 {
+  font-weight: 700;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#loginForm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#loginForm input[type="text"],
+#loginForm input[type="password"] {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  width: 130px;
+}
+
+#loginForm button {
+  background-color: var(--color-secundario);
+  border: none;
+  color: var(--color-blanco);
+  padding: 7px 15px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+#loginForm button:hover {
+  background-color: var(--color-hover);
+}
+#logoutBtn {
+  background-color: var(--color-error);
+  display: none;
+}
+#logoutBtn:hover {
+  background-color: #a32429;
+}
+
+/* ----------- MAIN --------------- */
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 80px 20px 20px 20px;
+  gap: 20px;
+  overflow: hidden;
+}
+
+#mapTablaContainer {
+  display: flex;
+  gap: 20px;
   flex: 1;
+  min-height: 350px;
+}
+
+#map, #panelDerecho {
+  flex: 1;
+  border-radius: var(--borde-radio);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-height: 100%;
+}
+
+#map {
+  width: 100%;
+}
+
+#panelDerecho {
   display: flex;
   flex-direction: column;
   background: var(--color-blanco);
-  border-radius: var(--borde-radio);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  min-width: 320px;
-  overflow-y: hidden; /* Evita doble scroll */
+  overflow-y: auto;
 }
 
+#controles {
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--color-gris-claro);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#controles label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#filterField, #searchInput {
+  padding: 7px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--color-gris-medio);
+  border-radius: 6px;
+  flex-grow: 1;
+  max-width: 180px;
+  transition: border-color 0.3s ease;
+}
+#filterField:focus, #searchInput:focus {
+  border-color: var(--color-secundario);
+  outline: none;
+}
+
+#downloadBtn {
+  background-color: var(--color-secundario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+#downloadBtn:hover {
+  background-color: var(--color-hover);
+}
+
+/* Tabla */
 #tabla {
   flex-grow: 1;
   overflow-y: auto;
   padding: 10px 20px;
-  min-height: 0; /* Importante para que no colapse en flexbox */
+  min-height: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 700px;
+}
+thead tr {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+th, td {
+  padding: 10px 12px;
+  border: 1px solid var(--color-gris-claro);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+tbody tr:hover {
+  background-color: var(--color-fondo);
+}
+td[contenteditable="true"] {
+  background-color: #fffbea;
+  cursor: text;
 }
 
 /* FORMULARIO DE AGREGAR PERSONAL */
 #addForm {
-  max-height: 250px; /* Ajusta según necesidad */
-  overflow-y: auto;
-  flex-shrink: 0;
-  padding: 20px;
   background: var(--color-blanco);
-  border-top: 2px solid var(--color-secundario);
-  display: none;
-  border-radius: 0 0 var(--borde-radio) var(--borde-radio);
-  box-shadow: inset 0 10px 15px -10px rgba(0,0,0,0.1);
+  border-radius: var(--borde-radio);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  max-height: 350px;
+  overflow-y: auto;
 }
 
-/* Mejoras opcionales de scroll dentro del form */
+#addForm h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--color-primario);
+}
+
+#camposForm label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+#camposForm input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1px solid var(--color-gris-medio);
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+#camposForm input:focus {
+  outline: none;
+  border-color: var(--color-secundario);
+}
+
+#addForm button {
+  background-color: var(--color-secundario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+#addForm button:hover {
+  background-color: var(--color-hover);
+}
+
+/* Scrollbar para el formulario */
 #addForm::-webkit-scrollbar {
   width: 8px;
 }
@@ -38,3 +270,37 @@
   border-radius: 4px;
 }
 
+/* Responsive */
+@media (max-width: 900px) {
+  main {
+    padding: 80px 10px 10px 10px;
+  }
+  #mapTablaContainer {
+    flex-direction: column;
+    min-height: auto;
+    gap: 10px;
+  }
+  #map, #panelDerecho {
+    min-height: 300px;
+  }
+  #tabla table {
+    min-width: 100%;
+  }
+  #controles {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #filterField, #searchInput {
+    max-width: 100%;
+    flex-grow: 1;
+  }
+  #loginForm {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  #loginForm input {
+    width: 100px;
+    flex-grow: 1;
+  }
+}
