@@ -298,32 +298,51 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
   });
 
 // 16. Buscar y mostrar ruta más cercana bajo demanda
-document.getElementById('findRouteBtn').addEventListener('click', () => {
-  const id = document.getElementById('personSelect').value;
-  if (!id) return alert('Seleccione una persona');
+document.getElementById("findRouteBtn").addEventListener("click", () => {
+  const select = document.getElementById("personSelect");
+  const selectedId = parseInt(select.value);
 
-  const persona = geojsonData.features.find(f => f._id == id);
-  if (!persona?.geometry?.coordinates) return alert("La persona no tiene coordenadas");
+  if (isNaN(selectedId)) {
+    return alert("Selecciona una persona válida.");
+  }
 
-  const punto = turf.point(persona.geometry.coordinates);
-  let minDist = Infinity, selLayer = null;
+  const persona = geojsonData.features.find(f => f._id === selectedId);
+  if (!persona || !persona.geometry) {
+    return alert("No se encontró ubicación para esta persona.");
+  }
+
+  const [lng, lat] = persona.geometry.coordinates;
+  const punto = L.latLng(lat, lng);
+
+  // Buscar ruta más cercana
+  let distanciaMinima = Infinity;
+  let rutaMasCercana = null;
 
   Object.values(capasOverlay).forEach(grupo => {
     grupo.eachLayer(layer => {
-      if (!layer.feature?.geometry) return;
-      const dist = turf.pointToLineDistance(punto, layer.feature, { units: 'meters' });
-      if (dist < minDist) {
-        minDist = dist;
-        selLayer = layer;
+      if (layer instanceof L.GeoJSON) {
+        layer.eachLayer(featureLayer => {
+          if (featureLayer.getLatLngs) {
+            const coords = featureLayer.getLatLngs().flat();
+            coords.forEach(coord => {
+              const d = punto.distanceTo(coord);
+              if (d < distanciaMinima) {
+                distanciaMinima = d;
+                rutaMasCercana = featureLayer;
+              }
+            });
+          }
+        });
       }
     });
   });
 
-  if (selLayer) {
-    map.fitBounds(selLayer.getBounds(), { padding: [20, 20] });
-    selLayer.setStyle({ color: '#ff0000', weight: 5 });
-    setTimeout(() => selLayer.setStyle({ color: '#007acc', weight: 3 }), 5000);
+  if (rutaMasCercana) {
+    rutaMasCercana.setStyle({ color: "#ff9900", weight: 6 });
+    map.fitBounds(rutaMasCercana.getBounds(), { padding: [30, 30] });
+    alert("Ruta más cercana resaltada en naranja.");
   } else {
-    alert("No se encontró una ruta cercana.");
+    alert("No se encontró ninguna ruta cercana.");
   }
 });
+
