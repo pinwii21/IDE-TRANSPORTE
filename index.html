@@ -2,295 +2,227 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>IDE TRANSPORTE PERSONA</title>
-  <!-- Carga estilos y librería Leaflet -->
+  <title>Editor GeoJSON de Personal</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Estilos visuales mejorados para una interfaz profesional */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px;
       background-color: #f4f6f8;
       color: #333;
     }
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-    nav {
-      display: flex;
-      gap: 15px;
-    }
-    nav a {
-      color: #ecf0f1;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    main {
-      padding: 20px;
-    }
-    h2 {
+    h1, h2 {
       color: #2c3e50;
     }
-    details {
+    form, #controls {
       background: #ffffff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-    details summary {
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    form label {
+    label, input, select, button {
       display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
+      margin-bottom: 12px;
     }
-    form input, form select {
+    input, select {
       padding: 8px;
       width: 100%;
       max-width: 300px;
-      margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      text-transform: uppercase; /* Mantener mayúsculas */
     }
-    form button {
+    button {
       padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #loginSection {
+      margin-bottom: 20px;
+    }
+    #loginBtn {
       background-color: #2980b9;
       color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
     }
-    form button:hover {
-      background-color: #1f5f87;
-    }
-    #controls {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-    #controls select, #controls input {
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      text-transform: uppercase; /* Mayúsculas */
-    }
-    #controls button {
-      padding: 10px 20px;
-      background-color: #27ae60;
+    #logoutBtn {
+      background-color: #c0392b;
       color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    #controls button i {
-      font-size: 1rem;
-    }
-    #controls button:hover {
-      background-color: #1e8449;
+    #controls button, #downloadBtn {
+      background-color: #27ae60;
+      color: white;
     }
     table {
-      border-collapse: collapse;
       width: 100%;
-      background: #fff;
-      border-radius: 10px;
+      border-collapse: collapse;
+      background: white;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
     }
     th, td {
       padding: 12px;
       border-bottom: 1px solid #eaeaea;
-      text-align: left;
-      text-transform: uppercase; /* Tabla en mayúsculas */
     }
     th {
       background-color: #34495e;
-      color: #ecf0f1;
+      color: white;
     }
     td[contenteditable="true"] {
       background-color: #fefbd8;
     }
     #map {
       height: 500px;
-      border-radius: 10px;
       margin-top: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1><i class="fas fa-map-marker-alt"></i> Editor GeoJSON de Personal</h1>
-    <nav>
-      <a href="#addForm">Agregar</a>
-      <a href="#controls">Filtrar</a>
-      <a href="#map">Mapa</a>
-    </nav>
-  </header>
-  <main>
-    <!-- Sección de formulario desplegable -->
-    <details open>
-      <summary><i class="fas fa-user-plus"></i> Agregar nuevo personal</summary>
-      <form id="addForm">
-        <label>CODIGO: <input type="text" id="CODIGO" required /></label>
-        <label>NOMBRE: <input type="text" id="NOMBRE" required /></label>
-        <label>RUTA: <input type="text" id="RUTA" /></label>
-        <label>CEDULA: <input type="text" id="CEDULA" /></label>
-        <label>TELEFONO: <input type="text" id="TELEFONO" /></label>
-        <label>DISCAPACIDAD: <input type="text" id="DISCAPACIDAD" /></label>
-        <label>TIPO HORARIO: <input type="text" id="TIPO_HORARIO" /></label>
-        <label>CARGO: <input type="text" id="CARGO" /></label>
-        <label>AREA: <input type="text" id="AREA" /></label>
-        <label>MODALIDAD DE CONTRATO: <input type="text" id="MODALIDAD_DE_CONTRATO" /></label>
-        <label>DIRECCION: <input type="text" id="DIRECCION" /></label>
-        <label>HORARIO: <input type="text" id="HORARIO" /></label>
-        <label>LUGAR TRABAJO: <input type="text" id="LUGAR_TRABAJO" /></label>
-        <label>LONGITUD: <input type="number" step="any" id="LONGITUD" required /></label>
-        <label>LATITUD: <input type="number" step="any" id="LATITUD" required /></label>
-        <label>CONTRATO LUZ: <input type="text" id="CONTRATO_LUZ" /></label>
-        <label>TRANSPORTE: <input type="text" id="TRANSPORTE" /></label>
-        <button type="submit">Agregar</button>
-      </form>
-    </details>
 
-    <!-- Filtros y descarga -->
-    <div id="controls">
-      <label for="filterField">Filtrar por:</label>
-      <select id="filterField">
-        <option value="CODIGO">CODIGO</option>
-        <option value="NOMBRE" selected>NOMBRE</option>
-      </select>
-      <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
-      <button id="downloadBtn"><i class="fas fa-download"></i> Descargar GeoJSON</button>
-    </div>
+  <h1>Editor GeoJSON de Personal</h1>
 
-    <div id="map"></div>
-    <div id="tableContainer"></div>
-  </main>
+  <div id="loginSection">
+    <label>Usuario: <input type="text" id="usuario" /></label>
+    <label>Clave: <input type="password" id="clave" /></label>
+    <button id="loginBtn">Iniciar sesión</button>
+    <button id="logoutBtn" style="display:none">Cerrar sesión</button>
+  </div>
+
+  <form id="addForm" style="display:none">
+    <h2>Agregar nuevo personal</h2>
+    <div id="camposForm"></div>
+    <button type="submit">Agregar Personal</button>
+  </form>
+
+  <div id="controls">
+    <label for="filterField">Filtrar por:</label>
+    <select id="filterField">
+      <option value="CODIGO">Código</option>
+      <option value="NOMBRE" selected>Nombre</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Buscar..." />
+    <button id="downloadBtn">Descargar GeoJSON</button>
+  </div>
+
+  <div id="map"></div>
+  <div id="tabla"></div>
 
   <script>
-    // Campos tal cual definidos (en mayúsculas y con guiones bajos donde corresponda)
+    const usuarios = {
+      admin: "1234",
+      kevin: "admin2025"
+    };
+
     const campos = [
-      "CODIGO","NOMBRE","RUTA","CEDULA","TELEFONO","DISCAPACIDAD",
-      "TIPO_HORARIO","CARGO","AREA","MODALIDAD_DE_CONTRATO","DIRECCION",
-      "HORARIO","LUGAR_TRABAJO","LONGITUD","LATITUD","CONTRATO_LUZ","TRANSPORTE"
+      "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
+      "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
+      "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
     ];
-    let geojsonData = { type: "FeatureCollection", features: [] };
 
-    // Inicializa mapa Leaflet
-    let map = L.map('map').setView([0, 0], 2);
-    let geojsonLayer = null;
+    let geojsonData = null;
+    let usuarioLogueado = false;
+    let map = L.map("map").setView([0, 0], 2);
+    let geojsonLayer;
 
-    // Añade capa base
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
     }).addTo(map);
 
-    // Carga GeoJSON desde GitHub
+    // Cargar datos desde GitHub
     fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
       .then(r => r.json())
       .then(data => {
         geojsonData = data;
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
+        crearCamposFormulario();
       });
 
-    // Construye tabla editable
-    function mostrarTabla(data) {
-      const cont = document.getElementById("tableContainer");
-      let html = `<table><thead><tr><th>#</th>`;
+    // Login básico
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const usuario = document.getElementById("usuario").value.trim();
+      const clave = document.getElementById("clave").value.trim();
+      if (usuarios[usuario] && usuarios[usuario] === clave) {
+        usuarioLogueado = true;
+        document.getElementById("addForm").style.display = "block";
+        document.getElementById("logoutBtn").style.display = "inline-block";
+        alert("¡Bienvenido!");
+      } else {
+        alert("Credenciales incorrectas");
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      location.reload();
+    });
+
+    // Crear formulario dinámico
+    function crearCamposFormulario() {
+      const cont = document.getElementById("camposForm");
+      cont.innerHTML = "";
       campos.forEach(campo => {
-        // Mostrar con espacios en lugar de guiones bajos para el encabezado
-        let header = campo.replace(/_/g, " ");
-        html += `<th>${header}</th>`;
+        cont.innerHTML += `<label>${campo.replace(/_/g, " ")}: <input type="text" id="${campo}" /></label>`;
       });
-      html += `</tr></thead><tbody>`;
+    }
 
+    // Mostrar tabla editable
+    function mostrarTabla(data) {
+      const cont = document.getElementById("tabla");
+      if (!data.features) return;
+      let html = `<table><thead><tr><th>#</th>`;
+      campos.forEach(c => html += `<th>${c}</th>`);
+      html += `</tr></thead><tbody>`;
       data.features.forEach((f, i) => {
         html += `<tr><td>${i + 1}</td>`;
         campos.forEach(campo => {
-          const valor = f.properties[campo] || "";
-          html += `<td contenteditable="true" data-feature="${i}" data-attr="${campo}">${valor}</td>`;
+          let valor = f.properties[campo] || "";
+          if (campo === "LATITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[1];
+          if (campo === "LONGITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[0];
+          html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ""} data-feature="${i}" data-attr="${campo}">${valor}</td>`;
         });
         html += `</tr>`;
       });
       html += `</tbody></table>`;
       cont.innerHTML = html;
 
-      // Evento para editar directamente en tabla
-      cont.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-        td.addEventListener('input', e => {
-          const fila = e.target.dataset.feature;
-          const attr = e.target.dataset.attr;
-          let valor = e.target.textContent.trim().toUpperCase();
-          geojsonData.features[fila].properties[attr] = valor;
+      if(usuarioLogueado){
+        document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+          td.addEventListener('input', e => {
+            const fila = td.dataset.feature;
+            const campo = td.dataset.attr;
+            const valor = td.textContent.trim().toUpperCase();
+            geojsonData.features[fila].properties[campo] = valor;
 
-          // Actualizar geometría si es LATITUD o LONGITUD
-          if(attr === "LATITUD" || attr === "LONGITUD"){
-            let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
-            let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
-            geojsonData.features[fila].geometry = {
-              type: "Point",
-              coordinates: [lng, lat]
-            };
-            // Actualizar marcador en el mapa
-            mostrarMapa(geojsonData);
-          }
+            if(campo === "LATITUD" || campo === "LONGITUD"){
+              let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
+              let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
+              geojsonData.features[fila].geometry = {
+                type: "Point",
+                coordinates: [lng, lat]
+              };
+              mostrarMapa(geojsonData);
+            }
+          });
         });
-      });
+      }
     }
 
-    // Mostrar puntos en el mapa con popup
+    // Mostrar mapa
     function mostrarMapa(data) {
-      if (geojsonLayer) {
-        map.removeLayer(geojsonLayer);
-      }
+      if(geojsonLayer) map.removeLayer(geojsonLayer);
       geojsonLayer = L.geoJSON(data, {
-        onEachFeature: (feature, layer) => {
-          let popupContent = "";
-          for (const key in feature.properties) {
-            const label = key.replace(/_/g, " ");
-            popupContent += `<strong>${label}:</strong> ${feature.properties[key]}<br>`;
+        onEachFeature: (f, l) => {
+          let html = "";
+          for(const key in f.properties){
+            html += `<b>${key.replace(/_/g, " ")}:</b> ${f.properties[key]}<br>`;
           }
-          layer.bindPopup(popupContent);
+          l.bindPopup(html);
         },
-        pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-          radius: 6,
-          fillColor: "#0074D9",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+          radius: 6, fillColor: "#0074D9", color: "#000", weight: 1, opacity: 1, fillOpacity: 0.8
         })
       }).addTo(map);
 
@@ -301,52 +233,46 @@
       }
     }
 
-    // Filtrar por código o nombre
+    // Filtro
+    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
+    document.getElementById("filterField").addEventListener("change", filtrarDatos);
     function filtrarDatos() {
       const campo = document.getElementById("filterField").value;
       const texto = document.getElementById("searchInput").value.trim().toLowerCase();
-
       if (!texto) {
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
         return;
       }
-
-      const filtrados = geojsonData.features.filter(f => {
-        return (f.properties[campo] || "").toLowerCase().includes(texto);
-      });
-
+      const filtrados = geojsonData.features.filter(f =>
+        (f.properties[campo] || "").toLowerCase().includes(texto)
+      );
       mostrarTabla({ type: "FeatureCollection", features: filtrados });
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
     }
 
-    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
-    document.getElementById("filterField").addEventListener("change", filtrarDatos);
-
-    // Agregar nuevo personal desde formulario
-    document.getElementById("addForm").addEventListener("submit", e => {
+    // Agregar nuevo personal
+    addForm.addEventListener("submit", e => {
       e.preventDefault();
       const nuevaFeature = {
         type: "Feature",
         properties: {},
         geometry: { type: "Point", coordinates: [0, 0] }
       };
-
       campos.forEach(campo => {
         const input = document.getElementById(campo);
-        let val = input ? input.value.trim().toUpperCase() : "";
+        const val = input ? input.value.trim().toUpperCase() : "";
         nuevaFeature.properties[campo] = val;
         if(campo === "LATITUD") nuevaFeature.geometry.coordinates[1] = parseFloat(val) || 0;
         if(campo === "LONGITUD") nuevaFeature.geometry.coordinates[0] = parseFloat(val) || 0;
       });
-
       geojsonData.features.push(nuevaFeature);
       mostrarTabla(geojsonData);
       mostrarMapa(geojsonData);
-      e.target.reset();
+      addForm.reset();
     });
 
-    // Descargar GeoJSON actualizado
+    // Descargar GeoJSON
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const blob = new Blob([JSON.stringify(geojsonData, null, 2)], {type: "application/json"});
       const url = URL.createObjectURL(blob);
