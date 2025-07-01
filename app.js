@@ -220,63 +220,76 @@ logoutBtn.addEventListener("click", () => {
   mostrarTabla(geojsonData);
 });
 
-// 14. Cargar rutas y calcular ruta más cercana
-const carpetas=[
-  {dir:'Rutas_de_ENTRADA',name:'Rutas de ENTRADA',color:'#28a745'},
-  {dir:'Rutas_de_SALIDA', name:'Rutas de SALIDA', color:'#dc3545'}
-];
-
-function poblarSelectPersonas(){
-  const sel=document.getElementById('personSelect');
-  sel.innerHTML='<option value="">-- Selecciona --</option>';
-  geojsonData.features.forEach(f=>{
-    const opt=document.createElement('option');
-    opt.value=f._id; opt.text=`${f.properties.NOMBRE} (${f.properties.CODIGO})`;
+// 14. Poblado de select de personas
+function poblarSelectPersonas() {
+  const sel = document.getElementById('personSelect');
+  sel.innerHTML = '<option value="">-- Selecciona --</option>';
+  geojsonData.features.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f._id;
+    opt.text = `${f.properties.NOMBRE} (${f.properties.CODIGO})`;
     sel.appendChild(opt);
   });
 }
 
-async function cargarIndexYCapas(){
-  for(const {dir,name,color} of carpetas){
-    try{
-      const r=await fetch(`${dir}/index.json`);
-      if(!r.ok) throw 0;
-      const lista=await r.json(), grupo=L.layerGroup();
-      for(const file of lista){
-        try{
-          const rr=await fetch(`${dir}/${encodeURIComponent(file)}`);
-          if(!rr.ok) throw 0;
-          const data=await rr.json();
-          L.geoJSON(data,{style:{color,weight:3}}).addTo(grupo);
-        }catch{}
-      }
-      rutasCapas[name]=grupo; grupo.addTo(map);
-    }catch(e){console.error(name,'indice falló');}
+// 15. Cargar rutas de carpetas y control de capas
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
+];
+
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const idxRes = await fetch(`${dir}/index.json`);
+      if (!idxRes.ok) throw new Error('Índice no encontrado');
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
+      lista.forEach(file => {
+        fetch(`${dir}/${encodeURIComponent(file)}`)
+          .then(r => r.json())
+          .then(data => {
+            L.geoJSON(data, {
+              style: { color, weight: 3 }
+            }).addTo(grupo);
+          })
+          .catch(() => console.warn('No se pudo cargar', file));
+      });
+      rutasCapas[name] = grupo;
+      grupo.addTo(map);
+    } catch (e) {
+      console.error('Error cargando índice de', dir, e);
+    }
   }
-  L.control.layers(null,rutasCapas,{collapsed:false}).addTo(map);
+  L.control.layers(null, rutasCapas, { collapsed: false }).addTo(map);
 }
 
-// función para calcular y resaltar ruta más cercana
-async function encontrarRuta(){
-  const id=document.getElementById('personSelect').value;
-  if(id==='') return alert('Seleccione una persona');
-  const f=geojsonData.features.find(x=>x._id==id);
-  const punto=turf.point(f.geometry.coordinates);
-  let min=Infinity, selLayer=null;
-  Object.values(rutasCapas).forEach(gr=>{
-    gr.eachLayer(layer=>{
-      const dist=turf.pointToLineDistance(punto,layer.feature,{units:'meters'});
-      if(dist<min){min=dist; selLayer=layer;}
+// 16. Buscar y resaltar ruta más cercana
+function encontrarRuta() {
+  const id = document.getElementById('personSelect').value;
+  if (!id) return alert('Seleccione una persona');
+  const persona = geojsonData.features.find(f => f._id == id);
+  const punto = turf.point(persona.geometry.coordinates);
+  let minDist = Infinity, selLayer = null;
+
+  Object.values(rutasCapas).forEach(grupo => {
+    grupo.eachLayer(layer => {
+      const dist = turf.pointToLineDistance(punto, layer.feature, { units: 'meters' });
+      if (dist < minDist) {
+        minDist = dist;
+        selLayer = layer;
+      }
     });
   });
-  if(selLayer){
-    map.fitBounds(selLayer.getBounds(),{padding:[20,20]});
-    selLayer.setStyle({color:'#FF0000',weight:5});
-    setTimeout(()=>selLayer.setStyle({color:selLayer.options.style.color,weight:3}),5000);
+
+  if (selLayer) {
+    map.fitBounds(selLayer.getBounds(), { padding: [20, 20] });
+    selLayer.setStyle({ color: '#ff0000', weight: 5 });
+    setTimeout(() => selLayer.setStyle({ color: rutasCapas[selLayer.options.name]?.options.color || '#007acc', weight: 3 }), 5000);
   }
 }
-document.getElementById('findRouteBtn').addEventListener('click',encontrarRuta);
-// iniciar carga de rutas\cargarIndexYCapas();
 
-
+// Iniciar carga de rutas y asignar evento
+cargarIndexYCapas();
+document.getElementById('findRouteBtn').addEventListener('click', encontrarRuta);
 
