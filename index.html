@@ -5,13 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Editor GeoJSON de Personal</title>
 
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<!-- FontAwesome para iconos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 <style>
-  /* --- Variables de color --- */
   :root {
     --color-primario: #004d99;
     --color-secundario: #007acc;
@@ -26,7 +23,6 @@
     --borde-radio: 8px;
   }
 
-  /* --- Reset básico --- */
   * {
     box-sizing: border-box;
   }
@@ -40,7 +36,6 @@
     flex-direction: column;
   }
 
-  /* --- Barra superior fija --- */
   header {
     background: var(--color-primario);
     color: var(--color-blanco);
@@ -63,7 +58,6 @@
     gap: 10px;
   }
 
-  /* --- Formulario login en header --- */
   #loginForm {
     display: flex;
     align-items: center;
@@ -104,16 +98,14 @@
     background-color: #a32429;
   }
 
-  /* --- Contenedor principal --- */
   main {
     display: flex;
     height: calc(100vh - 60px);
-    padding: 80px 20px 20px 20px; /* espacio para header */
+    padding: 80px 20px 20px 20px;
     gap: 20px;
     overflow: hidden;
   }
 
-  /* --- Mapa --- */
   #map {
     flex: 1.3;
     border-radius: var(--borde-radio);
@@ -121,7 +113,6 @@
     min-width: 320px;
   }
 
-  /* --- Panel derecho: tabla y controles --- */
   #panelDerecho {
     flex: 1;
     display: flex;
@@ -132,13 +123,13 @@
     min-width: 320px;
   }
 
-  /* --- Controles búsqueda y filtro --- */
   #controles {
     padding: 15px 20px;
     border-bottom: 1px solid var(--color-gris-claro);
     display: flex;
     gap: 15px;
     align-items: center;
+    flex-wrap: wrap;
   }
   #controles label {
     font-weight: 600;
@@ -176,7 +167,7 @@
     background-color: var(--color-hover);
   }
 
-  /* --- Tabla con scroll vertical --- */
+  /* Aquí hacemos que la tabla ocupe el espacio que queda, con scroll */
   #tabla {
     flex-grow: 1;
     overflow-y: auto;
@@ -211,15 +202,14 @@
     cursor: text;
   }
 
-  /* --- Formulario agregar personal --- */
+  /* --- FORMULARIO AQUI ABAJO, separado y con padding */
   #addForm {
-    max-width: 400px;
-    margin: 0 auto 20px;
     padding: 20px;
     background: var(--color-blanco);
-    border-radius: var(--borde-radio);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-top: 2px solid var(--color-secundario);
     display: none;
+    border-radius: 0 0 var(--borde-radio) var(--borde-radio);
+    box-shadow: inset 0 10px 15px -10px rgba(0,0,0,0.1);
   }
   #addForm h2 {
     margin-top: 0;
@@ -263,7 +253,6 @@
     background-color: var(--color-hover);
   }
 
-  /* --- Responsive --- */
   @media (max-width: 900px) {
     main {
       flex-direction: column;
@@ -346,17 +335,14 @@
   </section>
 </main>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-  // Usuarios permitidos
   const usuarios = {
     admin: "1234",
     kevin: "admin2025"
   };
 
-  // Campos que se manejarán
   const campos = [
     "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
     "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
@@ -365,14 +351,13 @@
 
   let geojsonData = null;
   let usuarioLogueado = false;
-  let map = L.map("map").setView([-0.180653, -78.467838], 13); // Quito aprox
+  let map = L.map("map").setView([-0.180653, -78.467838], 13);
   let geojsonLayer = null;
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  // Centrar mapa según datos
   function centrarMapaSegunDatos(data){
     if(!data.features || data.features.length === 0) return;
     const coords = data.features
@@ -389,7 +374,6 @@
     map.fitBounds(bounds, {padding: [40, 40]});
   }
 
-  // Cargar datos iniciales
   fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
   .then(r => r.json())
   .then(data => {
@@ -401,7 +385,6 @@
     crearCamposFormulario();
   });
 
-  // Crear campos del formulario para agregar
   function crearCamposFormulario(){
     const cont = document.getElementById("camposForm");
     cont.innerHTML = "";
@@ -418,7 +401,6 @@
     });
   }
 
-  // Mostrar tabla editable
   function mostrarTabla(data){
     const cont = document.getElementById("tabla");
     if(!data.features) return;
@@ -441,11 +423,10 @@
     if(usuarioLogueado) asignarEventosEdicion();
   }
 
-  // Asignar eventos para editar celdas
   function asignarEventosEdicion(){
     const tds = document.querySelectorAll('td[contenteditable="true"]');
     tds.forEach(td => {
-      td.oninput = null; // quitar duplicados
+      td.oninput = null;
       td.addEventListener("input", () => {
         const id = parseInt(td.dataset.featureId);
         const campo = td.dataset.attr;
@@ -460,7 +441,6 @@
           const lat = parseFloat(feature.properties["LATITUD"]) || 0;
           const lng = parseFloat(feature.properties["LONGITUD"]) || 0;
           feature.geometry = { type: "Point", coordinates: [lng, lat] };
-          // Actualizar mapa después de pequeña pausa
           clearTimeout(window.editarTimeout);
           window.editarTimeout = setTimeout(() => {
             mostrarMapa(geojsonData);
@@ -471,7 +451,6 @@
     });
   }
 
-  // Mostrar puntos en mapa
   function mostrarMapa(data){
     if(geojsonLayer) map.removeLayer(geojsonLayer);
     geojsonLayer = L.geoJSON(data, {
@@ -497,7 +476,6 @@
     return getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99';
   }
 
-  // Filtrar tabla y mapa
   document.getElementById("searchInput").addEventListener("input", filtrarDatos);
   document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
@@ -518,7 +496,7 @@
     centrarMapaSegunDatos({type:"FeatureCollection", features: filtrados});
   }
 
-  // Agregar personal
+  // Agregar nuevo personal
   document.getElementById("addForm").addEventListener("submit", e=>{
     e.preventDefault();
     const nuevo = {
@@ -556,7 +534,6 @@
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const addForm = document.getElementById("addForm");
-  const loginForm = document.getElementById("loginForm");
   const usuarioInput = document.getElementById("usuario");
   const claveInput = document.getElementById("clave");
 
@@ -590,6 +567,5 @@
   });
 
 </script>
-
 </body>
 </html>
