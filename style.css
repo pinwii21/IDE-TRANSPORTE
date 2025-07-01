@@ -1,21 +1,23 @@
 :root {
-  --color-primario: #004d99;
-  --color-secundario: #007acc;
-  --color-fondo: #f8f9fa;
-  --color-texto: #212529;
-  --color-blanco: #fff;
-  --color-gris-claro: #e9ecef;
-  --color-gris-medio: #adb5bd;
-  --color-error: #dc3545;
-  --color-exito: #28a745;
-  --color-hover: #005bb5;
+  --color-primario: #004d99;       /* Azul oscuro */
+  --color-secundario: #007acc;     /* Azul medio */
+  --color-fondo: #f0f4f8;          /* Fondo gris azulado claro */
+  --color-texto: #212529;          /* Texto negro */
+  --color-blanco: #ffffff;         /* Blanco puro */
+  --color-gris-claro: #dee2e6;     /* Gris claro para bordes */
+  --color-gris-medio: #adb5bd;     /* Gris medio */
+  --color-error: #dc3545;          /* Rojo para errores */
+  --color-exito: #28a745;          /* Verde para éxito */
+  --color-hover: #005bb5;          /* Azul más fuerte */
   --borde-radio: 8px;
   --sombra-suave: 0 4px 12px rgba(0,0,0,0.1);
   --transition-fast: 0.25s ease;
 }
 
-/* Reset básico */
-*, *::before, *::after {
+/* RESET */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -23,7 +25,7 @@ body, html {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--color-fondo);
+  background-color: var(--color-fondo);
   color: var(--color-texto);
   height: 100vh;
   display: flex;
@@ -32,7 +34,7 @@ body, html {
 
 /* HEADER */
 header {
-  background: var(--color-primario);
+  background-color: var(--color-primario);
   color: var(--color-blanco);
   height: 60px;
   display: flex;
@@ -43,16 +45,15 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 header h1 {
-  font-weight: 700;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 header i {
@@ -66,14 +67,12 @@ header i {
   gap: 14px;
 }
 
-#loginForm input[type="text"],
-#loginForm input[type="password"] {
+#loginForm input {
   padding: 8px 12px;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
   width: 140px;
-  transition: box-shadow 0.3s ease;
 }
 
 #loginForm input:focus {
@@ -83,26 +82,19 @@ header i {
 
 #loginForm button {
   background-color: var(--color-secundario);
-  border: none;
   color: var(--color-blanco);
   padding: 9px 20px;
-  font-weight: 600;
+  border: none;
   border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1rem;
-  transition: background-color var(--transition-fast);
 }
 
-#loginForm button:hover:not(:disabled) {
+#loginForm button:hover {
   background-color: var(--color-hover);
-}
-
-#loginForm button:disabled {
-  background-color: var(--color-gris-medio);
-  cursor: not-allowed;
 }
 
 #logoutBtn {
@@ -114,15 +106,16 @@ header i {
   background-color: #a32429;
 }
 
-/* MAIN */
+/* LAYOUT PRINCIPAL */
 main {
   display: flex;
   height: calc(100vh - 60px);
-  padding: 80px 24px 24px 24px;
+  padding: 80px 24px 24px;
   gap: 24px;
-  overflow: hidden;
+  background-color: var(--color-fondo);
 }
 
+/* MAPA */
 #map {
   flex: 1.3;
   border-radius: var(--borde-radio);
@@ -141,49 +134,45 @@ main {
   min-width: 320px;
 }
 
-/* CONTROLES DE FILTRO */
+/* CONTROLES */
 #controles {
   padding: 16px 24px;
   border-bottom: 1px solid var(--color-gris-claro);
   display: flex;
-  gap: 18px;
+  gap: 16px;
   align-items: center;
   flex-wrap: wrap;
+  background-color: var(--color-blanco);
 }
 
 #controles label {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: bold;
 }
 
 #filterField, #searchInput {
   padding: 8px 14px;
-  font-size: 1rem;
-  border: 1.5px solid var(--color-gris-medio);
   border-radius: 8px;
-  flex-grow: 1;
-  max-width: 190px;
-  transition: border-color 0.3s ease;
+  border: 1px solid var(--color-gris-medio);
+  font-size: 1rem;
 }
 
 #filterField:focus, #searchInput:focus {
   border-color: var(--color-secundario);
   outline: none;
-  box-shadow: 0 0 6px var(--color-secundario);
+  box-shadow: 0 0 4px var(--color-secundario);
 }
 
 #downloadBtn {
   background-color: var(--color-secundario);
   color: var(--color-blanco);
   border: none;
-  padding: 10px 22px;
+  padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 700;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
-  white-space: nowrap;
 }
 
 #downloadBtn:hover {
@@ -201,32 +190,28 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  min-width: 700px;
+  background-color: var(--color-blanco);
 }
 
-thead tr {
+thead {
   background-color: var(--color-primario);
   color: var(--color-blanco);
   position: sticky;
   top: 0;
-  z-index: 10;
 }
 
 th, td {
-  padding: 10px 14px;
+  padding: 10px;
   border: 1px solid var(--color-gris-claro);
   text-align: left;
-  vertical-align: middle;
-  white-space: nowrap;
 }
 
 tbody tr:hover {
-  background-color: var(--color-fondo);
+  background-color: #e6f2ff;
 }
 
 td[contenteditable="true"] {
   background-color: #fffbea;
-  cursor: text;
 }
 
 td[contenteditable="true"]:focus {
@@ -234,19 +219,16 @@ td[contenteditable="true"]:focus {
   outline: 2px solid var(--color-secundario);
 }
 
-/* FORMULARIO AGREGAR PERSONAL */
+/* FORMULARIO AGREGAR */
 #addForm {
   padding: 24px;
-  background: var(--color-blanco);
-  border-top: 3px solid var(--color-secundario);
   display: none;
-  border-radius: 0 0 var(--borde-radio) var(--borde-radio);
-  box-shadow: inset 0 10px 15px -10px rgba(0,0,0,0.1);
+  background-color: var(--color-blanco);
+  border-top: 3px solid var(--color-secundario);
 }
 
 #addForm h2 {
   font-size: 1.4rem;
-  font-weight: 700;
   color: var(--color-primario);
   display: flex;
   align-items: center;
@@ -261,40 +243,34 @@ td[contenteditable="true"]:focus {
 }
 
 #camposForm label {
-  display: flex;
-  flex-direction: column;
   font-weight: 600;
   font-size: 0.95rem;
 }
 
 #camposForm input {
-  margin-top: 6px;
-  padding: 8px 10px;
-  font-size: 1rem;
-  border: 1.5px solid var(--color-gris-medio);
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-gris-medio);
 }
 
 #camposForm input:focus {
-  outline: none;
   border-color: var(--color-secundario);
   box-shadow: 0 0 6px var(--color-secundario);
+  outline: none;
 }
 
 #addForm button {
   background-color: var(--color-secundario);
-  color: var(--color-blanco);
+  color: white;
+  padding: 14px 24px;
   border: none;
-  padding: 14px 28px;
   border-radius: 10px;
-  font-weight: 700;
+  font-weight: bold;
   cursor: pointer;
-  display: inline-flex;
+  font-size: 1rem;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 1.1rem;
-  transition: background-color var(--transition-fast);
+  gap: 10px;
 }
 
 #addForm button:hover {
@@ -308,7 +284,8 @@ td[contenteditable="true"]:focus {
     padding: 80px 16px 16px;
   }
 
-  #map, #panelDerecho {
+  #map,
+  #panelDerecho {
     width: 100%;
     height: 380px;
     margin-bottom: 24px;
@@ -318,24 +295,14 @@ td[contenteditable="true"]:focus {
     gap: 12px;
   }
 
-  #filterField, #searchInput {
-    max-width: 100%;
-    flex-grow: 1;
-    font-size: 1rem;
-  }
-
   #loginForm {
     flex-wrap: wrap;
-    gap: 10px;
     justify-content: flex-end;
+    gap: 10px;
   }
 
   #loginForm input {
     width: 120px;
-  }
-
-  #loginForm button {
-    padding: 9px 16px;
   }
 
   table {
