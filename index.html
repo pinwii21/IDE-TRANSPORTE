@@ -16,7 +16,9 @@
       --table-row-hover: #eaeaea;
       --editable-bg: #fefbd8;
     }
-
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -27,23 +29,87 @@
       display: flex;
       flex-direction: column;
     }
-
     header {
       background-color: var(--main-color);
       color: white;
-      padding: 20px;
-      text-align: center;
+      padding: 20px 40px 20px 20px;
+      position: relative;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-
     header h1 {
       margin: 0;
       font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-
+    #loginSection {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: var(--form-bg);
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+      padding: 15px 20px;
+      width: 280px;
+      z-index: 1000;
+      font-size: 14px;
+    }
+    #loginSection label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--main-color);
+    }
+    #loginSection input {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      outline-offset: 2px;
+    }
+    #loginSection .form-inline {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    #loginSection button {
+      flex: 1;
+      padding: 10px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    #loginBtn {
+      background-color: #2980b9;
+    }
+    #loginBtn:hover {
+      background-color: #1f6391;
+    }
+    #logoutBtn {
+      background-color: #c0392b;
+      display: none;
+    }
+    #logoutBtn:hover {
+      background-color: #962d22;
+    }
     .container {
       max-width: 1200px;
-      margin: 20px auto;
+      margin: 90px auto 30px;
       padding: 0 15px;
       display: flex;
       gap: 20px;
@@ -51,32 +117,29 @@
       flex-grow: 1;
       min-height: 0;
     }
-
-    /* Mapa y tabla lado a lado */
     #map {
       flex: 0 0 55%;
       height: 600px;
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      min-width: 300px;
     }
-
     #tabla {
       flex: 0 0 43%;
       max-height: 600px;
-      overflow: auto;
+      overflow-y: auto;
       background: var(--form-bg);
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.05);
       padding: 10px;
+      min-width: 300px;
     }
-
-    /* Tabla */
     table {
       border-collapse: collapse;
       width: 100%;
       min-width: 700px;
+      font-size: 13px;
     }
-
     th, td {
       padding: 10px 12px;
       border: 1px solid #ddd;
@@ -84,7 +147,6 @@
       vertical-align: middle;
       white-space: nowrap;
     }
-
     th {
       background-color: var(--table-header-bg);
       color: white;
@@ -92,17 +154,13 @@
       top: 0;
       z-index: 2;
     }
-
     tr:hover {
       background-color: var(--table-row-hover);
     }
-
     td[contenteditable="true"] {
       background-color: var(--editable-bg);
       cursor: text;
     }
-
-    /* Formularios y controles */
     .card {
       background: var(--form-bg);
       padding: 20px;
@@ -110,13 +168,11 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.05);
       margin-bottom: 20px;
     }
-
     label {
       font-weight: 600;
       margin-bottom: 6px;
       display: block;
     }
-
     input, select {
       width: 100%;
       max-width: 400px;
@@ -127,7 +183,6 @@
       font-size: 14px;
       box-sizing: border-box;
     }
-
     button {
       background-color: var(--accent-color);
       color: white;
@@ -142,34 +197,15 @@
       align-items: center;
       gap: 8px;
     }
-
     button:hover {
       background-color: #219150;
     }
-
     .btn-danger {
       background-color: #c0392b;
     }
-
     .btn-danger:hover {
       background-color: #962d22;
     }
-
-    /* Login section */
-    #loginSection {
-      max-width: 420px;
-      margin: 0 auto 30px;
-    }
-
-    .form-inline {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    /* Controls (filter + download) */
     #controls {
       max-width: 1200px;
       margin: 0 auto 20px;
@@ -182,21 +218,17 @@
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     }
-
     #filterField {
       width: auto;
       min-width: 150px;
       font-size: 14px;
     }
-
     #searchInput {
       flex: 1 1 auto;
       min-width: 180px;
       font-size: 14px;
       padding: 10px;
     }
-
-    /* Responsive */
     @media (max-width: 900px) {
       .container {
         flex-direction: column;
@@ -205,6 +237,7 @@
         flex: 1 1 100%;
         max-height: 400px;
         height: 400px;
+        min-width: auto;
       }
       table {
         min-width: 100%;
@@ -217,13 +250,21 @@
         flex-grow: 1;
         min-width: unset;
       }
+      #loginSection {
+        position: static;
+        width: auto;
+        margin: 10px auto 20px;
+        box-shadow: none;
+        padding: 10px 0;
+        background: none;
+      }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> Editor GeoJSON de Personal</h1>
+    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
   </header>
 
   <section id="loginSection" class="card">
