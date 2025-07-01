@@ -267,3 +267,33 @@ async function cargarIndexYCapas() {
 
 // Iniciar la carga de rutas
 cargarIndexYCapas();
+// 16. Buscar y mostrar ruta más cercana bajo demanda
+document.getElementById('findRouteBtn').addEventListener('click', () => {
+  const id = document.getElementById('personSelect').value;
+  if (!id) return alert('Seleccione una persona');
+
+  const persona = geojsonData.features.find(f => f._id == id);
+  if (!persona?.geometry?.coordinates) return alert("La persona no tiene coordenadas");
+
+  const punto = turf.point(persona.geometry.coordinates);
+  let minDist = Infinity, selLayer = null;
+
+  Object.values(capasOverlay).forEach(grupo => {
+    grupo.eachLayer(layer => {
+      if (!layer.feature?.geometry) return;
+      const dist = turf.pointToLineDistance(punto, layer.feature, { units: 'meters' });
+      if (dist < minDist) {
+        minDist = dist;
+        selLayer = layer;
+      }
+    });
+  });
+
+  if (selLayer) {
+    map.fitBounds(selLayer.getBounds(), { padding: [20, 20] });
+    selLayer.setStyle({ color: '#ff0000', weight: 5 });
+    setTimeout(() => selLayer.setStyle({ color: '#007acc', weight: 3 }), 5000);
+  } else {
+    alert("No se encontró una ruta cercana.");
+  }
+});
