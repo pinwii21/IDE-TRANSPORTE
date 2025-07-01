@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -34,6 +34,13 @@
       </select>
       <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
+
+      <!-- NUEVO: Selector de persona + botón ruta -->
+      <label for="personSelect">Persona:</label>
+      <select id="personSelect">
+        <option value="">-- Selecciona --</option>
+      </select>
+      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
     </section>
 
     <div id="tabla" aria-live="polite"></div>
@@ -47,6 +54,7 @@
 </main>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
