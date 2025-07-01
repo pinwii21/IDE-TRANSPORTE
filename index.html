@@ -5,40 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IDE TRANSPORTE</title>
 
-  <!-- CSS externo -->
+  <!-- Estilos -->
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
 
-<header>
+<header role="banner">
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-  <form id="loginForm" onsubmit="return false;">
-    <input id="usuario" type="text" placeholder="Usuario" autocomplete="username" required />
-    <input id="clave" type="password" placeholder="Clave" autocomplete="current-password" required />
-    <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
-    <button id="logoutBtn" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+  <form id="loginForm" onsubmit="return false;" aria-label="Formulario de inicio de sesión">
+    <input id="usuario" type="text" placeholder="Usuario" autocomplete="username" required aria-label="Usuario" />
+    <input id="clave" type="password" placeholder="Clave" autocomplete="current-password" required aria-label="Clave" />
+    <button id="loginBtn" title="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    <button id="logoutBtn" title="Cerrar sesión" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
   </form>
 </header>
 
-<main>
-  <div id="map"></div>
+<main role="main">
+  <div id="map" aria-label="Mapa de ubicación del personal"></div>
 
-  <section id="panelDerecho">
-    <section id="controles">
+  <section id="panelDerecho" aria-label="Panel de controles y tabla de personal">
+    <section id="controles" aria-label="Controles de filtro y búsqueda">
       <label for="filterField">Filtrar por:</label>
       <select id="filterField">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
-      <input type="search" id="searchInput" placeholder="Buscar..." />
+      <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
-    <div id="tabla"></div>
+    <div id="tabla" aria-live="polite"></div>
 
-    <form id="addForm">
+    <form id="addForm" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
       <div id="camposForm"></div>
       <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
@@ -48,7 +48,7 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="app.js"></script>
-
 </body>
 </html>
+
 
