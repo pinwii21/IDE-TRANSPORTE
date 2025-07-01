@@ -1,24 +1,104 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
+h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #004d99;
+}
+
+/* Tabla */
 table {
     border-collapse: collapse;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-th, td {
+th {
+    background-color: #004d99;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+td {
     border: 1px solid #ccc;
-    padding: 8px;
+    padding: 10px;
     text-align: left;
 }
 
 td[contenteditable="true"] {
+    background-color: #fffbea;
+    transition: background-color 0.3s ease;
+    cursor: text;
+}
+
+td[contenteditable="true"]:hover {
     background-color: #f0f8ff;
 }
 
-h1 {
-    font-size: 24px;
+/* Formulario */
+form {
+    margin-top: 30px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border-top: 4px solid #007acc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+form h2 {
+    margin-top: 0;
+    color: #007acc;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="password"],
+form input[type="email"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+form input:focus {
+    border-color: #007acc;
+    outline: none;
+}
+
+form button {
+    margin-top: 20px;
+    background-color: #007acc;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #005fa3;
 }
