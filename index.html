@@ -5,11 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>IDE TRANSPORTE</title>
 
+<!-- Hoja de estilos de Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- Íconos de FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 <style>
   :root {
+    /* Variables de color y estilos reutilizables */
     --color-primario: #004d99;
     --color-secundario: #007acc;
     --color-fondo: #f8f9fa;
@@ -26,7 +29,9 @@
   * {
     box-sizing: border-box;
   }
+
   body, html {
+    /* Estilo general de la página */
     margin: 0; padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--color-fondo);
@@ -37,6 +42,7 @@
   }
 
   header {
+    /* Barra superior fija con login */
     background: var(--color-primario);
     color: var(--color-blanco);
     height: 60px;
@@ -50,14 +56,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
-  header h1 {
-    font-weight: 700;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
   #loginForm {
     display: flex;
     align-items: center;
@@ -66,6 +64,7 @@
 
   #loginForm input[type="text"],
   #loginForm input[type="password"] {
+    /* Campos de usuario y clave */
     padding: 6px 10px;
     border: none;
     border-radius: 5px;
@@ -74,6 +73,7 @@
   }
 
   #loginForm button {
+    /* Botón de login */
     background-color: var(--color-secundario);
     border: none;
     color: var(--color-blanco);
@@ -87,18 +87,15 @@
     gap: 6px;
     font-size: 0.9rem;
   }
-  #loginForm button:hover {
-    background-color: var(--color-hover);
-  }
+
   #logoutBtn {
+    /* Botón de cerrar sesión */
     background-color: var(--color-error);
     display: none;
   }
-  #logoutBtn:hover {
-    background-color: #a32429;
-  }
 
   main {
+    /* Contenedor principal: mapa + panel */
     display: flex;
     height: calc(100vh - 60px);
     padding: 80px 20px 20px 20px;
@@ -107,6 +104,7 @@
   }
 
   #map {
+    /* Contenedor del mapa Leaflet */
     flex: 1.3;
     border-radius: var(--borde-radio);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -114,6 +112,7 @@
   }
 
   #panelDerecho {
+    /* Panel derecho: controles y tabla */
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -124,6 +123,7 @@
   }
 
   #controles {
+    /* Filtros y botón de descarga */
     padding: 15px 20px;
     border-bottom: 1px solid var(--color-gris-claro);
     display: flex;
@@ -131,44 +131,9 @@
     align-items: center;
     flex-wrap: wrap;
   }
-  #controles label {
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  #filterField, #searchInput {
-    padding: 7px 12px;
-    font-size: 1rem;
-    border: 1px solid var(--color-gris-medio);
-    border-radius: 6px;
-    flex-grow: 1;
-    max-width: 180px;
-    transition: border-color 0.3s ease;
-  }
-  #filterField:focus, #searchInput:focus {
-    border-color: var(--color-secundario);
-    outline: none;
-  }
 
-  #downloadBtn {
-    background-color: var(--color-secundario);
-    color: var(--color-blanco);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s ease;
-    white-space: nowrap;
-  }
-  #downloadBtn:hover {
-    background-color: var(--color-hover);
-  }
-
-  /* Aquí hacemos que la tabla ocupe el espacio que queda, con scroll */
   #tabla {
+    /* Tabla de datos */
     flex-grow: 1;
     overflow-y: auto;
     padding: 10px 20px;
@@ -180,169 +145,92 @@
     font-size: 0.9rem;
     min-width: 700px;
   }
+
   thead tr {
+    /* Encabezado de la tabla */
     background-color: var(--color-primario);
     color: var(--color-blanco);
     position: sticky;
     top: 0;
     z-index: 10;
   }
-  th, td {
-    padding: 10px 12px;
-    border: 1px solid var(--color-gris-claro);
-    text-align: left;
-    vertical-align: middle;
-    white-space: nowrap;
-  }
-  tbody tr:hover {
-    background-color: var(--color-fondo);
-  }
+
   td[contenteditable="true"] {
+    /* Celdas editables */
     background-color: #fffbea;
     cursor: text;
   }
 
-  /* --- FORMULARIO AQUI ABAJO, separado y con padding */
   #addForm {
+    /* Formulario de nuevo personal */
     padding: 20px;
     background: var(--color-blanco);
     border-top: 2px solid var(--color-secundario);
-    display: none;
+    display: none; /* se muestra solo si se inicia sesión */
     border-radius: 0 0 var(--borde-radio) var(--borde-radio);
     box-shadow: inset 0 10px 15px -10px rgba(0,0,0,0.1);
   }
-  #addForm h2 {
-    margin-top: 0;
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: var(--color-primario);
-  }
-  #camposForm label {
-    display: block;
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
-  #camposForm input {
-    width: 100%;
-    padding: 8px 10px;
-    font-size: 1rem;
-    border: 1px solid var(--color-gris-medio);
-    border-radius: 6px;
-    transition: border-color 0.3s ease;
-  }
-  #camposForm input:focus {
-    outline: none;
-    border-color: var(--color-secundario);
-  }
-  #addForm button {
-    background-color: var(--color-secundario);
-    color: var(--color-blanco);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-  }
-  #addForm button:hover {
-    background-color: var(--color-hover);
-  }
 
   @media (max-width: 900px) {
+    /* Adaptación para móviles */
     main {
       flex-direction: column;
-      padding: 80px 10px 10px 10px;
-    }
-    #map, #panelDerecho {
-      min-width: auto;
-      width: 100%;
-      height: 350px;
-      margin-bottom: 20px;
-    }
-    #tabla table {
-      min-width: 100%;
-    }
-    #controles {
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    #filterField, #searchInput {
-      max-width: 100%;
-      flex-grow: 1;
-    }
-    #loginForm {
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-    #loginForm input {
-      width: 100px;
-      flex-grow: 1;
     }
   }
 </style>
-
 </head>
-<body>
 
+<body>
+<!-- ENCABEZADO Y FORMULARIO DE LOGIN -->
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-
   <form id="loginForm" onsubmit="return false;">
-    <input id="usuario" type="text" placeholder="Usuario" autocomplete="username" required />
-    <input id="clave" type="password" placeholder="Clave" autocomplete="current-password" required />
-    <button id="loginBtn" title="Iniciar sesión">
-      <i class="fa-solid fa-right-to-bracket"></i> Entrar
-    </button>
-    <button id="logoutBtn" title="Cerrar sesión" style="display:none;">
-      <i class="fa-solid fa-right-from-bracket"></i> Salir
-    </button>
+    <input id="usuario" type="text" placeholder="Usuario" required />
+    <input id="clave" type="password" placeholder="Clave" required />
+    <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
   </form>
 </header>
 
+<!-- CUERPO PRINCIPAL -->
 <main>
-  <div id="map"></div>
+  <div id="map"></div> <!-- Mapa Leaflet -->
 
   <section id="panelDerecho">
+    <!-- Controles de filtro y descarga -->
     <section id="controles">
       <label for="filterField">Filtrar por:</label>
-      <select id="filterField" title="Campo para filtrar">
+      <select id="filterField">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
-
-      <input type="search" id="searchInput" placeholder="Buscar..." title="Buscar" />
-
-      <button id="downloadBtn" title="Descargar datos como GeoJSON">
-        <i class="fa-solid fa-download"></i> Descargar
-      </button>
+      <input type="search" id="searchInput" placeholder="Buscar..." />
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
-    <div id="tabla" aria-live="polite" aria-label="Tabla editable de personal"></div>
-
+    <!-- Tabla con datos del personal -->
+    <div id="tabla"></div>
   </section>
 </main>
-<!-- Formulario centrado debajo del mapa y tabla -->
-<form id="addForm" aria-label="Formulario para agregar personal">
+
+<!-- FORMULARIO PARA NUEVO PERSONAL -->
+<form id="addForm">
   <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
   <div id="camposForm"></div>
-  <button type="submit">
-    <i class="fa-solid fa-plus"></i> Agregar Personal
-  </button>
+  <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
 </form>
+
+<!-- LIBRERÍA LEAFLET -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+  // Usuarios autorizados
   const usuarios = {
     admin: "1234",
     kevin: "admin2025"
   };
 
+  // Lista de campos que tendrá cada registro
   const campos = [
     "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
     "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
@@ -351,110 +239,101 @@
 
   let geojsonData = null;
   let usuarioLogueado = false;
-  let map = L.map("map").setView([-0.180653, -78.467838], 13);
-  let geojsonLayer = null;
 
+  // Inicialización del mapa
+  let map = L.map("map").setView([-0.180653, -78.467838], 13);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  function centrarMapaSegunDatos(data){
-    if(!data.features || data.features.length === 0) return;
+  // Centrar mapa según datos GeoJSON
+  function centrarMapaSegunDatos(data) {
+    if (!data.features?.length) return;
     const coords = data.features
-      .filter(f => f.geometry && f.geometry.type === "Point" && f.geometry.coordinates.length === 2)
+      .filter(f => f.geometry?.coordinates?.length === 2)
       .map(f => f.geometry.coordinates);
-    if(coords.length === 0) return;
-    const lats = coords.map(c => c[1]);
-    const lngs = coords.map(c => c[0]);
-    const south = Math.min(...lats);
-    const north = Math.max(...lats);
-    const west = Math.min(...lngs);
-    const east = Math.max(...lngs);
-    const bounds = [[south, west], [north, east]];
+    const bounds = [[Math.min(...coords.map(c => c[1])), Math.min(...coords.map(c => c[0]))],
+                    [Math.max(...coords.map(c => c[1])), Math.max(...coords.map(c => c[0]))]];
     map.fitBounds(bounds, {padding: [40, 40]});
   }
 
+  // Carga el GeoJSON desde GitHub
   fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
-  .then(r => r.json())
-  .then(data => {
-    data.features.forEach((f,i)=> f._id = i);
-    geojsonData = data;
-    mostrarTabla(geojsonData);
-    mostrarMapa(geojsonData);
-    centrarMapaSegunDatos(geojsonData);
-    crearCamposFormulario();
-  });
+    .then(r => r.json())
+    .then(data => {
+      data.features.forEach((f, i) => f._id = i); // identificador único
+      geojsonData = data;
+      mostrarTabla(geojsonData);
+      mostrarMapa(geojsonData);
+      centrarMapaSegunDatos(geojsonData);
+      crearCamposFormulario();
+    });
 
-  function crearCamposFormulario(){
+  // Genera los campos del formulario
+  function crearCamposFormulario() {
     const cont = document.getElementById("camposForm");
-    cont.innerHTML = "";
     campos.forEach(campo => {
       const label = document.createElement("label");
       label.textContent = campo.replace(/_/g, " ") + ":";
       const input = document.createElement("input");
       input.type = "text";
       input.id = campo;
-      input.autocomplete = "off";
-      input.required = campo === "CODIGO" || campo === "NOMBRE" || campo === "LATITUD" || campo === "LONGITUD";
+      input.required = ["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo);
       label.appendChild(input);
       cont.appendChild(label);
     });
   }
 
-  function mostrarTabla(data){
+  // Muestra tabla editable
+  function mostrarTabla(data) {
     const cont = document.getElementById("tabla");
-    if(!data.features) return;
     let html = `<table><thead><tr><th>#</th>`;
     campos.forEach(c => html += `<th>${c}</th>`);
     html += `</tr></thead><tbody>`;
-
-    data.features.forEach((f,i) => {
-      html += `<tr><td>${i+1}</td>`;
+    data.features.forEach((f, i) => {
+      html += `<tr><td>${i + 1}</td>`;
       campos.forEach(campo => {
         let valor = f.properties[campo] || "";
-        if(campo === "LATITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[1];
-        if(campo === "LONGITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[0];
+        if (campo === "LATITUD") valor = f.geometry.coordinates[1];
+        if (campo === "LONGITUD") valor = f.geometry.coordinates[0];
         html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ''} data-feature-id="${f._id}" data-attr="${campo}">${valor}</td>`;
       });
       html += `</tr>`;
     });
     html += `</tbody></table>`;
     cont.innerHTML = html;
-    if(usuarioLogueado) asignarEventosEdicion();
+    if (usuarioLogueado) asignarEventosEdicion();
   }
 
-  function asignarEventosEdicion(){
-    const tds = document.querySelectorAll('td[contenteditable="true"]');
-    tds.forEach(td => {
-      td.oninput = null;
+  // Permite editar celdas
+  function asignarEventosEdicion() {
+    document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
       td.addEventListener("input", () => {
         const id = parseInt(td.dataset.featureId);
         const campo = td.dataset.attr;
         const val = td.textContent.trim().toUpperCase();
-
         const feature = geojsonData.features.find(f => f._id === id);
-        if(!feature) return;
-
         feature.properties[campo] = val;
-
-        if(campo === "LATITUD" || campo === "LONGITUD"){
-          const lat = parseFloat(feature.properties["LATITUD"]) || 0;
-          const lng = parseFloat(feature.properties["LONGITUD"]) || 0;
-          feature.geometry = { type: "Point", coordinates: [lng, lat] };
-          clearTimeout(window.editarTimeout);
-          window.editarTimeout = setTimeout(() => {
-            mostrarMapa(geojsonData);
-            centrarMapaSegunDatos(geojsonData);
-          }, 300);
+        if (campo === "LATITUD" || campo === "LONGITUD") {
+          feature.geometry = {
+            type: "Point",
+            coordinates: [
+              parseFloat(feature.properties["LONGITUD"]),
+              parseFloat(feature.properties["LATITUD"])
+            ]
+          };
+          mostrarMapa(geojsonData);
+          centrarMapaSegunDatos(geojsonData);
         }
       });
     });
   }
 
-  function mostrarMapa(data){
-    if(geojsonLayer) map.removeLayer(geojsonLayer);
+  // Muestra el mapa
+  function mostrarMapa(data) {
+    if (geojsonLayer) map.removeLayer(geojsonLayer);
     geojsonLayer = L.geoJSON(data, {
-      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+      pointToLayer: (f, latlng) => L.circleMarker(latlng, {
         radius: 6,
         fillColor: varColorPrimario(),
         color: "#000",
@@ -464,51 +343,47 @@
       }),
       onEachFeature: (feature, layer) => {
         let popup = '';
-        for(const key in feature.properties){
-          popup += `<b>${key.replace(/_/g," ")}:</b> ${feature.properties[key]}<br>`;
+        for (const key in feature.properties) {
+          popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
         }
         layer.bindPopup(popup);
       }
     }).addTo(map);
   }
 
+  // Obtiene el color primario desde CSS
   function varColorPrimario() {
-    return getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99';
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim();
   }
 
+  // Filtrar por campo y valor
   document.getElementById("searchInput").addEventListener("input", filtrarDatos);
   document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
-  function filtrarDatos(){
+  function filtrarDatos() {
     const campo = document.getElementById("filterField").value;
     const texto = document.getElementById("searchInput").value.trim().toLowerCase();
-    if(!texto){
-      mostrarTabla(geojsonData);
-      mostrarMapa(geojsonData);
-      centrarMapaSegunDatos(geojsonData);
-      return;
-    }
     const filtrados = geojsonData.features.filter(f =>
       (f.properties[campo] || "").toLowerCase().includes(texto)
     );
-    mostrarTabla({type:"FeatureCollection", features: filtrados});
-    mostrarMapa({type:"FeatureCollection", features: filtrados});
-    centrarMapaSegunDatos({type:"FeatureCollection", features: filtrados});
+    mostrarTabla({type: "FeatureCollection", features: filtrados});
+    mostrarMapa({type: "FeatureCollection", features: filtrados});
+    centrarMapaSegunDatos({type: "FeatureCollection", features: filtrados});
   }
 
-  // Agregar nuevo personal
-  document.getElementById("addForm").addEventListener("submit", e=>{
+  // Agregar nuevo personal desde formulario
+  document.getElementById("addForm").addEventListener("submit", e => {
     e.preventDefault();
     const nuevo = {
       type: "Feature",
       properties: {},
-      geometry: {type:"Point", coordinates: [0,0]}
+      geometry: {type: "Point", coordinates: [0, 0]}
     };
-    for(const campo of campos){
+    for (const campo of campos) {
       const val = document.getElementById(campo).value.trim().toUpperCase();
       nuevo.properties[campo] = val;
-      if(campo === "LONGITUD") nuevo.geometry.coordinates[0] = parseFloat(val) || 0;
-      if(campo === "LATITUD") nuevo.geometry.coordinates[1] = parseFloat(val) || 0;
+      if (campo === "LONGITUD") nuevo.geometry.coordinates[0] = parseFloat(val) || 0;
+      if (campo === "LATITUD") nuevo.geometry.coordinates[1] = parseFloat(val) || 0;
     }
     nuevo._id = geojsonData.features.length;
     geojsonData.features.push(nuevo);
@@ -518,8 +393,8 @@
     e.target.reset();
   });
 
-  // Descargar GeoJSON
-  document.getElementById("downloadBtn").addEventListener("click", ()=>{
+  // Descargar archivo GeoJSON
+  document.getElementById("downloadBtn").addEventListener("click", () => {
     const dataStr = JSON.stringify(geojsonData, null, 2);
     const blob = new Blob([dataStr], {type: "application/json"});
     const url = URL.createObjectURL(blob);
@@ -537,10 +412,10 @@
   const usuarioInput = document.getElementById("usuario");
   const claveInput = document.getElementById("clave");
 
-  loginBtn.addEventListener("click", ()=>{
+  loginBtn.addEventListener("click", () => {
     const user = usuarioInput.value.trim();
     const pass = claveInput.value.trim();
-    if(usuarios[user] && usuarios[user] === pass){
+    if (usuarios[user] === pass) {
       usuarioLogueado = true;
       alert(`¡Bienvenido, ${user}!`);
       addForm.style.display = "block";
@@ -554,7 +429,7 @@
     }
   });
 
-  logoutBtn.addEventListener("click", ()=>{
+  logoutBtn.addEventListener("click", () => {
     usuarioLogueado = false;
     addForm.style.display = "none";
     logoutBtn.style.display = "none";
@@ -565,7 +440,7 @@
     claveInput.value = "";
     mostrarTabla(geojsonData);
   });
-
 </script>
 </body>
 </html>
+
