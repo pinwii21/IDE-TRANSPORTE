@@ -32,15 +32,12 @@
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
-
       <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
-
       <label for="personSelect">Persona:</label>
       <select id="personSelect">
-        <option value="">-- Selecciona persona --</option>
+        <option value="">-- Selecciona --</option>
       </select>
       <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
-
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
@@ -54,8 +51,38 @@
   </section>
 </main>
 
+<!-- Scripts -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script>
+  const usuarios = { admin: "1234", kevin: "admin2025" };
+  let usuarioLogueado = false;
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const user = document.getElementById("usuario").value.trim();
+    const pass = document.getElementById("clave").value.trim();
+    if (usuarios[user] === pass) {
+      usuarioLogueado = true;
+      alert(`Bienvenido ${user}`);
+      document.getElementById("addForm").style.display = "block";
+      document.getElementById("logoutBtn").style.display = "inline-flex";
+      document.getElementById("loginBtn").style.display = "none";
+      document.getElementById("usuario").disabled = true;
+      document.getElementById("clave").disabled = true;
+    } else {
+      alert("Usuario o contraseña incorrectos");
+    }
+  });
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    usuarioLogueado = false;
+    document.getElementById("addForm").style.display = "none";
+    document.getElementById("logoutBtn").style.display = "none";
+    document.getElementById("loginBtn").style.display = "inline-flex";
+    document.getElementById("usuario").disabled = false;
+    document.getElementById("clave").disabled = false;
+    document.getElementById("usuario").value = "";
+    document.getElementById("clave").value = "";
+  });
+</script>
 <script src="app.js"></script>
 </body>
 </html>
