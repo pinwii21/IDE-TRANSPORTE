@@ -1,4 +1,5 @@
 // app.js
+// app.js
 
 // 1. Configuración de usuarios y campos
 const usuarios = {
@@ -15,7 +16,6 @@ const campos = [
 let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
-const rutasCapas = {}; // Agregado para almacenar capas de rutas
 
 // 3. Inicializar mapa Leaflet
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
@@ -33,7 +33,6 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     mostrarTabla(data);
     mostrarMapa(data);
     centrarMapa(data);
-    poblarSelectPersonas();
   });
 
 // 5. Crear formulario de alta
@@ -106,7 +105,8 @@ function mostrarMapa(data) {
   geojsonLayer = L.geoJSON(data, {
     pointToLayer: (f, latlng) => L.circleMarker(latlng, {
       radius: 6,
-      fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99',
+      fillColor: getComputedStyle(document.documentElement)
+                  .getPropertyValue('--color-primario').trim() || '#004d99',
       color: "#000",
       weight: 1,
       opacity: 1,
@@ -125,7 +125,9 @@ function mostrarMapa(data) {
 // 9. Centrar el mapa según datos
 function centrarMapa(data) {
   if (!data.features.length) return;
-  const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
+  const coords = data.features
+    .map(f => f.geometry?.coordinates)
+    .filter(c => Array.isArray(c));
   const lats = coords.map(c => c[1]);
   const lngs = coords.map(c => c[0]);
   const bounds = [
@@ -136,23 +138,22 @@ function centrarMapa(data) {
 }
 
 // 10. Filtrar datos
-const input = document.getElementById("searchInput");
-const select = document.getElementById("filterField");
-input.addEventListener("input", filtrarDatos);
-select.addEventListener("change", filtrarDatos);
+document.getElementById("searchInput").addEventListener("input", filtrarDatos);
+document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
 function filtrarDatos() {
-  const campo = select.value;
-  const texto = input.value.toLowerCase();
-  const filtrados = geojsonData.features.filter(f => (f.properties[campo] || "").toLowerCase().includes(texto));
+  const campo = document.getElementById("filterField").value;
+  const texto = document.getElementById("searchInput").value.toLowerCase();
+  const filtrados = geojsonData.features.filter(f =>
+    (f.properties[campo] || "").toLowerCase().includes(texto)
+  );
   mostrarTabla({ type: "FeatureCollection", features: filtrados });
   mostrarMapa({ type: "FeatureCollection", features: filtrados });
   centrarMapa({ type: "FeatureCollection", features: filtrados });
 }
 
 // 11. Añadir nuevo personal
-const form = document.getElementById("addForm");
-form.addEventListener("submit", e => {
+document.getElementById("addForm").addEventListener("submit", e => {
   e.preventDefault();
   const nuevo = {
     type: "Feature",
@@ -163,7 +164,7 @@ form.addEventListener("submit", e => {
     const val = document.getElementById(c).value.trim().toUpperCase();
     nuevo.properties[c] = val;
     if (c === "LONGITUD") nuevo.geometry.coordinates[0] = parseFloat(val);
-    if (c === "LATITUD") nuevo.geometry.coordinates[1] = parseFloat(val);
+    if (c === "LATITUD")  nuevo.geometry.coordinates[1] = parseFloat(val);
   });
   if (isNaN(nuevo.geometry.coordinates[0]) || isNaN(nuevo.geometry.coordinates[1])) {
     return alert("LATITUD o LONGITUD inválida.");
@@ -220,53 +221,50 @@ logoutBtn.addEventListener("click", () => {
   mostrarTabla(geojsonData);
 });
 
-// 14. Poblado de select de personas
-function poblarSelectPersonas() {
-  const sel = document.getElementById('personSelect');
-  sel.innerHTML = '<option value="">-- Selecciona --</option>';
-  geojsonData.features.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f._id;
-    opt.text = `${f.properties.NOMBRE} (${f.properties.CODIGO})`;
-    sel.appendChild(opt);
-  });
-}
+// 14. Cargar capas de rutas desde carpetas con index.json
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA',  name: 'Rutas de SALIDA',  color: '#dc3545' }
+];
+const capasOverlay = {};
 
-// 15. Cargar rutas de carpetas y control de capas con popups
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
       const idxRes = await fetch(`${dir}/index.json`);
       if (!idxRes.ok) throw new Error('Índice no encontrado');
       const lista = await idxRes.json();
-
       const grupo = L.layerGroup();
-      lista.forEach(file => {
-        fetch(`${dir}/${encodeURIComponent(file)}`)
-          .then(r => r.json())
-          .then(data => {
-            L.geoJSON(data, {
-              style: { color, weight: 3 },
-              onEachFeature: (feature, layer) => {
-                if (!feature.properties) return;
-                let contenido = '';
-                for (const key in feature.properties) {
-                  contenido += `<b>${key}:</b> ${feature.properties[key]}<br>`;
-                }
-                layer.bindPopup(contenido || 'Sin atributos');
-              }
-            }).addTo(grupo);
-          })
-          .catch(() => console.warn('No se pudo cargar', file));
-      });
 
-      rutasCapas[name] = grupo;
+      for (const fichero of lista) {
+        const url = `${dir}/${encodeURIComponent(fichero)}`;
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error();
+          const data = await r.json();
+          L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          }).addTo(grupo);
+        } catch {
+          console.warn('No se pudo cargar', url);
+        }
+      }
+
+      capasOverlay[name] = grupo;
       grupo.addTo(map);
-    } catch (e) {
-      console.error('Error cargando índice de', dir, e);
+    } catch (err) {
+      console.error('Error cargando índice de', dir, err);
     }
   }
-
-  // Añadir control de capas al mapa
-  L.control.layers(null, rutasCapas, { collapsed: false }).addTo(map);
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
+
+// Iniciar la carga de rutas
+cargarIndexYCapas();
