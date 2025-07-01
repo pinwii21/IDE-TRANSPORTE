@@ -1,5 +1,4 @@
 // app.js
-// app.js
 
 // 1. Configuración de usuarios y campos
 const usuarios = {
