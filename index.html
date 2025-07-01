@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IDE TRANSPORTE</title>
+
   <!-- Estilos -->
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -31,15 +32,7 @@
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
-
       <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
-
-      <label for="personSelect">Persona:</label>
-      <select id="personSelect">
-        <option value="">-- Selecciona persona --</option>
-      </select>
-      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
-
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
@@ -54,7 +47,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
