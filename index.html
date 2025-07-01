@@ -48,7 +48,10 @@
 
   <div id="controls">
     <label for="filterField">Filtrar por:</label>
-    <select id="filterField"></select>
+    <select id="filterField">
+      <option value="CODIGO">CODIGO</option>
+      <option value="NOMBRE">NOMBRE</option>
+    </select>
     <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
     <button id="downloadBtn">Descargar GeoJSON</button>
   </div>
@@ -72,18 +75,7 @@
         geojsonData = data;
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
-        cargarCamposFiltro();
       });
-
-    function cargarCamposFiltro() {
-      const select = document.getElementById("filterField");
-      campos.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-      });
-    }
 
     function mostrarTabla(data) {
       const cont = document.getElementById("tableContainer");
@@ -165,3 +157,4 @@
   </script>
 </body>
 </html>
+
