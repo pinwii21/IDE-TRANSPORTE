@@ -199,3 +199,48 @@ logoutBtn.addEventListener("click", () => {
   document.getElementById("clave").value = "";
   mostrarTabla(geojsonData);
 });
+
+// Cargar múltiples archivos GeoJSON de una carpeta
+async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color) {
+  const capa = L.layerGroup();
+
+  for (let i = 1; i <= 100; i++) {
+    const nombreArchivo = `RUTA_${i}.geojson`; // Asume nombres como RUTA_1.geojson
+    const url = `${carpeta}/${nombreArchivo}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+
+      const subcapa = L.geoJSON(data, {
+        style: { color: color || "#007acc", weight: 3 },
+        onEachFeature: (feature, layer) => {
+          const props = feature.properties || {};
+          let popup = `<b>${nombreArchivo}</b><br>`;
+          for (const key in props) {
+            popup += `<b>${key}:</b> ${props[key]}<br>`;
+          }
+          layer.bindPopup(popup);
+        }
+      });
+
+      subcapa.addTo(capa);
+    } catch (err) {
+      console.warn("No se pudo cargar:", url);
+    }
+  }
+
+  capasOverlay[nombreCapa] = capa;
+  capa.addTo(map);
+}
+
+const capasOverlay = {}; // Contendrá las capas visibles
+
+// Llama estas funciones al cargar la página
+cargarGeoJSONDesdeCarpeta("rutas_entrada", "Rutas Entrada", "#28a745");
+cargarGeoJSONDesdeCarpeta("rutas_salida", "Rutas Salida", "#dc3545");
+
+// Añadir control de capas
+setTimeout(() => {
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+}, 2000); // Esperamos unos segundos para que se carguen algunas capas
