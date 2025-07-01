@@ -1,3 +1,5 @@
+// app.js
+
 // 1. Configuración de usuarios y campos
 const usuarios = {
   admin: "1234",
@@ -10,9 +12,7 @@ const campos = [
 ];
 
 // 2. Variables globales
-let geojsonData = null;      // Personal
-let rutasLayer = null;       // Rutas
-let capasOverlay = {};       // Para compatibilidad con la lógica de rutas
+let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
 
@@ -22,8 +22,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 4. Cargar personal (entrada)
-fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/entrada/index.json')
+// 4. Cargar GeoJSON de personal desde GitHub
+fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
     data.features.forEach((f, i) => f._id = i);
@@ -32,52 +32,9 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/entrada/in
     mostrarTabla(data);
     mostrarMapa(data);
     centrarMapa(data);
-    actualizarListaPersonas(data.features);
-    document.getElementById('addForm').style.display = usuarioLogueado ? 'block' : 'none';
   });
 
-// 5. Cargar rutas (salida)
-fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/salida/index.json')
-  .then(res => res.json())
-  .then(data => {
-    rutasLayer = L.geoJSON(data, {
-      style: {
-        color: "#009944",
-        weight: 4,
-        opacity: 0.7
-      }
-    }).addTo(map);
-    capasOverlay['rutas'] = rutasLayer;
-  });
-
-// 6. Login/logout
-document.getElementById('loginBtn').onclick = function() {
-  const user = document.getElementById('usuario').value.trim();
-  const pass = document.getElementById('clave').value.trim();
-  if (usuarios[user] && usuarios[user] === pass) {
-    usuarioLogueado = true;
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = '';
-    document.getElementById('usuario').disabled = true;
-    document.getElementById('clave').disabled = true;
-    document.getElementById('addForm').style.display = 'block';
-    mostrarTabla(geojsonData); // hacer la tabla editable
-  } else {
-    alert('Usuario o clave incorrectos');
-  }
-};
-
-document.getElementById('logoutBtn').onclick = function() {
-  usuarioLogueado = false;
-  document.getElementById('loginBtn').style.display = '';
-  document.getElementById('logoutBtn').style.display = 'none';
-  document.getElementById('usuario').disabled = false;
-  document.getElementById('clave').disabled = false;
-  document.getElementById('addForm').style.display = 'none';
-  mostrarTabla(geojsonData); // deshabilitar edición
-};
-
-// 7. Crear formulario de alta
+// 5. Crear formulario de alta
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -93,7 +50,7 @@ function crearCamposFormulario() {
   });
 }
 
-// 8. Mostrar tabla editable
+// 6. Mostrar tabla editable
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -117,7 +74,7 @@ function mostrarTabla(data) {
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 9. Asignar edición en celdas
+// 7. Asignar edición en celdas
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -141,13 +98,14 @@ function asignarEventosEdicion() {
   });
 }
 
-// 10. Mostrar puntos en el mapa
+// 8. Mostrar puntos en el mapa
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
     pointToLayer: (f, latlng) => L.circleMarker(latlng, {
       radius: 6,
-      fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99',
+      fillColor: getComputedStyle(document.documentElement)
+                  .getPropertyValue('--color-primario').trim() || '#004d99',
       color: "#000",
       weight: 1,
       opacity: 1,
@@ -163,106 +121,149 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 11. Centrar el mapa según datos
+// 9. Centrar el mapa según datos
 function centrarMapa(data) {
   if (!data.features.length) return;
-  const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
+  const coords = data.features
+    .map(f => f.geometry?.coordinates)
+    .filter(c => Array.isArray(c));
   const lats = coords.map(c => c[1]);
   const lngs = coords.map(c => c[0]);
-  const bounds = [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]];
+  const bounds = [
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)]
+  ];
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 12. Filtrar datos
-const searchInput = document.getElementById("searchInput");
-const filterField = document.getElementById("filterField");
-searchInput.addEventListener("input", filtrarDatos);
-filterField.addEventListener("change", filtrarDatos);
+// 10. Filtrar datos
+document.getElementById("searchInput").addEventListener("input", filtrarDatos);
+document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
 function filtrarDatos() {
-  const campo = filterField.value;
-  const texto = searchInput.value.toLowerCase();
-  const filtrados = geojsonData.features.filter(f => (f.properties[campo] || "").toLowerCase().includes(texto));
-  const dataset = { type: "FeatureCollection", features: filtrados };
-  mostrarTabla(dataset);
-  mostrarMapa(dataset);
-  centrarMapa(dataset);
-  actualizarListaPersonas(filtrados); // ← actualizar el select también
+  const campo = document.getElementById("filterField").value;
+  const texto = document.getElementById("searchInput").value.toLowerCase();
+  const filtrados = geojsonData.features.filter(f =>
+    (f.properties[campo] || "").toLowerCase().includes(texto)
+  );
+  mostrarTabla({ type: "FeatureCollection", features: filtrados });
+  mostrarMapa({ type: "FeatureCollection", features: filtrados });
+  centrarMapa({ type: "FeatureCollection", features: filtrados });
 }
 
-// 13. Lista desplegable de personas
-function actualizarListaPersonas(lista) {
-  const select = document.getElementById("personSelect");
-  if (!select) return;
-  select.innerHTML = '<option value="">-- Selecciona persona --</option>';
-  lista.forEach(f => {
-    const nombre = f.properties?.NOMBRE || "SIN NOMBRE";
-    const codigo = f.properties?.CODIGO || "SIN CÓDIGO";
-    const value = f._id;
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = `${nombre} (${codigo})`;
-    select.appendChild(option);
-  });
-}
-
-// 14. Buscar y mostrar ruta más cercana al clickar en "Calcular"
-document.getElementById("findRouteBtn").addEventListener("click", () => {
-  const select = document.getElementById("personSelect");
-  const selectedId = parseInt(select.value);
-
-  if (isNaN(selectedId)) return alert("Selecciona una persona válida.");
-  const persona = geojsonData.features.find(f => f._id === selectedId);
-  if (!persona || !persona.geometry) return alert("No se encontró ubicación para esta persona.");
-
-  const [lng, lat] = persona.geometry.coordinates;
-  const punto = L.latLng(lat, lng);
-  let distanciaMinima = Infinity;
-  let rutaMasCercana = null;
-
-  // Recorrer todas las rutas cargadas
-  if (capasOverlay['rutas']) {
-    capasOverlay['rutas'].eachLayer(featureLayer => {
-      if (typeof featureLayer.getLatLngs === 'function') {
-        const coords = featureLayer.getLatLngs().flat();
-        coords.forEach(coord => {
-          const d = punto.distanceTo(coord);
-          if (d < distanciaMinima) {
-            distanciaMinima = d;
-            rutaMasCercana = featureLayer;
-          }
-        });
-      }
-    });
-  }
-
-  if (rutaMasCercana) {
-    rutaMasCercana.setStyle({ color: "#ff9900", weight: 6 });
-    map.fitBounds(rutaMasCercana.getBounds(), { padding: [30, 30] });
-    alert("Ruta más cercana resaltada en naranja.");
-  } else {
-    alert("No se encontró ninguna ruta cercana.");
-  }
-});
-
-// 15. Agregar personal
-document.getElementById('addForm').onsubmit = function(e) {
+// 11. Añadir nuevo personal
+document.getElementById("addForm").addEventListener("submit", e => {
   e.preventDefault();
-  const nuevo = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
-  campos.forEach(campo => {
-    const val = document.getElementById(campo).value.trim().toUpperCase();
-    nuevo.properties[campo] = val;
+  const nuevo = {
+    type: "Feature",
+    properties: {},
+    geometry: { type: "Point", coordinates: [0, 0] }
+  };
+  campos.forEach(c => {
+    const val = document.getElementById(c).value.trim().toUpperCase();
+    nuevo.properties[c] = val;
+    if (c === "LONGITUD") nuevo.geometry.coordinates[0] = parseFloat(val);
+    if (c === "LATITUD")  nuevo.geometry.coordinates[1] = parseFloat(val);
   });
-  const lat = parseFloat(nuevo.properties["LATITUD"]);
-  const lng = parseFloat(nuevo.properties["LONGITUD"]);
-  if (!isNaN(lat) && !isNaN(lng)) {
-    nuevo.geometry.coordinates = [lng, lat];
+  if (isNaN(nuevo.geometry.coordinates[0]) || isNaN(nuevo.geometry.coordinates[1])) {
+    return alert("LATITUD o LONGITUD inválida.");
   }
   nuevo._id = geojsonData.features.length;
   geojsonData.features.push(nuevo);
   mostrarTabla(geojsonData);
   mostrarMapa(geojsonData);
   centrarMapa(geojsonData);
-  actualizarListaPersonas(geojsonData.features);
-  this.reset();
-};
+  e.target.reset();
+});
+
+// 12. Descargar GeoJSON
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "datos_personal.geojson";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// 13. Login / Logout
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+loginBtn.addEventListener("click", () => {
+  const user = document.getElementById("usuario").value.trim();
+  const pass = document.getElementById("clave").value.trim();
+  if (usuarios[user] === pass) {
+    usuarioLogueado = true;
+    alert(`¡Bienvenido, ${user}!`);
+    document.getElementById("addForm").style.display = "block";
+    logoutBtn.style.display = "inline-flex";
+    loginBtn.style.display = "none";
+    document.getElementById("usuario").disabled = true;
+    document.getElementById("clave").disabled = true;
+    mostrarTabla(geojsonData);
+  } else {
+    alert("Usuario o contraseña incorrectos.");
+  }
+});
+
+logoutBtn.addEventListener("click", () => {
+  usuarioLogueado = false;
+  document.getElementById("addForm").style.display = "none";
+  logoutBtn.style.display = "none";
+  loginBtn.style.display = "inline-flex";
+  document.getElementById("usuario").disabled = false;
+  document.getElementById("clave").disabled = false;
+  document.getElementById("usuario").value = "";
+  document.getElementById("clave").value = "";
+  mostrarTabla(geojsonData);
+});
+
+// 14. Cargar capas de rutas desde carpetas con index.json
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA',  name: 'Rutas de SALIDA',  color: '#dc3545' }
+];
+const capasOverlay = {};
+
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const idxRes = await fetch(`${dir}/index.json`);
+      if (!idxRes.ok) throw new Error('Índice no encontrado');
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
+
+      for (const fichero of lista) {
+        const url = `${dir}/${encodeURIComponent(fichero)}`;
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error();
+          const data = await r.json();
+          L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          }).addTo(grupo);
+        } catch {
+          console.warn('No se pudo cargar', url);
+        }
+      }
+
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
+    } catch (err) {
+      console.error('Error cargando índice de', dir, err);
+    }
+  }
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+}
+
+// Iniciar la carga de rutas
+cargarIndex
