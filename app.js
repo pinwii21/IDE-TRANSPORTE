@@ -5,6 +5,7 @@ const usuarios = {
   admin: "1234",
   kevin: "admin2025"
 };
+
 const campos = [
   "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
   "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
@@ -56,12 +57,13 @@ function crearCamposFormulario() {
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
+
   let html = `<table><thead><tr><th>#</th>`;
   campos.forEach(c => html += `<th>${c}</th>`);
   html += `</tr></thead><tbody>`;
 
   data.features.forEach((f, i) => {
-    html += `<tr><td>${i+1}</td>`;
+    html += `<tr><td>${i + 1}</td>`;
     campos.forEach(campo => {
       let val = f.properties[campo] || '';
       if (campo === "LATITUD") val = f.geometry?.coordinates[1] || '';
@@ -70,6 +72,7 @@ function mostrarTabla(data) {
     });
     html += `</tr>`;
   });
+
   html += `</tbody></table>`;
   cont.innerHTML = html;
 
@@ -165,10 +168,7 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. Buscar y mostrar ruta más cercana
-// (ya implementado previamente)
-
-// 13. Cargar rutas desde carpetas
+// 12. Cargar rutas desde carpetas
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
