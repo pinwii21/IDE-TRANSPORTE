@@ -200,20 +200,22 @@ logoutBtn.addEventListener("click", () => {
   mostrarTabla(geojsonData);
 });
 
-// Cargar múltiples archivos GeoJSON de una carpeta
-async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color) {
+const capasOverlay = {}; // Guardará las capas visibles
+
+async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color = "#007acc") {
   const capa = L.layerGroup();
 
-  for (let i = 1; i <= 100; i++) {
-    const nombreArchivo = `RUTA_${i}.geojson`; // Asume nombres como RUTA_1.geojson
+  // Intentamos cargar 200 rutas por carpeta
+  for (let i = 1; i <= 200; i++) {
+    const nombreArchivo = `RUTA_${i}.geojson`;
     const url = `${carpeta}/${nombreArchivo}`;
     try {
       const res = await fetch(url);
-      if (!res.ok) continue;
+      if (!res.ok) continue; // Si no existe, lo ignoramos
       const data = await res.json();
 
       const subcapa = L.geoJSON(data, {
-        style: { color: color || "#007acc", weight: 3 },
+        style: { color: color, weight: 3 },
         onEachFeature: (feature, layer) => {
           const props = feature.properties || {};
           let popup = `<b>${nombreArchivo}</b><br>`;
@@ -226,7 +228,7 @@ async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color) {
 
       subcapa.addTo(capa);
     } catch (err) {
-      console.warn("No se pudo cargar:", url);
+      console.warn("Archivo no encontrado o inválido:", url);
     }
   }
 
@@ -234,13 +236,12 @@ async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color) {
   capa.addTo(map);
 }
 
-const capasOverlay = {}; // Contendrá las capas visibles
+// Llamar al cargar la página
+cargarGeoJSONDesdeCarpeta("Rutas de ENTRADA", "Rutas de ENTRADA", "#28a745"); // verde
+cargarGeoJSONDesdeCarpeta("Rutas de SALIDA", "Rutas de SALIDA", "#dc3545");   // rojo
 
-// Llama estas funciones al cargar la página
-cargarGeoJSONDesdeCarpeta("rutas_entrada", "Rutas Entrada", "#28a745");
-cargarGeoJSONDesdeCarpeta("rutas_salida", "Rutas Salida", "#dc3545");
-
-// Añadir control de capas
+// Esperar un poco y luego agregar el control de capas
 setTimeout(() => {
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
-}, 2000); // Esperamos unos segundos para que se carguen algunas capas
+}, 3000);
+
