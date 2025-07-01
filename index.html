@@ -1,167 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mapa con espacio adecuado</title>
-
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
-    }
-
-    #map {
-      margin: 0 auto 20px auto; /* centro horizontal, margen abajo */
-      padding: 10px;
-      max-width: 900px;
-      height: 500px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-      background: white;
-    }
-
-    form {
-      max-width: 900px;
-      margin: 0 auto 20px auto;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-
-    form label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-
-    form input,
-    form select,
-    form button {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1em;
-    }
-
-    form button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    form button:hover {
-      background-color: #0056b3;
-    }
-
-    table {
-      width: 900px;
-      margin: 0 auto;
-      border-collapse: collapse;
-      background: white;
-      box-sizing: border-box;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th,
-    td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-
-    @media (max-width: 950px) {
-      #map,
-      form,
-      table {
-        width: 95%;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDE TRANSPORTE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <h1 style="text-align:center;">Mapa con formulario y tabla</h1>
 
-  <div id="map"></div>
-
-  <form id="form-personal">
-    <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" name="nombre" placeholder="Ingresa nombre" required />
-
-    <label for="telefono">Teléfono:</label>
-    <input type="tel" id="telefono" name="telefono" placeholder="Ingresa teléfono" required />
-
-    <button type="submit">Guardar</button>
+<header>
+  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+  <form id="loginForm">
+    <input id="usuario" type="text" placeholder="Usuario" required>
+    <input id="clave" type="password" placeholder="Clave" required>
+    <button id="loginBtn" type="button"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    <button id="logoutBtn" type="button" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
   </form>
+</header>
 
-  <table id="tabla-personal">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Aquí se agregan filas dinámicamente -->
-    </tbody>
-  </table>
+<main>
+  <div id="map"></div>
+  <section id="panelDerecho">
+    <section id="controles">
+      <label for="filterField">Filtrar por:</label>
+      <select id="filterField">
+        <option value="CODIGO">Código</option>
+        <option value="NOMBRE" selected>Nombre</option>
+      </select>
+      <input id="searchInput" type="search" placeholder="Buscar...">
+      <label for="personSelect">Persona:</label>
+      <select id="personSelect">
+        <option value="">-- Selecciona --</option>
+      </select>
+      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
+    </section>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    // Inicializar mapa
-    const map = L.map('map').setView([-0.180653, -78.467838], 13); // Quito, Ecuador
+    <div id="tabla"></div>
 
-    // Capa base OSM
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    <form id="addForm">
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <div id="camposForm"></div>
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+    </form>
+  </section>
+</main>
 
-    // Manejar formulario
-    const form = document.getElementById('form-personal');
-    const tablaBody = document.querySelector('#tabla-personal tbody');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const nombre = form.nombre.value.trim();
-      const telefono = form.telefono.value.trim();
-
-      if (!nombre || !telefono) {
-        alert('Por favor, completa todos los campos.');
-        return;
-      }
-
-      // Agregar fila a la tabla
-      const fila = document.createElement('tr');
-      fila.innerHTML = `<td>${nombre}</td><td>${telefono}</td>`;
-      tablaBody.appendChild(fila);
-
-      // Limpiar formulario
-      form.reset();
-    });
-  </script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
+
