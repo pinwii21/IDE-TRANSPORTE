@@ -220,52 +220,63 @@ logoutBtn.addEventListener("click", () => {
   mostrarTabla(geojsonData);
 });
 
-// 14. Cargar capas de rutas desde carpetas con index.json
-const carpetas = [
-  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
-  { dir: 'Rutas_de_SALIDA',  name: 'Rutas de SALIDA',  color: '#dc3545' }
+// 14. Cargar rutas y calcular ruta más cercana
+const carpetas=[
+  {dir:'Rutas_de_ENTRADA',name:'Rutas de ENTRADA',color:'#28a745'},
+  {dir:'Rutas_de_SALIDA', name:'Rutas de SALIDA', color:'#dc3545'}
 ];
-const capasOverlay = {};
 
-async function cargarIndexYCapas() {
-  for (const { dir, name, color } of carpetas) {
-    try {
-      const idxRes = await fetch(`${dir}/index.json`);
-      if (!idxRes.ok) throw new Error('Índice no encontrado');
-      const lista = await idxRes.json();
-      const grupo = L.layerGroup();
-
-      for (const fichero of lista) {
-        const url = `${dir}/${encodeURIComponent(fichero)}`;
-        try {
-          const r = await fetch(url);
-          if (!r.ok) throw new Error();
-          const data = await r.json();
-          L.geoJSON(data, {
-            style: { color, weight: 3 },
-            onEachFeature: (feature, layer) => {
-              let popup = `<b>${fichero}</b><br>`;
-              for (const k in feature.properties) {
-                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
-              }
-              layer.bindPopup(popup);
-            }
-          }).addTo(grupo);
-        } catch {
-          console.warn('No se pudo cargar', url);
-        }
-      }
-
-      capasOverlay[name] = grupo;
-      grupo.addTo(map);
-    } catch (err) {
-      console.error('Error cargando índice de', dir, err);
-    }
-  }
-  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+function poblarSelectPersonas(){
+  const sel=document.getElementById('personSelect');
+  sel.innerHTML='<option value="">-- Selecciona --</option>';
+  geojsonData.features.forEach(f=>{
+    const opt=document.createElement('option');
+    opt.value=f._id; opt.text=`${f.properties.NOMBRE} (${f.properties.CODIGO})`;
+    sel.appendChild(opt);
+  });
 }
 
-// Iniciar la carga de rutas
-cargarIndexYCapas();
+async function cargarIndexYCapas(){
+  for(const {dir,name,color} of carpetas){
+    try{
+      const r=await fetch(`${dir}/index.json`);
+      if(!r.ok) throw 0;
+      const lista=await r.json(), grupo=L.layerGroup();
+      for(const file of lista){
+        try{
+          const rr=await fetch(`${dir}/${encodeURIComponent(file)}`);
+          if(!rr.ok) throw 0;
+          const data=await rr.json();
+          L.geoJSON(data,{style:{color,weight:3}}).addTo(grupo);
+        }catch{}
+      }
+      rutasCapas[name]=grupo; grupo.addTo(map);
+    }catch(e){console.error(name,'indice falló');}
+  }
+  L.control.layers(null,rutasCapas,{collapsed:false}).addTo(map);
+}
+
+// función para calcular y resaltar ruta más cercana
+async function encontrarRuta(){
+  const id=document.getElementById('personSelect').value;
+  if(id==='') return alert('Seleccione una persona');
+  const f=geojsonData.features.find(x=>x._id==id);
+  const punto=turf.point(f.geometry.coordinates);
+  let min=Infinity, selLayer=null;
+  Object.values(rutasCapas).forEach(gr=>{
+    gr.eachLayer(layer=>{
+      const dist=turf.pointToLineDistance(punto,layer.feature,{units:'meters'});
+      if(dist<min){min=dist; selLayer=layer;}
+    });
+  });
+  if(selLayer){
+    map.fitBounds(selLayer.getBounds(),{padding:[20,20]});
+    selLayer.setStyle({color:'#FF0000',weight:5});
+    setTimeout(()=>selLayer.setStyle({color:selLayer.options.style.color,weight:3}),5000);
+  }
+}
+document.getElementById('findRouteBtn').addEventListener('click',encontrarRuta);
+// iniciar carga de rutas\cargarIndexYCapas();
+
 
 
