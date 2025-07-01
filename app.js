@@ -245,24 +245,27 @@ async function cargarIndexYCapas() {
       if (!idxRes.ok) throw new Error('Índice no encontrado');
       const lista = await idxRes.json();
       const grupo = L.layerGroup();
-      lista.forEach(file => {
+      for (const file of lista) {
         fetch(`${dir}/${encodeURIComponent(file)}`)
           .then(r => r.json())
           .then(data => {
-            L.geoJSON(data, {
+            const capa = L.geoJSON(data, {
               style: { color, weight: 3 }
-            }).addTo(grupo);
+            });
+            capa.addTo(grupo);
           })
           .catch(() => console.warn('No se pudo cargar', file));
-      });
+      }
       rutasCapas[name] = grupo;
       grupo.addTo(map);
     } catch (e) {
-      console.error('Error cargando índice de', dir, e);
+      console.error(`Error cargando índice de ${dir}`, e);
     }
   }
+
+  // Añadir control de capas al mapa
   L.control.layers(null, rutasCapas, { collapsed: false }).addTo(map);
 }
 
-// Iniciar carga de rutas
+// Ejecutar la carga de rutas
 cargarIndexYCapas();
