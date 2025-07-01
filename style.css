@@ -1,23 +1,20 @@
 :root {
-  --color-primario: #004d99;       /* Azul oscuro */
-  --color-secundario: #007acc;     /* Azul medio */
-  --color-fondo: #f0f4f8;          /* Fondo gris azulado claro */
-  --color-texto: #212529;          /* Texto negro */
-  --color-blanco: #ffffff;         /* Blanco puro */
-  --color-gris-claro: #dee2e6;     /* Gris claro para bordes */
-  --color-gris-medio: #adb5bd;     /* Gris medio */
-  --color-error: #dc3545;          /* Rojo para errores */
-  --color-exito: #28a745;          /* Verde para éxito */
-  --color-hover: #005bb5;          /* Azul más fuerte */
+  --color-primario: #004d99;
+  --color-secundario: #007acc;
+  --color-fondo: #f0f4f8;
+  --color-texto: #212529;
+  --color-blanco: #ffffff;
+  --color-gris-claro: #dee2e6;
+  --color-gris-medio: #adb5bd;
+  --color-error: #dc3545;
+  --color-exito: #28a745;
+  --color-hover: #005bb5;
   --borde-radio: 8px;
   --sombra-suave: 0 4px 12px rgba(0,0,0,0.1);
   --transition-fast: 0.25s ease;
 }
 
-/* RESET */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -32,7 +29,6 @@ body, html {
   flex-direction: column;
 }
 
-/* HEADER */
 header {
   background-color: var(--color-primario);
   color: var(--color-blanco);
@@ -42,31 +38,23 @@ header {
   justify-content: space-between;
   padding: 0 24px;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-
 header h1 {
   font-size: 1.5rem;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+header i { font-size: 1.4rem; }
 
-header i {
-  font-size: 1.4rem;
-}
-
-/* FORMULARIO LOGIN */
 #loginForm {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-
 #loginForm input {
   padding: 8px 12px;
   border: none;
@@ -74,12 +62,10 @@ header i {
   font-size: 1rem;
   width: 140px;
 }
-
 #loginForm input:focus {
   outline: none;
   box-shadow: 0 0 6px var(--color-secundario);
 }
-
 #loginForm button {
   background-color: var(--color-secundario);
   color: var(--color-blanco);
@@ -92,38 +78,22 @@ header i {
   align-items: center;
   gap: 8px;
 }
+#loginForm button:hover { background-color: var(--color-hover); }
+#logoutBtn { background-color: var(--color-error); display: none; }
+#logoutBtn:hover { background-color: #a32429; }
 
-#loginForm button:hover {
-  background-color: var(--color-hover);
-}
-
-#logoutBtn {
-  background-color: var(--color-error);
-  display: none;
-}
-
-#logoutBtn:hover {
-  background-color: #a32429;
-}
-
-/* LAYOUT PRINCIPAL */
 main {
   display: flex;
   height: calc(100vh - 60px);
   padding: 80px 24px 24px;
   gap: 24px;
-  background-color: var(--color-fondo);
 }
-
-/* MAPA */
 #map {
   flex: 1.3;
   border-radius: var(--borde-radio);
   box-shadow: var(--sombra-suave);
   min-width: 320px;
 }
-
-/* PANEL DERECHO */
 #panelDerecho {
   flex: 1;
   display: flex;
@@ -134,99 +104,70 @@ main {
   min-width: 320px;
 }
 
-/* CONTROLES */
 #controles {
   padding: 16px 24px;
   border-bottom: 1px solid var(--color-gris-claro);
   display: flex;
   gap: 16px;
   align-items: center;
-  flex-wrap: wrap;
-  background-color: var(--color-blanco);
+  background: var(--color-blanco);
 }
-
-#controles label {
-  font-weight: bold;
-}
-
+#controles label { font-weight: bold; }
 #filterField, #searchInput {
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid var(--color-gris-medio);
-  font-size: 1rem;
 }
-
-#filterField:focus, #searchInput:focus {
+#controles input:focus, #controles select:focus {
   border-color: var(--color-secundario);
-  outline: none;
   box-shadow: 0 0 4px var(--color-secundario);
 }
 
 #downloadBtn {
-  background-color: var(--color-secundario);
+  background: var(--color-secundario);
   color: var(--color-blanco);
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+#downloadBtn:hover { background: var(--color-hover); }
 
-#downloadBtn:hover {
-  background-color: var(--color-hover);
-}
-
-/* TABLA */
 #tabla {
   flex-grow: 1;
   overflow-y: auto;
   padding: 16px 24px;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  background-color: var(--color-blanco);
+  background: var(--color-blanco);
 }
-
 thead {
-  background-color: var(--color-primario);
+  background: var(--color-primario);
   color: var(--color-blanco);
   position: sticky;
   top: 0;
 }
-
 th, td {
   padding: 10px;
   border: 1px solid var(--color-gris-claro);
   text-align: left;
 }
+tbody tr:hover { background: #e6f2ff; }
+td[contenteditable] { background: #fffbea; }
+td[contenteditable]:focus { background: #fff3b0; outline: 2px solid var(--color-secundario); }
 
-tbody tr:hover {
-  background-color: #e6f2ff;
-}
-
-td[contenteditable="true"] {
-  background-color: #fffbea;
-}
-
-td[contenteditable="true"]:focus {
-  background-color: #fff3b0;
-  outline: 2px solid var(--color-secundario);
-}
-
-/* FORMULARIO AGREGAR */
 #addForm {
   padding: 24px;
   display: none;
-  background-color: var(--color-blanco);
+  background: var(--color-blanco);
   border-top: 3px solid var(--color-secundario);
 }
-
 #addForm h2 {
   font-size: 1.4rem;
   color: var(--color-primario);
@@ -234,78 +175,36 @@ td[contenteditable="true"]:focus {
   align-items: center;
   gap: 10px;
 }
-
 #camposForm {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 18px 20px;
   margin-bottom: 24px;
 }
-
-#camposForm label {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
+#camposForm label { font-weight: 600; }
 #camposForm input {
   padding: 8px;
-  border-radius: 6px;
   border: 1px solid var(--color-gris-medio);
+  border-radius: 6px;
 }
-
-#camposForm input:focus {
-  border-color: var(--color-secundario);
-  box-shadow: 0 0 6px var(--color-secundario);
-  outline: none;
-}
+#camposForm input:focus { box-shadow: 0 0 6px var(--color-secundario); outline: none; }
 
 #addForm button {
-  background-color: var(--color-secundario);
-  color: white;
+  background: var(--color-secundario);
+  color: var(--color-blanco);
   padding: 14px 24px;
   border: none;
   border-radius: 10px;
-  font-weight: bold;
   cursor: pointer;
-  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+#addForm button:hover { background: var(--color-hover); }
 
-#addForm button:hover {
-  background-color: var(--color-hover);
-}
-
-/* RESPONSIVE */
 @media (max-width: 900px) {
-  main {
-    flex-direction: column;
-    padding: 80px 16px 16px;
-  }
-
-  #map,
-  #panelDerecho {
-    width: 100%;
-    height: 380px;
-    margin-bottom: 24px;
-  }
-
-  #controles {
-    gap: 12px;
-  }
-
-  #loginForm {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  #loginForm input {
-    width: 120px;
-  }
-
-  table {
-    min-width: 100%;
-  }
+  main { flex-direction: column; padding: 80px 16px 16px; }
+  #map, #panelDerecho { width: 100%; height: 380px; margin-bottom: 24px; }
+  #loginForm { flex-wrap: wrap; gap: 10px; }
+  table { min-width: 100%; }
 }
