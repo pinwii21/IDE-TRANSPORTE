@@ -267,6 +267,36 @@ async function cargarIndexYCapas() {
 
 // Iniciar la carga de rutas
 cargarIndexYCapas();
+
+// 15. Llenar <select> con nombres al cargar datos
+function actualizarListaPersonas() {
+  const select = document.getElementById("personSelect");
+  if (!select) return;
+  select.innerHTML = '<option value="">-- Selecciona persona --</option>';
+  geojsonData.features.forEach(f => {
+    const nombre = f.properties?.NOMBRE || "SIN NOMBRE";
+    const codigo = f.properties?.CODIGO || "SIN CÓDIGO";
+    const value = f._id;
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = `${nombre} (${codigo})`;
+    select.appendChild(option);
+  });
+}
+
+// Llamar esta función después de cargar datos o filtrar
+fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
+  .then(res => res.json())
+  .then(data => {
+    data.features.forEach((f, i) => f._id = i);
+    geojsonData = data;
+    crearCamposFormulario();
+    mostrarTabla(data);
+    mostrarMapa(data);
+    centrarMapa(data);
+    actualizarListaPersonas(); // 👈 AÑADIDO
+  });
+
 // 16. Buscar y mostrar ruta más cercana bajo demanda
 document.getElementById('findRouteBtn').addEventListener('click', () => {
   const id = document.getElementById('personSelect').value;
