@@ -1,447 +1,75 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Editor GeoJSON de Personal</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    :root {
-      --main-color: #2c3e50;
-      --accent-color: #27ae60;
-      --light-bg: #f4f6f8;
-      --form-bg: #ffffff;
-      --table-header-bg: #34495e;
-      --table-row-hover: #eaeaea;
-      --editable-bg: #fefbd8;
-    }
+// Cuando cargamos datos, añadimos _id a cada feature para mantener referencia original
+fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
+  .then(r => r.json())
+  .then(data => {
+    // Agregar _id
+    data.features.forEach((f, i) => f._id = i);
+    geojsonData = data;
+    mostrarTabla(geojsonData);
+    mostrarMapa(geojsonData);
+    crearCamposFormulario();
+  });
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--light-bg);
-      color: var(--main-color);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+// Mostrar tabla
+function mostrarTabla(data) {
+  const cont = document.getElementById("tabla");
+  if (!data.features) return;
+  let html = `<table><thead><tr><th>#</th>`;
+  campos.forEach(c => html += `<th>${c}</th>`);
+  html += `</tr></thead><tbody>`;
 
-    header {
-      background-color: var(--main-color);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      flex-shrink: 0;
-    }
+  data.features.forEach((f, i) => {
+    // Usamos f._id para identificar feature original
+    html += `<tr><td>${i + 1}</td>`;
+    campos.forEach(campo => {
+      let valor = f.properties[campo] || "";
+      if (campo === "LATITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[1];
+      if (campo === "LONGITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[0];
+      html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ""} data-feature-id="${f._id}" data-attr="${campo}">${valor}</td>`;
+    });
+    html += `</tr>`;
+  });
 
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+  html += `</tbody></table>`;
+  cont.innerHTML = html;
 
-    .container {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 0 15px;
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      flex-grow: 1;
-      min-height: 0;
-    }
+  if(usuarioLogueado){
+    asignarEventosEdicion();
+  }
+}
 
-    /* Mapa y tabla lado a lado */
-    #map {
-      flex: 0 0 55%;
-      height: 600px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
+// Editar celdas
+function asignarEventosEdicion(){
+  const tdsEditables = document.querySelectorAll('td[contenteditable="true"]');
+  tdsEditables.forEach(td => td.oninput = null); // eliminar eventos previos
 
-    #tabla {
-      flex: 0 0 43%;
-      max-height: 600px;
-      overflow: auto;
-      background: var(--form-bg);
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-      padding: 10px;
-    }
+  let timeoutId = null;
+  tdsEditables.forEach(td => {
+    td.addEventListener('input', () => {
+      const featureId = parseInt(td.dataset.featureId);
+      const campo = td.dataset.attr;
+      const valor = td.textContent.trim().toUpperCase();
 
-    /* Tabla */
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      min-width: 700px;
-    }
+      // Encontrar la feature original por _id
+      const feature = geojsonData.features.find(f => f._id === featureId);
+      if (!feature) return;
 
-    th, td {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      text-align: left;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
+      feature.properties[campo] = valor;
 
-    th {
-      background-color: var(--table-header-bg);
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
+      if(campo === "LATITUD" || campo === "LONGITUD"){
+        let lat = parseFloat(feature.properties["LATITUD"]) || 0;
+        let lng = parseFloat(feature.properties["LONGITUD"]) || 0;
 
-    tr:hover {
-      background-color: var(--table-row-hover);
-    }
+        feature.geometry = {
+          type: "Point",
+          coordinates: [lng, lat]
+        };
 
-    td[contenteditable="true"] {
-      background-color: var(--editable-bg);
-      cursor: text;
-    }
-
-    /* Formularios y controles */
-    .card {
-      background: var(--form-bg);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-weight: 600;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    input, select {
-      width: 100%;
-      max-width: 400px;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    button {
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      transition: background-color 0.2s ease-in-out;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    button:hover {
-      background-color: #219150;
-    }
-
-    .btn-danger {
-      background-color: #c0392b;
-    }
-
-    .btn-danger:hover {
-      background-color: #962d22;
-    }
-
-    /* Login section */
-    #loginSection {
-      max-width: 420px;
-      margin: 0 auto 30px;
-    }
-
-    .form-inline {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    /* Controls (filter + download) */
-    #controls {
-      max-width: 1200px;
-      margin: 0 auto 20px;
-      padding: 10px 15px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      background: var(--form-bg);
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-    }
-
-    #filterField {
-      width: auto;
-      min-width: 150px;
-      font-size: 14px;
-    }
-
-    #searchInput {
-      flex: 1 1 auto;
-      min-width: 180px;
-      font-size: 14px;
-      padding: 10px;
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .container {
-        flex-direction: column;
-      }
-      #map, #tabla {
-        flex: 1 1 100%;
-        max-height: 400px;
-        height: 400px;
-      }
-      table {
-        min-width: 100%;
-      }
-      #controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      #searchInput {
-        flex-grow: 1;
-        min-width: unset;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> Editor GeoJSON de Personal</h1>
-  </header>
-
-  <section id="loginSection" class="card">
-    <label>Usuario: <input type="text" id="usuario" autocomplete="username" /></label>
-    <label>Clave: <input type="password" id="clave" autocomplete="current-password" /></label>
-    <div class="form-inline">
-      <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</button>
-      <button id="logoutBtn" class="btn-danger" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
-    </div>
-  </section>
-
-  <form id="addForm" class="card" style="display:none">
-    <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-    <div id="camposForm"></div>
-    <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-  </form>
-
-  <section id="controls">
-    <label for="filterField">Filtrar por:</label>
-    <select id="filterField">
-      <option value="CODIGO">Código</option>
-      <option value="NOMBRE" selected>Nombre</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="Buscar..." />
-    <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar GeoJSON</button>
-  </section>
-
-  <main class="container" style="flex-grow:1; min-height:600px;">
-    <div id="map"></div>
-    <div id="tabla"></div>
-  </main>
-
-  <script>
-    const usuarios = {
-      admin: "1234",
-      kevin: "admin2025"
-    };
-
-    const campos = [
-      "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
-      "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
-      "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
-    ];
-
-    let geojsonData = null;
-    let usuarioLogueado = false;
-    let map = L.map("map").setView([0, 0], 2);
-    let geojsonLayer;
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    }).addTo(map);
-
-    fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
-      .then(r => r.json())
-      .then(data => {
-        geojsonData = data;
-        mostrarTabla(geojsonData);
-        mostrarMapa(geojsonData);
-        crearCamposFormulario();
-      });
-
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const usuario = document.getElementById("usuario").value.trim();
-      const clave = document.getElementById("clave").value.trim();
-      if (usuarios[usuario] && usuarios[usuario] === clave) {
-        usuarioLogueado = true;
-        document.getElementById("addForm").style.display = "block";
-        document.getElementById("logoutBtn").style.display = "inline-block";
-        alert("¡Bienvenido!");
-        mostrarTabla(geojsonData);
-      } else {
-        alert("Credenciales incorrectas");
+        if(timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          mostrarMapa(geojsonData);
+        }, 300);
       }
     });
-
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      location.reload();
-    });
-
-    function crearCamposFormulario() {
-      const cont = document.getElementById("camposForm");
-      cont.innerHTML = "";
-      campos.forEach(campo => {
-        cont.innerHTML += `<label>${campo.replace(/_/g, " ")}: <input type="text" id="${campo}" autocomplete="off" /></label>`;
-      });
-    }
-
-    function mostrarTabla(data) {
-      const cont = document.getElementById("tabla");
-      if (!data.features) return;
-      let html = `<table><thead><tr><th>#</th>`;
-      campos.forEach(c => html += `<th>${c}</th>`);
-      html += `</tr></thead><tbody>`;
-      data.features.forEach((f, i) => {
-        html += `<tr><td>${i + 1}</td>`;
-        campos.forEach(campo => {
-          let valor = f.properties[campo] || "";
-          if (campo === "LATITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[1];
-          if (campo === "LONGITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[0];
-          html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ""} data-feature="${i}" data-attr="${campo}">${valor}</td>`;
-        });
-        html += `</tr>`;
-      });
-      html += `</tbody></table>`;
-      cont.innerHTML = html;
-
-      if(usuarioLogueado){
-        asignarEventosEdicion();
-      }
-    }
-
-    function asignarEventosEdicion(){
-      const tdsEditables = document.querySelectorAll('td[contenteditable="true"]');
-      tdsEditables.forEach(td => {
-        td.oninput = null; // eliminar si había
-      });
-
-      let timeoutId = null;
-      tdsEditables.forEach(td => {
-        td.addEventListener('input', () => {
-          const fila = td.dataset.feature;
-          const campo = td.dataset.attr;
-          const valor = td.textContent.trim().toUpperCase();
-          geojsonData.features[fila].properties[campo] = valor;
-
-          if(campo === "LATITUD" || campo === "LONGITUD"){
-            let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
-            let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
-
-            geojsonData.features[fila].geometry = {
-              type: "Point",
-              coordinates: [lng, lat]
-            };
-
-            if(timeoutId) clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-              mostrarMapa(geojsonData);
-            }, 300);
-          }
-        });
-      });
-    }
-
-    function mostrarMapa(data) {
-      if(geojsonLayer) map.removeLayer(geojsonLayer);
-      geojsonLayer = L.geoJSON(data, {
-        onEachFeature: (f, l) => {
-          let html = "";
-          for(const key in f.properties){
-            html += `<b>${key.replace(/_/g, " ")}:</b> ${f.properties[key]}<br>`;
-          }
-          l.bindPopup(html);
-        },
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
-          radius: 6, fillColor: "#0074D9", color: "#000", weight: 1, opacity: 1, fillOpacity: 0.8
-        })
-      }).addTo(map);
-
-      try {
-        map.fitBounds(geojsonLayer.getBounds());
-      } catch {
-        map.setView([0, 0], 2);
-      }
-    }
-
-    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
-    document.getElementById("filterField").addEventListener("change", filtrarDatos);
-
-    function filtrarDatos() {
-      const campo = document.getElementById("filterField").value;
-      const texto = document.getElementById("searchInput").value.trim().toLowerCase();
-      if (!texto) {
-        mostrarTabla(geojsonData);
-        mostrarMapa(geojsonData);
-        return;
-      }
-      const filtrados = geojsonData.features.filter(f =>
-        (f.properties[campo] || "").toLowerCase().includes(texto)
-      );
-      mostrarTabla({ type: "FeatureCollection", features: filtrados });
-      mostrarMapa({ type: "FeatureCollection", features: filtrados });
-    }
-
-    const addForm = document.getElementById("addForm");
-    addForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const nuevaFeature = {
-        type: "Feature",
-        properties: {},
-        geometry: { type: "Point", coordinates: [0, 0] }
-      };
-      campos.forEach(campo => {
-        const input = document.getElementById(campo);
-        const val = input ? input.value.trim().toUpperCase() : "";
-        nuevaFeature.properties[campo] = val;
-        if(campo === "LATITUD") nuevaFeature.geometry.coordinates[1] = parseFloat(val) || 0;
-        if(campo === "LONGITUD") nuevaFeature.geometry.coordinates[0] = parseFloat(val) || 0;
-      });
-      geojsonData.features.push(nuevaFeature);
-      mostrarTabla(geojsonData);
-      mostrarMapa(geojsonData);
-      addForm.reset();
-    });
-
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(geojsonData, null, 2)], {type: "application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "BASE_DATOS_TRANSPORTE_2025_EDITADO.geojson";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  </script>
-
-</body>
-</html>
-
+  });
+}
