@@ -15,6 +15,7 @@ const campos = [
 let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
+const capasOverlay = {};
 
 // 3. Inicializar mapa Leaflet
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
@@ -145,7 +146,7 @@ function filtrarDatos() {
   mostrarTabla(dataset);
   mostrarMapa(dataset);
   centrarMapa(dataset);
-  actualizarListaPersonas(filtrados); // ← actualizar el select también
+  actualizarListaPersonas(filtrados);
 }
 
 // 11. Lista desplegable de personas
@@ -180,17 +181,13 @@ document.getElementById("findRouteBtn").addEventListener("click", () => {
 
   Object.values(capasOverlay).forEach(grupo => {
     grupo.eachLayer(layer => {
-      if (layer instanceof L.GeoJSON) {
-        layer.eachLayer(featureLayer => {
-          if (featureLayer.getLatLngs) {
-            const coords = featureLayer.getLatLngs().flat();
-            coords.forEach(coord => {
-              const d = punto.distanceTo(coord);
-              if (d < distanciaMinima) {
-                distanciaMinima = d;
-                rutaMasCercana = featureLayer;
-              }
-            });
+      if (layer instanceof L.GeoJSON || layer instanceof L.Polyline) {
+        const coords = layer.getLatLngs().flat();
+        coords.forEach(coord => {
+          const d = punto.distanceTo(coord);
+          if (d < distanciaMinima) {
+            distanciaMinima = d;
+            rutaMasCercana = layer;
           }
         });
       }
@@ -205,3 +202,55 @@ document.getElementById("findRouteBtn").addEventListener("click", () => {
     alert("No se encontró ninguna ruta cercana.");
   }
 });
+
+// 13. Cargar rutas desde carpetas
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
+];
+
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const idxRes = await fetch(indexUrl);
+      if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
+
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
+
+      for (const fichero of lista) {
+        const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+        try {
+          const r = await fetch(geojsonUrl);
+          if (!r.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
+          const data = await r.json();
+
+          const layer = L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          });
+          layer.addTo(grupo);
+        } catch (err) {
+          console.warn("GeoJSON inválido o no accesible:", err.message);
+        }
+      }
+
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
+    } catch (err) {
+      console.error(`Error en carpeta ${dir}:`, err.message);
+    }
+  }
+
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+}
+
+// Iniciar carga de rutas
+cargarIndexYCapas();
