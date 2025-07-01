@@ -120,7 +120,9 @@
       e.preventDefault();
       const nueva = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
       campos.forEach(c => {
-        const val = document.getElementById(c.replace(/ /g,"_")).value.trim().toUpperCase();
+        const id = c.replace(/ /g, "_");
+        const input = document.getElementById(id);
+        const val = input ? input.value.trim().toUpperCase() : "";
         nueva.properties[c] = val;
         if (c === "LATITUD") nueva.geometry.coordinates[1] = parseFloat(val);
         if (c === "LONGITUD") nueva.geometry.coordinates[0] = parseFloat(val);
@@ -131,13 +133,23 @@
       e.target.reset();
     });
 
-    document.getElementById("searchInput").addEventListener("input", () => {
+    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
+    document.getElementById("filterField").addEventListener("change", filtrarDatos);
+
+    function filtrarDatos() {
       const campo = document.getElementById("filterField").value;
       const texto = document.getElementById("searchInput").value.trim().toLowerCase();
-      const filtrados = geojsonData.features.filter(f => (f.properties[campo] || "").toLowerCase().includes(texto));
+      if (!texto) {
+        mostrarTabla(geojsonData);
+        mostrarMapa(geojsonData);
+        return;
+      }
+      const filtrados = geojsonData.features.filter(f => {
+        return (f.properties[campo] || "").toLowerCase().includes(texto);
+      });
       mostrarTabla({ features: filtrados });
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
-    });
+    }
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
@@ -153,4 +165,3 @@
   </script>
 </body>
 </html>
-
