@@ -205,43 +205,56 @@ const capasOverlay = {}; // Guardará las capas visibles
 async function cargarGeoJSONDesdeCarpeta(carpeta, nombreCapa, color = "#007acc") {
   const capa = L.layerGroup();
 
-  // Intentamos cargar 200 rutas por carpeta
-  for (let i = 1; i <= 200; i++) {
-    const nombreArchivo = `RUTA_${i}.geojson`;
-    const url = `${carpeta}/${nombreArchivo}`;
+  const capasOverlay = {};
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA',  name: 'Rutas de SALIDA',  color: '#dc3545' }
+];
+
+// Inicializar mapa
+const map = L.map('map').setView([-0.180653, -78.467838], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// Cargar índice y GeoJSONs
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
     try {
-      const res = await fetch(url);
-      if (!res.ok) continue; // Si no existe, lo ignoramos
-      const data = await res.json();
+      const idxRes = await fetch(`${dir}/index.json`);
+      if (!idxRes.ok) throw new Error('Índice no encontrado');
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
 
-      const subcapa = L.geoJSON(data, {
-        style: { color: color, weight: 3 },
-        onEachFeature: (feature, layer) => {
-          const props = feature.properties || {};
-          let popup = `<b>${nombreArchivo}</b><br>`;
-          for (const key in props) {
-            popup += `<b>${key}:</b> ${props[key]}<br>`;
-          }
-          layer.bindPopup(popup);
+      for (const fichero of lista) {
+        const url = `${dir}/${encodeURIComponent(fichero)}`;
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error();
+          const data = await r.json();
+          L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          }).addTo(grupo);
+        } catch {
+          console.warn('No se pudo cargar', url);
         }
-      });
+      }
 
-      subcapa.addTo(capa);
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
     } catch (err) {
-      console.warn("Archivo no encontrado o inválido:", url);
+      console.error('Error cargando índice de', dir, err);
     }
   }
-
-  capasOverlay[nombreCapa] = capa;
-  capa.addTo(map);
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
-// Llamar al cargar la página
-cargarGeoJSONDesdeCarpeta("Rutas de ENTRADA", "Rutas de ENTRADA", "#28a745"); // verde
-cargarGeoJSONDesdeCarpeta("Rutas de SALIDA", "Rutas de SALIDA", "#dc3545");   // rojo
-
-// Esperar un poco y luego agregar el control de capas
-setTimeout(() => {
-  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
-}, 3000);
+cargarIndexYCapas();
 
