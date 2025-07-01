@@ -6,7 +6,7 @@
   <!-- Carga estilos y librería Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papNMVEC8+N+uEWTbT3hsAmGZbCjdbt6uT2s7dNT4/OnCEKTcHoBVo+vEjM0b7NnfhkVJH7Nv8gKZPlr1d0X2Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     /* Estilos visuales mejorados para una interfaz profesional */
     body {
@@ -71,6 +71,7 @@
       margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      text-transform: uppercase; /* Mantener mayúsculas */
     }
     form button {
       padding: 10px 20px;
@@ -99,6 +100,7 @@
       padding: 8px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      text-transform: uppercase; /* Mayúsculas */
     }
     #controls button {
       padding: 10px 20px;
@@ -129,6 +131,7 @@
       padding: 12px;
       border-bottom: 1px solid #eaeaea;
       text-align: left;
+      text-transform: uppercase; /* Tabla en mayúsculas */
     }
     th {
       background-color: #34495e;
@@ -149,7 +152,7 @@
   <header>
     <h1><i class="fas fa-map-marker-alt"></i> Editor GeoJSON de Personal</h1>
     <nav>
-      <a href="#form">Agregar</a>
+      <a href="#addForm">Agregar</a>
       <a href="#controls">Filtrar</a>
       <a href="#map">Mapa</a>
     </nav>
@@ -159,57 +162,61 @@
     <details open>
       <summary><i class="fas fa-user-plus"></i> Agregar nuevo personal</summary>
       <form id="addForm">
-        <!-- Los campos del formulario -->
-    <label>CODIGO: <input type="text" id="CODIGO" required /></label>
-    <label>NOMBRE: <input type="text" id="NOMBRE" required /></label>
-    <label>RUTA: <input type="text" id="RUTA" /></label>
-    <label>CEDULA: <input type="text" id="CEDULA" /></label><br>
-    <label>TELEFONO: <input type="text" id="TELEFONO" /></label>
-    <label>DISCAPACIDAD: <input type="text" id="DISCAPACIDAD" /></label>
-    <label>TIPO HORARIO: <input type="text" id="TIPO_HORARIO" /></label>
-    <label>CARGO: <input type="text" id="CARGO" /></label><br>
-    <label>AREA: <input type="text" id="AREA" /></label>
-    <label>MODALIDAD DE CONTRATO: <input type="text" id="MODALIDAD_DE_CONTRATO" /></label>
-    <label>DIRECCION: <input type="text" id="DIRECCION" /></label>
-    <label>HORARIO: <input type="text" id="HORARIO" /></label><br>
-    <label>LUGAR TRABAJO: <input type="text" id="LUGAR_TRABAJO" /></label>
-    <label>LONGITUD: <input type="number" step="any" id="LONGITUD" required /></label>
-    <label>LATITUD: <input type="number" step="any" id="LATITUD" required /></label><br>
-    <label>CONTRATO LUZ: <input type="text" id="CONTRATO_LUZ" /></label>
-    <label>TRANSPORTE: <input type="text" id="TRANSPORTE" /></label>
-    <br><button type="submit">Agregar</button>
+        <label>CODIGO: <input type="text" id="CODIGO" required /></label>
+        <label>NOMBRE: <input type="text" id="NOMBRE" required /></label>
+        <label>RUTA: <input type="text" id="RUTA" /></label>
+        <label>CEDULA: <input type="text" id="CEDULA" /></label>
+        <label>TELEFONO: <input type="text" id="TELEFONO" /></label>
+        <label>DISCAPACIDAD: <input type="text" id="DISCAPACIDAD" /></label>
+        <label>TIPO HORARIO: <input type="text" id="TIPO_HORARIO" /></label>
+        <label>CARGO: <input type="text" id="CARGO" /></label>
+        <label>AREA: <input type="text" id="AREA" /></label>
+        <label>MODALIDAD DE CONTRATO: <input type="text" id="MODALIDAD_DE_CONTRATO" /></label>
+        <label>DIRECCION: <input type="text" id="DIRECCION" /></label>
+        <label>HORARIO: <input type="text" id="HORARIO" /></label>
+        <label>LUGAR TRABAJO: <input type="text" id="LUGAR_TRABAJO" /></label>
+        <label>LONGITUD: <input type="number" step="any" id="LONGITUD" required /></label>
+        <label>LATITUD: <input type="number" step="any" id="LATITUD" required /></label>
+        <label>CONTRATO LUZ: <input type="text" id="CONTRATO_LUZ" /></label>
+        <label>TRANSPORTE: <input type="text" id="TRANSPORTE" /></label>
+        <button type="submit">Agregar</button>
       </form>
     </details>
 
-  <!-- Filtros y descarga -->
-  <div id="controls">
-    <label for="filterField">Filtrar por:</label>
-    <select id="filterField">
-      <option value="CODIGO">CODIGO</option>
-      <option value="NOMBRE">NOMBRE</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
-    <button id="downloadBtn">Descargar GeoJSON</button>
-  </div>
+    <!-- Filtros y descarga -->
+    <div id="controls">
+      <label for="filterField">Filtrar por:</label>
+      <select id="filterField">
+        <option value="CODIGO">CODIGO</option>
+        <option value="NOMBRE" selected>NOMBRE</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Escribe para filtrar..." />
+      <button id="downloadBtn"><i class="fas fa-download"></i> Descargar GeoJSON</button>
+    </div>
 
-  <div id="map"></div>
-  <div id="tableContainer"></div>
+    <div id="map"></div>
+    <div id="tableContainer"></div>
+  </main>
 
   <script>
-    // Lista de todos los campos de la base de datos
-    const campos = ["CODIGO","NOMBRE","RUTA","CEDULA","TELEFONO","DISCAPACIDAD","TIPO HORARIO","CARGO","AREA","MODALIDAD DE CONTRATO","DIRECCION","HORARIO","LUGAR TRABAJO","LONGITUD","LATITUD","CONTRATO LUZ","TRANSPORTE"];
+    // Campos tal cual definidos (en mayúsculas y con guiones bajos donde corresponda)
+    const campos = [
+      "CODIGO","NOMBRE","RUTA","CEDULA","TELEFONO","DISCAPACIDAD",
+      "TIPO_HORARIO","CARGO","AREA","MODALIDAD_DE_CONTRATO","DIRECCION",
+      "HORARIO","LUGAR_TRABAJO","LONGITUD","LATITUD","CONTRATO_LUZ","TRANSPORTE"
+    ];
     let geojsonData = { type: "FeatureCollection", features: [] };
 
-    // Inicializa el mapa
+    // Inicializa mapa Leaflet
     let map = L.map('map').setView([0, 0], 2);
     let geojsonLayer = null;
 
-    // Añade fondo de mapa con OpenStreetMap
+    // Añade capa base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Cargar archivo GeoJSON desde GitHub
+    // Carga GeoJSON desde GitHub
     fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
       .then(r => r.json())
       .then(data => {
@@ -218,81 +225,130 @@
         mostrarMapa(geojsonData);
       });
 
-    // Construye y muestra la tabla de datos
+    // Construye tabla editable
     function mostrarTabla(data) {
       const cont = document.getElementById("tableContainer");
-      let html = `<table><thead><tr><th>#</th>` + campos.map(c => `<th>${c}</th>`).join("") + `</tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>#</th>`;
+      campos.forEach(campo => {
+        // Mostrar con espacios en lugar de guiones bajos para el encabezado
+        let header = campo.replace(/_/g, " ");
+        html += `<th>${header}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
       data.features.forEach((f, i) => {
-        html += `<tr><td>${i+1}</td>` + campos.map(c => `<td contenteditable="true" data-feature="${i}" data-attr="${c}">${f.properties[c] || ""}</td>`).join("") + `</tr>`;
+        html += `<tr><td>${i + 1}</td>`;
+        campos.forEach(campo => {
+          const valor = f.properties[campo] || "";
+          html += `<td contenteditable="true" data-feature="${i}" data-attr="${campo}">${valor}</td>`;
+        });
+        html += `</tr>`;
       });
       html += `</tbody></table>`;
       cont.innerHTML = html;
 
-      // Editar valores directamente en la tabla
-      cont.querySelectorAll("td[contenteditable='true']").forEach(td => {
-        td.addEventListener("input", e => {
+      // Evento para editar directamente en tabla
+      cont.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+        td.addEventListener('input', e => {
           const fila = e.target.dataset.feature;
           const attr = e.target.dataset.attr;
-          const valor = e.target.textContent.trim().toUpperCase();
+          let valor = e.target.textContent.trim().toUpperCase();
           geojsonData.features[fila].properties[attr] = valor;
+
+          // Actualizar geometría si es LATITUD o LONGITUD
+          if(attr === "LATITUD" || attr === "LONGITUD"){
+            let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
+            let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
+            geojsonData.features[fila].geometry = {
+              type: "Point",
+              coordinates: [lng, lat]
+            };
+            // Actualizar marcador en el mapa
+            mostrarMapa(geojsonData);
+          }
         });
       });
     }
 
-    // Muestra los puntos en el mapa con popups
+    // Mostrar puntos en el mapa con popup
     function mostrarMapa(data) {
-      if (geojsonLayer) map.removeLayer(geojsonLayer);
+      if (geojsonLayer) {
+        map.removeLayer(geojsonLayer);
+      }
       geojsonLayer = L.geoJSON(data, {
-        onEachFeature: (f, layer) => {
-          let popup = "";
-          for (let k in f.properties) popup += `<strong>${k}</strong>: ${f.properties[k]}<br>`;
-          layer.bindPopup(popup);
+        onEachFeature: (feature, layer) => {
+          let popupContent = "";
+          for (const key in feature.properties) {
+            const label = key.replace(/_/g, " ");
+            popupContent += `<strong>${label}:</strong> ${feature.properties[key]}<br>`;
+          }
+          layer.bindPopup(popupContent);
         },
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#0074D9", color: "#000", weight: 1, opacity: 1, fillOpacity: 0.8 })
+        pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+          radius: 6,
+          fillColor: "#0074D9",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        })
       }).addTo(map);
-      try { map.fitBounds(geojsonLayer.getBounds()); } catch { map.setView([0, 0], 2); }
+
+      try {
+        map.fitBounds(geojsonLayer.getBounds());
+      } catch {
+        map.setView([0, 0], 2);
+      }
     }
 
-    // Evento: agregar nuevo personal desde formulario
-    document.getElementById("addForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const nueva = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
-      campos.forEach(c => {
-        const id = c.replace(/ /g, "_");
-        const input = document.getElementById(id);
-        const val = input ? input.value.trim().toUpperCase() : "";
-        nueva.properties[c] = val;
-        if (c === "LATITUD") nueva.geometry.coordinates[1] = parseFloat(val);
-        if (c === "LONGITUD") nueva.geometry.coordinates[0] = parseFloat(val);
-      });
-      geojsonData.features.push(nueva);
-      mostrarTabla(geojsonData);
-      mostrarMapa(geojsonData);
-      e.target.reset();
-    });
-
-    // Eventos de filtrado por campo y texto
-    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
-    document.getElementById("filterField").addEventListener("change", filtrarDatos);
-
+    // Filtrar por código o nombre
     function filtrarDatos() {
       const campo = document.getElementById("filterField").value;
       const texto = document.getElementById("searchInput").value.trim().toLowerCase();
+
       if (!texto) {
         mostrarTabla(geojsonData);
         mostrarMapa(geojsonData);
         return;
       }
+
       const filtrados = geojsonData.features.filter(f => {
         return (f.properties[campo] || "").toLowerCase().includes(texto);
       });
-      mostrarTabla({ features: filtrados });
+
+      mostrarTabla({ type: "FeatureCollection", features: filtrados });
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
     }
 
-    // Descargar el archivo actualizado
+    document.getElementById("searchInput").addEventListener("input", filtrarDatos);
+    document.getElementById("filterField").addEventListener("change", filtrarDatos);
+
+    // Agregar nuevo personal desde formulario
+    document.getElementById("addForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const nuevaFeature = {
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Point", coordinates: [0, 0] }
+      };
+
+      campos.forEach(campo => {
+        const input = document.getElementById(campo);
+        let val = input ? input.value.trim().toUpperCase() : "";
+        nuevaFeature.properties[campo] = val;
+        if(campo === "LATITUD") nuevaFeature.geometry.coordinates[1] = parseFloat(val) || 0;
+        if(campo === "LONGITUD") nuevaFeature.geometry.coordinates[0] = parseFloat(val) || 0;
+      });
+
+      geojsonData.features.push(nuevaFeature);
+      mostrarTabla(geojsonData);
+      mostrarMapa(geojsonData);
+      e.target.reset();
+    });
+
+    // Descargar GeoJSON actualizado
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(geojsonData, null, 2)], {type: "application/json"});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -305,5 +361,3 @@
   </script>
 </body>
 </html>
-
-
