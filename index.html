@@ -5,110 +5,171 @@
   <title>Editor GeoJSON de Personal</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    :root {
+      --main-color: #2c3e50;
+      --accent-color: #27ae60;
+      --light-bg: #f4f6f8;
+      --form-bg: #ffffff;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
+      padding: 0;
+      background-color: var(--light-bg);
+      color: var(--main-color);
+    }
+
+    header {
+      background-color: var(--main-color);
+      color: white;
       padding: 20px;
-      background-color: #f4f6f8;
-      color: #333;
+      text-align: center;
     }
-    h1, h2 {
-      color: #2c3e50;
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
     }
-    form, #controls {
-      background: #ffffff;
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--form-bg);
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     }
-    label, input, select, button {
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
       display: block;
-      margin-bottom: 12px;
     }
+
     input, select {
-      padding: 8px;
       width: 100%;
-      max-width: 300px;
+      max-width: 400px;
+      padding: 10px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
+
     button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
       padding: 10px 20px;
       border-radius: 6px;
-      border: none;
-      font-weight: bold;
       cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background 0.2s;
     }
-    #loginSection {
-      margin-bottom: 20px;
+
+    button:hover {
+      background-color: #219150;
     }
-    #loginBtn {
-      background-color: #2980b9;
-      color: #fff;
-    }
-    #logoutBtn {
+
+    .btn-danger {
       background-color: #c0392b;
-      color: #fff;
     }
-    #controls button, #downloadBtn {
-      background-color: #27ae60;
-      color: white;
+
+    #map {
+      height: 500px;
+      border-radius: 10px;
+      overflow: hidden;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      margin-top: 10px;
     }
+
     th, td {
-      padding: 12px;
-      border-bottom: 1px solid #eaeaea;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
     }
+
     th {
-      background-color: #34495e;
+      background-color: var(--main-color);
       color: white;
     }
+
     td[contenteditable="true"] {
       background-color: #fefbd8;
     }
-    #map {
-      height: 500px;
-      margin-top: 20px;
-      border-radius: 10px;
+
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      #controls {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>Editor GeoJSON de Personal</h1>
+  <header>
+    <h1><i class="fa-solid fa-map-location-dot"></i> Editor GeoJSON de Personal</h1>
+  </header>
 
-  <div id="loginSection">
-    <label>Usuario: <input type="text" id="usuario" /></label>
-    <label>Clave: <input type="password" id="clave" /></label>
-    <button id="loginBtn">Iniciar sesión</button>
-    <button id="logoutBtn" style="display:none">Cerrar sesión</button>
+  <div class="container">
+    <div class="card" id="loginSection">
+      <label>Usuario: <input type="text" id="usuario" /></label>
+      <label>Clave: <input type="password" id="clave" /></label>
+      <div class="form-inline">
+        <button id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</button>
+        <button id="logoutBtn" class="btn-danger hidden"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+      </div>
+    </div>
+
+    <form id="addForm" class="card hidden">
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <div id="camposForm"></div>
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+    </form>
+
+    <div class="card" id="controls">
+      <label for="filterField">Filtrar por:</label>
+      <select id="filterField">
+        <option value="CODIGO">Código</option>
+        <option value="NOMBRE" selected>Nombre</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Buscar..." />
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar GeoJSON</button>
+    </div>
+
+    <div id="map" class="card"></div>
+    <div id="tabla" class="card"></div>
   </div>
-
-  <form id="addForm" style="display:none">
-    <h2>Agregar nuevo personal</h2>
-    <div id="camposForm"></div>
-    <button type="submit">Agregar Personal</button>
-  </form>
-
-  <div id="controls">
-    <label for="filterField">Filtrar por:</label>
-    <select id="filterField">
-      <option value="CODIGO">Código</option>
-      <option value="NOMBRE" selected>Nombre</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="Buscar..." />
-    <button id="downloadBtn">Descargar GeoJSON</button>
-  </div>
-
-  <div id="map"></div>
-  <div id="tabla"></div>
 
   <script>
     const usuarios = {
@@ -131,7 +192,6 @@
       attribution: "© OpenStreetMap"
     }).addTo(map);
 
-    // Cargar datos desde GitHub
     fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
       .then(r => r.json())
       .then(data => {
@@ -141,14 +201,13 @@
         crearCamposFormulario();
       });
 
-    // Login básico
     document.getElementById("loginBtn").addEventListener("click", () => {
       const usuario = document.getElementById("usuario").value.trim();
       const clave = document.getElementById("clave").value.trim();
       if (usuarios[usuario] && usuarios[usuario] === clave) {
         usuarioLogueado = true;
-        document.getElementById("addForm").style.display = "block";
-        document.getElementById("logoutBtn").style.display = "inline-block";
+        document.getElementById("addForm").classList.remove("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
         alert("¡Bienvenido!");
       } else {
         alert("Credenciales incorrectas");
@@ -159,7 +218,6 @@
       location.reload();
     });
 
-    // Crear formulario dinámico
     function crearCamposFormulario() {
       const cont = document.getElementById("camposForm");
       cont.innerHTML = "";
@@ -168,7 +226,6 @@
       });
     }
 
-    // Mostrar tabla editable
     function mostrarTabla(data) {
       const cont = document.getElementById("tabla");
       if (!data.features) return;
@@ -190,7 +247,7 @@
 
       if(usuarioLogueado){
         document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-          td.addEventListener('input', e => {
+          td.addEventListener('input', () => {
             const fila = td.dataset.feature;
             const campo = td.dataset.attr;
             const valor = td.textContent.trim().toUpperCase();
@@ -210,7 +267,6 @@
       }
     }
 
-    // Mostrar mapa
     function mostrarMapa(data) {
       if(geojsonLayer) map.removeLayer(geojsonLayer);
       geojsonLayer = L.geoJSON(data, {
@@ -233,7 +289,6 @@
       }
     }
 
-    // Filtro
     document.getElementById("searchInput").addEventListener("input", filtrarDatos);
     document.getElementById("filterField").addEventListener("change", filtrarDatos);
     function filtrarDatos() {
@@ -251,7 +306,6 @@
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
     }
 
-    // Agregar nuevo personal
     addForm.addEventListener("submit", e => {
       e.preventDefault();
       const nuevaFeature = {
@@ -272,7 +326,6 @@
       addForm.reset();
     });
 
-    // Descargar GeoJSON
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const blob = new Blob([JSON.stringify(geojsonData, null, 2)], {type: "application/json"});
       const url = URL.createObjectURL(blob);
@@ -285,5 +338,6 @@
       URL.revokeObjectURL(url);
     });
   </script>
+
 </body>
 </html>
