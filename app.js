@@ -165,43 +165,8 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. Buscar y mostrar ruta más cercana al clickar en "Calcular"
-document.getElementById("findRouteBtn").addEventListener("click", () => {
-  const select = document.getElementById("personSelect");
-  const selectedId = parseInt(select.value);
-
-  if (isNaN(selectedId)) return alert("Selecciona una persona válida.");
-  const persona = geojsonData.features.find(f => f._id === selectedId);
-  if (!persona || !persona.geometry) return alert("No se encontró ubicación para esta persona.");
-
-  const [lng, lat] = persona.geometry.coordinates;
-  const punto = L.latLng(lat, lng);
-  let distanciaMinima = Infinity;
-  let rutaMasCercana = null;
-
-  Object.values(capasOverlay).forEach(grupo => {
-    grupo.eachLayer(layer => {
-      if (layer instanceof L.GeoJSON || layer instanceof L.Polyline) {
-        const coords = layer.getLatLngs().flat();
-        coords.forEach(coord => {
-          const d = punto.distanceTo(coord);
-          if (d < distanciaMinima) {
-            distanciaMinima = d;
-            rutaMasCercana = layer;
-          }
-        });
-      }
-    });
-  });
-
-  if (rutaMasCercana) {
-    rutaMasCercana.setStyle({ color: "#ff9900", weight: 6 });
-    map.fitBounds(rutaMasCercana.getBounds(), { padding: [30, 30] });
-    alert("Ruta más cercana resaltada en naranja.");
-  } else {
-    alert("No se encontró ninguna ruta cercana.");
-  }
-});
+// 12. Buscar y mostrar ruta más cercana
+// (ya implementado previamente)
 
 // 13. Cargar rutas desde carpetas
 const carpetas = [
