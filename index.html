@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>IDE TRANSPORTE</title>
 
-<!-- Importa estilos CSS para Leaflet (mapas) y FontAwesome (íconos) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 <style>
-  /* Variables CSS para colores y estilos reutilizables */
   :root {
     --color-primario: #004d99;
     --color-secundario: #007acc;
@@ -25,12 +23,9 @@
     --borde-radio: 8px;
   }
 
-  /* Reseteo de box-sizing para todos los elementos */
   * {
     box-sizing: border-box;
   }
-
-  /* Estilos base para el body y html, diseño con flexbox en columna */
   body, html {
     margin: 0; padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,7 +36,6 @@
     flex-direction: column;
   }
 
-  /* Estilo para el encabezado fijo superior */
   header {
     background: var(--color-primario);
     color: var(--color-blanco);
@@ -50,29 +44,26 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    position: fixed; /* Siempre visible arriba */
+    position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 1100;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
-  /* Estilo título con icono */
   header h1 {
     font-weight: 700;
     font-size: 1.4rem;
     display: flex;
     align-items: center;
-    gap: 10px; /* Espacio entre icono y texto */
+    gap: 10px;
   }
 
-  /* Estilos para el formulario de login en el header */
   #loginForm {
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
-  /* Inputs del login con padding y borde redondeado */
   #loginForm input[type="text"],
   #loginForm input[type="password"] {
     padding: 6px 10px;
@@ -82,7 +73,6 @@
     width: 130px;
   }
 
-  /* Botón de login con color secundario y efecto hover */
   #loginForm button {
     background-color: var(--color-secundario);
     border: none;
@@ -97,39 +87,32 @@
     gap: 6px;
     font-size: 0.9rem;
   }
-  /* Hover del botón login */
   #loginForm button:hover {
     background-color: var(--color-hover);
   }
-
-  /* Botón de logout inicialmente oculto */
   #logoutBtn {
     background-color: var(--color-error);
     display: none;
   }
-  /* Hover botón logout */
   #logoutBtn:hover {
     background-color: #a32429;
   }
 
-  /* Contenedor principal que sostiene mapa y panel derecho */
   main {
     display: flex;
-    height: calc(100vh - 60px); /* Restando altura header */
-    padding: 80px 20px 20px 20px; /* Para evitar el header fijo */
+    height: calc(100vh - 60px);
+    padding: 80px 20px 20px 20px;
     gap: 20px;
     overflow: hidden;
   }
 
-  /* Estilo contenedor del mapa */
   #map {
-    flex: 1.3; /* ocupa más espacio que panel derecho */
+    flex: 1.3;
     border-radius: var(--borde-radio);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     min-width: 320px;
   }
 
-  /* Panel derecho con controles y tabla */
   #panelDerecho {
     flex: 1;
     display: flex;
@@ -140,7 +123,6 @@
     min-width: 320px;
   }
 
-  /* Sección controles para filtros y botón descargar */
   #controles {
     padding: 15px 20px;
     border-bottom: 1px solid var(--color-gris-claro);
@@ -153,8 +135,6 @@
     font-weight: 600;
     white-space: nowrap;
   }
-
-  /* Inputs para filtro y búsqueda */
   #filterField, #searchInput {
     padding: 7px 12px;
     font-size: 1rem;
@@ -169,7 +149,6 @@
     outline: none;
   }
 
-  /* Botón para descargar datos */
   #downloadBtn {
     background-color: var(--color-secundario);
     color: var(--color-blanco);
@@ -188,24 +167,23 @@
     background-color: var(--color-hover);
   }
 
-  /* Contenedor para la tabla con scroll vertical */
+  /* Aquí hacemos que la tabla ocupe el espacio que queda, con scroll */
   #tabla {
-    flex-grow: 1; /* ocupa todo el espacio disponible */
+    flex-grow: 1;
     overflow-y: auto;
     padding: 10px 20px;
   }
 
-  /* Estilos de tabla */
   table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
-    min-width: 700px; /* para evitar que columnas se compriman mucho */
+    min-width: 700px;
   }
   thead tr {
     background-color: var(--color-primario);
     color: var(--color-blanco);
-    position: sticky; /* La cabecera se queda fija al hacer scroll */
+    position: sticky;
     top: 0;
     z-index: 10;
   }
@@ -214,22 +192,22 @@
     border: 1px solid var(--color-gris-claro);
     text-align: left;
     vertical-align: middle;
-    white-space: nowrap; /* evita que el texto haga wrap */
+    white-space: nowrap;
   }
   tbody tr:hover {
-    background-color: var(--color-fondo); /* resalta fila al pasar mouse */
+    background-color: var(--color-fondo);
   }
   td[contenteditable="true"] {
-    background-color: #fffbea; /* color de fondo para celdas editables */
-    cursor: text; /* cursor de texto para indicar que es editable */
+    background-color: #fffbea;
+    cursor: text;
   }
 
-  /* Estilos para el formulario de agregar personal, inicialmente oculto */
+  /* --- FORMULARIO AQUI ABAJO, separado y con padding */
   #addForm {
     padding: 20px;
     background: var(--color-blanco);
     border-top: 2px solid var(--color-secundario);
-    display: none; /* Se muestra solo tras login */
+    display: none;
     border-radius: 0 0 var(--borde-radio) var(--borde-radio);
     box-shadow: inset 0 10px 15px -10px rgba(0,0,0,0.1);
   }
@@ -275,7 +253,6 @@
     background-color: var(--color-hover);
   }
 
-  /* Media queries para pantallas pequeñas */
   @media (max-width: 900px) {
     main {
       flex-direction: column;
@@ -314,10 +291,8 @@
 <body>
 
 <header>
-  <!-- Título y logo del IDE -->
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-  <!-- Formulario de login con usuario, clave, botones entrar y salir -->
   <form id="loginForm" onsubmit="return false;">
     <input id="usuario" type="text" placeholder="Usuario" autocomplete="username" required />
     <input id="clave" type="password" placeholder="Clave" autocomplete="current-password" required />
@@ -331,33 +306,25 @@
 </header>
 
 <main>
-  <!-- Contenedor para el mapa Leaflet -->
   <div id="map"></div>
 
-  <!-- Panel derecho con controles, tabla editable y formulario para agregar -->
   <section id="panelDerecho">
     <section id="controles">
       <label for="filterField">Filtrar por:</label>
-      <!-- Selección de campo para filtrar la tabla y mapa -->
       <select id="filterField" title="Campo para filtrar">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
 
-      <!-- Campo de búsqueda para filtrar registros -->
       <input type="search" id="searchInput" placeholder="Buscar..." title="Buscar" />
 
-      <!-- Botón para descargar los datos visibles en formato GeoJSON -->
       <button id="downloadBtn" title="Descargar datos como GeoJSON">
         <i class="fa-solid fa-download"></i> Descargar
       </button>
     </section>
 
-    <!-- Contenedor donde se inyecta la tabla editable -->
     <div id="tabla" aria-live="polite" aria-label="Tabla editable de personal"></div>
 
-</main>
-      <!-- Formulario para agregar nuevo personal, oculto hasta login -->
     <form id="addForm" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
       <div id="camposForm"></div>
@@ -367,34 +334,30 @@
     </form>
   </section>
 </main>
-<!-- Biblioteca Leaflet para mapas -->
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-  // Usuarios permitidos con sus contraseñas (simulado)
   const usuarios = {
     admin: "1234",
     kevin: "admin2025"
   };
 
-  // Campos que tiene cada registro de personal
   const campos = [
     "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
     "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
     "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
   ];
 
-  let geojsonData = null;       // Guarda los datos cargados en GeoJSON
-  let usuarioLogueado = false;  // Controla si hay sesión iniciada
-  let map = L.map("map").setView([-0.180653, -78.467838], 13); // Inicializa mapa Leaflet
-  let geojsonLayer = null;      // Capa actual del mapa con los datos
+  let geojsonData = null;
+  let usuarioLogueado = false;
+  let map = L.map("map").setView([-0.180653, -78.467838], 13);
+  let geojsonLayer = null;
 
-  // Capa base OpenStreetMap para el mapa
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  // Centra y ajusta el zoom del mapa según los puntos de los datos cargados
   function centrarMapaSegunDatos(data){
     if(!data.features || data.features.length === 0) return;
     const coords = data.features
@@ -411,37 +374,33 @@
     map.fitBounds(bounds, {padding: [40, 40]});
   }
 
-  // Carga inicial del archivo GeoJSON con datos desde GitHub
   fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
   .then(r => r.json())
   .then(data => {
-    data.features.forEach((f,i)=> f._id = i); // Añade un ID interno para manejar edición
+    data.features.forEach((f,i)=> f._id = i);
     geojsonData = data;
-    mostrarTabla(geojsonData);     // Muestra la tabla con datos
-    mostrarMapa(geojsonData);      // Muestra los puntos en el mapa
-    centrarMapaSegunDatos(geojsonData); // Centra el mapa en los puntos
-    crearCamposFormulario();        // Crea los inputs del formulario de agregar personal
+    mostrarTabla(geojsonData);
+    mostrarMapa(geojsonData);
+    centrarMapaSegunDatos(geojsonData);
+    crearCamposFormulario();
   });
 
-  // Crea dinámicamente los campos input para el formulario de agregar personal
   function crearCamposFormulario(){
     const cont = document.getElementById("camposForm");
     cont.innerHTML = "";
     campos.forEach(campo => {
       const label = document.createElement("label");
-      label.textContent = campo.replace(/_/g, " ") + ":"; // Etiqueta del campo
+      label.textContent = campo.replace(/_/g, " ") + ":";
       const input = document.createElement("input");
       input.type = "text";
       input.id = campo;
       input.autocomplete = "off";
-      // Algunos campos son obligatorios
       input.required = campo === "CODIGO" || campo === "NOMBRE" || campo === "LATITUD" || campo === "LONGITUD";
       label.appendChild(input);
       cont.appendChild(label);
     });
   }
 
-  // Genera y muestra la tabla HTML editable con los datos
   function mostrarTabla(data){
     const cont = document.getElementById("tabla");
     if(!data.features) return;
@@ -450,27 +409,24 @@
     html += `</tr></thead><tbody>`;
 
     data.features.forEach((f,i) => {
-      html += `<tr><td>${i+1}</td>`; // Número fila
+      html += `<tr><td>${i+1}</td>`;
       campos.forEach(campo => {
         let valor = f.properties[campo] || "";
-        // Para latitud y longitud mostramos las coordenadas reales
         if(campo === "LATITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[1];
         if(campo === "LONGITUD" && f.geometry?.coordinates) valor = f.geometry.coordinates[0];
-        // Hacemos que celdas sean editables solo si usuario está logueado
         html += `<td ${usuarioLogueado ? 'contenteditable="true"' : ''} data-feature-id="${f._id}" data-attr="${campo}">${valor}</td>`;
       });
       html += `</tr>`;
     });
     html += `</tbody></table>`;
     cont.innerHTML = html;
-    if(usuarioLogueado) asignarEventosEdicion(); // Si está logueado, habilitar edición
+    if(usuarioLogueado) asignarEventosEdicion();
   }
 
-  // Asigna eventos para actualizar datos al editar celdas en la tabla
   function asignarEventosEdicion(){
     const tds = document.querySelectorAll('td[contenteditable="true"]');
     tds.forEach(td => {
-      td.oninput = null; // Limpiar para no duplicar eventos
+      td.oninput = null;
       td.addEventListener("input", () => {
         const id = parseInt(td.dataset.featureId);
         const campo = td.dataset.attr;
@@ -479,16 +435,13 @@
         const feature = geojsonData.features.find(f => f._id === id);
         if(!feature) return;
 
-        // Actualiza la propiedad modificada
         feature.properties[campo] = val;
 
-        // Si se cambia latitud o longitud, actualizar geometría del punto
         if(campo === "LATITUD" || campo === "LONGITUD"){
           const lat = parseFloat(feature.properties["LATITUD"]) || 0;
           const lng = parseFloat(feature.properties["LONGITUD"]) || 0;
           feature.geometry = { type: "Point", coordinates: [lng, lat] };
           clearTimeout(window.editarTimeout);
-          // Actualizar mapa después de un pequeño delay para no sobrecargar eventos
           window.editarTimeout = setTimeout(() => {
             mostrarMapa(geojsonData);
             centrarMapaSegunDatos(geojsonData);
@@ -498,9 +451,8 @@
     });
   }
 
-  // Muestra los datos en el mapa Leaflet como marcadores circulares
   function mostrarMapa(data){
-    if(geojsonLayer) map.removeLayer(geojsonLayer); // Limpia capa anterior
+    if(geojsonLayer) map.removeLayer(geojsonLayer);
     geojsonLayer = L.geoJSON(data, {
       pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
         radius: 6,
@@ -511,7 +463,6 @@
         fillOpacity: 0.9
       }),
       onEachFeature: (feature, layer) => {
-        // Popup con datos del feature
         let popup = '';
         for(const key in feature.properties){
           popup += `<b>${key.replace(/_/g," ")}:</b> ${feature.properties[key]}<br>`;
@@ -521,16 +472,13 @@
     }).addTo(map);
   }
 
-  // Función para obtener el color primario desde CSS
   function varColorPrimario() {
     return getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99';
   }
 
-  // Eventos para filtrar tabla y mapa según campo y texto
   document.getElementById("searchInput").addEventListener("input", filtrarDatos);
   document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
-  // Función para filtrar los datos en tabla y mapa según filtro activo
   function filtrarDatos(){
     const campo = document.getElementById("filterField").value;
     const texto = document.getElementById("searchInput").value.trim().toLowerCase();
@@ -540,17 +488,15 @@
       centrarMapaSegunDatos(geojsonData);
       return;
     }
-    // Filtra los features que contienen el texto en la propiedad seleccionada
     const filtrados = geojsonData.features.filter(f =>
       (f.properties[campo] || "").toLowerCase().includes(texto)
     );
-    // Muestra tabla y mapa con datos filtrados
     mostrarTabla({type:"FeatureCollection", features: filtrados});
     mostrarMapa({type:"FeatureCollection", features: filtrados});
     centrarMapaSegunDatos({type:"FeatureCollection", features: filtrados});
   }
 
-  // Evento para agregar nuevo personal al enviar el formulario
+  // Agregar nuevo personal
   document.getElementById("addForm").addEventListener("submit", e=>{
     e.preventDefault();
     const nuevo = {
@@ -558,22 +504,21 @@
       properties: {},
       geometry: {type:"Point", coordinates: [0,0]}
     };
-    // Recolecta datos de los inputs, convierte latitud y longitud en coordenadas
     for(const campo of campos){
       const val = document.getElementById(campo).value.trim().toUpperCase();
       nuevo.properties[campo] = val;
       if(campo === "LONGITUD") nuevo.geometry.coordinates[0] = parseFloat(val) || 0;
       if(campo === "LATITUD") nuevo.geometry.coordinates[1] = parseFloat(val) || 0;
     }
-    nuevo._id = geojsonData.features.length; // Asigna nuevo ID
-    geojsonData.features.push(nuevo);        // Añade al array de features
-    mostrarTabla(geojsonData);                // Actualiza tabla
-    mostrarMapa(geojsonData);                 // Actualiza mapa
-    centrarMapaSegunDatos(geojsonData);      // Centra mapa con nuevo dato
-    e.target.reset();                         // Limpia formulario
+    nuevo._id = geojsonData.features.length;
+    geojsonData.features.push(nuevo);
+    mostrarTabla(geojsonData);
+    mostrarMapa(geojsonData);
+    centrarMapaSegunDatos(geojsonData);
+    e.target.reset();
   });
 
-  // Descarga el GeoJSON actual como archivo local
+  // Descargar GeoJSON
   document.getElementById("downloadBtn").addEventListener("click", ()=>{
     const dataStr = JSON.stringify(geojsonData, null, 2);
     const blob = new Blob([dataStr], {type: "application/json"});
@@ -585,42 +530,40 @@
     URL.revokeObjectURL(url);
   });
 
-  // Variables para controles login/logout
+  // Login y logout
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const addForm = document.getElementById("addForm");
   const usuarioInput = document.getElementById("usuario");
   const claveInput = document.getElementById("clave");
 
-  // Evento para login: valida usuario y contraseña, muestra formulario y tabla editable
   loginBtn.addEventListener("click", ()=>{
     const user = usuarioInput.value.trim();
     const pass = claveInput.value.trim();
     if(usuarios[user] && usuarios[user] === pass){
       usuarioLogueado = true;
       alert(`¡Bienvenido, ${user}!`);
-      addForm.style.display = "block";      // Muestra formulario para agregar personal
-      logoutBtn.style.display = "flex";     // Muestra botón salir
-      loginBtn.style.display = "none";      // Oculta botón entrar
-      usuarioInput.disabled = true;          // Deshabilita inputs login
+      addForm.style.display = "block";
+      logoutBtn.style.display = "flex";
+      loginBtn.style.display = "none";
+      usuarioInput.disabled = true;
       claveInput.disabled = true;
-      mostrarTabla(geojsonData);             // Actualiza tabla para permitir edición
+      mostrarTabla(geojsonData);
     } else {
       alert("Usuario o contraseña incorrectos.");
     }
   });
 
-  // Evento para logout: oculta formulario, deshabilita edición y limpia login
   logoutBtn.addEventListener("click", ()=>{
     usuarioLogueado = false;
-    addForm.style.display = "none";          // Oculta formulario de agregar
-    logoutBtn.style.display = "none";        // Oculta botón salir
-    loginBtn.style.display = "flex";         // Muestra botón entrar
-    usuarioInput.disabled = false;            // Habilita inputs login
+    addForm.style.display = "none";
+    logoutBtn.style.display = "none";
+    loginBtn.style.display = "flex";
+    usuarioInput.disabled = false;
     claveInput.disabled = false;
-    usuarioInput.value = "";                  // Limpia campos
+    usuarioInput.value = "";
     claveInput.value = "";
-    mostrarTabla(geojsonData);                // Actualiza tabla para deshabilitar edición
+    mostrarTabla(geojsonData);
   });
 
 </script>
