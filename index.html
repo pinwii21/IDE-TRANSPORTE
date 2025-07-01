@@ -306,33 +306,35 @@
 </header>
 
 <main>
-  <div id="map"></div>
+  <div id="mapTablaContainer">
+    <div id="map"></div>
 
-  <section id="panelDerecho">
-    <section id="controles">
-      <label for="filterField">Filtrar por:</label>
-      <select id="filterField" title="Campo para filtrar">
-        <option value="CODIGO">Código</option>
-        <option value="NOMBRE" selected>Nombre</option>
-      </select>
+    <section id="panelDerecho">
+      <section id="controles">
+        <label for="filterField">Filtrar por:</label>
+        <select id="filterField" title="Campo para filtrar">
+          <option value="CODIGO">Código</option>
+          <option value="NOMBRE" selected>Nombre</option>
+        </select>
 
-      <input type="search" id="searchInput" placeholder="Buscar..." title="Buscar" />
+        <input type="search" id="searchInput" placeholder="Buscar..." title="Buscar" />
 
-      <button id="downloadBtn" title="Descargar datos como GeoJSON">
-        <i class="fa-solid fa-download"></i> Descargar
-      </button>
+        <button id="downloadBtn" title="Descargar datos como GeoJSON">
+          <i class="fa-solid fa-download"></i> Descargar
+        </button>
+      </section>
+
+      <div id="tabla" aria-live="polite" aria-label="Tabla editable de personal"></div>
     </section>
+  </div>
 
-    <div id="tabla" aria-live="polite" aria-label="Tabla editable de personal"></div>
-
-    <form id="addForm" aria-label="Formulario para agregar personal">
-      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-      <div id="camposForm"></div>
-      <button type="submit">
-        <i class="fa-solid fa-plus"></i> Agregar Personal
-      </button>
-    </form>
-  </section>
+  <form id="addForm" aria-label="Formulario para agregar personal">
+    <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+    <div id="camposForm"></div>
+    <button type="submit">
+      <i class="fa-solid fa-plus"></i> Agregar Personal
+    </button>
+  </form>
 </main>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
