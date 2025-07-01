@@ -233,10 +233,8 @@ function poblarSelectPersonas() {
 }
 
 // 15. Cargar rutas de carpetas y control de capas
-const carpetas = [
-  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
-  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
-];
+// 15. Cargar rutas de carpetas y control de capas
+const rutasCapas = {}; // Asegúrate de tener esto antes de usarlo
 
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
@@ -245,25 +243,29 @@ async function cargarIndexYCapas() {
       if (!idxRes.ok) throw new Error('Índice no encontrado');
       const lista = await idxRes.json();
       const grupo = L.layerGroup();
-      for (const file of lista) {
+      lista.forEach(file => {
         fetch(`${dir}/${encodeURIComponent(file)}`)
           .then(r => r.json())
           .then(data => {
-            const capa = L.geoJSON(data, {
-              style: { color, weight: 3 }
-            });
-            capa.addTo(grupo);
+            L.geoJSON(data, {
+              style: { color, weight: 3 },
+              onEachFeature: (feature, layer) => {
+                let contenido = '';
+                for (const key in feature.properties) {
+                  contenido += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                }
+                layer.bindPopup(contenido);
+              }
+            }).addTo(grupo);
           })
           .catch(() => console.warn('No se pudo cargar', file));
-      }
+      });
       rutasCapas[name] = grupo;
       grupo.addTo(map);
     } catch (e) {
-      console.error(`Error cargando índice de ${dir}`, e);
+      console.error('Error cargando índice de', dir, e);
     }
   }
-
-  // Añadir control de capas al mapa
   L.control.layers(null, rutasCapas, { collapsed: false }).addTo(map);
 }
 
