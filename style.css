@@ -108,12 +108,13 @@ main {
   padding: 16px 24px;
   border-bottom: 1px solid var(--color-gris-claro);
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   align-items: center;
   background: var(--color-blanco);
 }
 #controles label { font-weight: bold; }
-#filterField, #searchInput {
+#filterField, #searchInput, #personSelect {
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid var(--color-gris-medio);
@@ -123,7 +124,8 @@ main {
   box-shadow: 0 0 4px var(--color-secundario);
 }
 
-#downloadBtn {
+#downloadBtn,
+#findRouteBtn {
   background: var(--color-secundario);
   color: var(--color-blanco);
   border: none;
@@ -134,7 +136,10 @@ main {
   align-items: center;
   gap: 10px;
 }
-#downloadBtn:hover { background: var(--color-hover); }
+#downloadBtn:hover,
+#findRouteBtn:hover {
+  background: var(--color-hover);
+}
 
 #tabla {
   flex-grow: 1;
