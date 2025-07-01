@@ -1,88 +1,216 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IDE TRANSPORTE</title>
 
-  <!-- Estilos -->
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-</head>
-<body>
+:root {
+  --color-primario: #004d99;
+  --color-secundario: #007acc;
+  --color-fondo: #f0f4f8;
+  --color-texto: #212529;
+  --color-blanco: #ffffff;
+  --color-gris-claro: #dee2e6;
+  --color-gris-medio: #adb5bd;
+  --color-error: #dc3545;
+  --color-exito: #28a745;
+  --color-hover: #005bb5;
+  --borde-radio: 8px;
+  --sombra-suave: 0 4px 12px rgba(0,0,0,0.1);
+  --transition-fast: 0.25s ease;
+}
 
-<header role="banner">
-  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-  <form id="loginForm" onsubmit="return false;" aria-label="Formulario de inicio de sesión">
-    <input id="usuario" type="text" placeholder="Usuario" autocomplete="username" required aria-label="Usuario" />
-    <input id="clave" type="password" placeholder="Clave" autocomplete="current-password" required aria-label="Clave" />
-    <button id="loginBtn" title="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
-    <button id="logoutBtn" title="Cerrar sesión" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
-  </form>
-</header>
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-<main role="main">
-  <div id="map" aria-label="Mapa de ubicación del personal"></div>
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  <section id="panelDerecho" aria-label="Panel de controles y tabla de personal">
-    <section id="controles" aria-label="Controles de filtro y búsqueda">
-      <label for="filterField">Filtrar por:</label>
-      <select id="filterField">
-        <option value="CODIGO">Código</option>
-        <option value="NOMBRE" selected>Nombre</option>
-      </select>
-      <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
-      <label for="personSelect">Persona:</label>
-      <select id="personSelect">
-        <option value="">-- Selecciona --</option>
-      </select>
-      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
-      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
-    </section>
+header {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+header h1 {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+header i { font-size: 1.4rem; }
 
-    <div id="tabla" aria-live="polite"></div>
+#loginForm {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+#loginForm input {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 140px;
+}
+#loginForm input:focus {
+  outline: none;
+  box-shadow: 0 0 6px var(--color-secundario);
+}
+#loginForm button {
+  background-color: var(--color-secundario);
+  color: var(--color-blanco);
+  padding: 9px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#loginForm button:hover { background-color: var(--color-hover); }
+#logoutBtn { background-color: var(--color-error); display: none; }
+#logoutBtn:hover { background-color: #a32429; }
 
-    <form id="addForm" aria-label="Formulario para agregar personal">
-      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-      <div id="camposForm"></div>
-      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-    </form>
-  </section>
-</main>
+main {
+  display: flex;
+  height: calc(100vh - 60px);
+  padding: 80px 24px 24px;
+  gap: 24px;
+}
+#map {
+  flex: 1.3;
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  min-width: 320px;
+}
+#panelDerecho {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-blanco);
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  min-width: 320px;
+}
 
-<!-- Scripts -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-<script>
-  const usuarios = { admin: "1234", kevin: "admin2025" };
-  let usuarioLogueado = false;
-  document.getElementById("loginBtn").addEventListener("click", () => {
-    const user = document.getElementById("usuario").value.trim();
-    const pass = document.getElementById("clave").value.trim();
-    if (usuarios[user] === pass) {
-      usuarioLogueado = true;
-      alert(`Bienvenido ${user}`);
-      document.getElementById("addForm").style.display = "block";
-      document.getElementById("logoutBtn").style.display = "inline-flex";
-      document.getElementById("loginBtn").style.display = "none";
-      document.getElementById("usuario").disabled = true;
-      document.getElementById("clave").disabled = true;
-    } else {
-      alert("Usuario o contraseña incorrectos");
-    }
-  });
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    usuarioLogueado = false;
-    document.getElementById("addForm").style.display = "none";
-    document.getElementById("logoutBtn").style.display = "none";
-    document.getElementById("loginBtn").style.display = "inline-flex";
-    document.getElementById("usuario").disabled = false;
-    document.getElementById("clave").disabled = false;
-    document.getElementById("usuario").value = "";
-    document.getElementById("clave").value = "";
-  });
-</script>
-<script src="app.js"></script>
-</body>
-</html>
+#controles {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-gris-claro);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  background: var(--color-blanco);
+}
+#controles label { font-weight: bold; }
+#filterField, #searchInput, #personSelect {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-gris-medio);
+}
+#controles input:focus, #controles select:focus {
+  border-color: var(--color-secundario);
+  box-shadow: 0 0 4px var(--color-secundario);
+}
+
+#downloadBtn,
+#findRouteBtn {
+  background: var(--color-secundario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#downloadBtn:hover,
+#findRouteBtn:hover {
+  background: var(--color-hover);
+}
+
+#tabla {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 16px 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--color-blanco);
+}
+thead {
+  background: var(--color-primario);
+  color: var(--color-blanco);
+  position: sticky;
+  top: 0;
+}
+th, td {
+  padding: 10px;
+  border: 1px solid var(--color-gris-claro);
+  text-align: left;
+}
+tbody tr:hover { background: #e6f2ff; }
+td[contenteditable] { background: #fffbea; }
+td[contenteditable]:focus { background: #fff3b0; outline: 2px solid var(--color-secundario); }
+
+#addForm {
+  padding: 24px;
+  display: none;
+  background: var(--color-blanco);
+  border-top: 3px solid var(--color-secundario);
+}
+#addForm h2 {
+  font-size: 1.4rem;
+  color: var(--color-primario);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#camposForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 18px 20px;
+  margin-bottom: 24px;
+}
+#camposForm label { font-weight: 600; }
+#camposForm input {
+  padding: 8px;
+  border: 1px solid var(--color-gris-medio);
+  border-radius: 6px;
+}
+#camposForm input:focus { box-shadow: 0 0 6px var(--color-secundario); outline: none; }
+
+#addForm button {
+  background: var(--color-secundario);
+  color: var(--color-blanco);
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#addForm button:hover { background: var(--color-hover); }
+
+@media (max-width: 900px) {
+  main { flex-direction: column; padding: 80px 16px 16px; }
+  #map, #panelDerecho { width: 100%; height: 380px; margin-bottom: 24px; }
+  #loginForm { flex-wrap: wrap; gap: 10px; }
+  table { min-width: 100%; }
+}
