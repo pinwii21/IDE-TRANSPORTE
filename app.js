@@ -11,30 +11,28 @@ const campos = [
   "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
 ];
 
-// 2. Variables globales
 let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
+const rutasCapas = {}; // Capas de rutas por grupo
 
-// 3. Inicializar mapa Leaflet
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 4. Cargar GeoJSON de personal desde GitHub
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
     data.features.forEach((f, i) => f._id = i);
     geojsonData = data;
     crearCamposFormulario();
+    poblarSelectPersonas();
     mostrarTabla(data);
     mostrarMapa(data);
     centrarMapa(data);
   });
 
-// 5. Crear formulario de alta
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -50,7 +48,17 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. Mostrar tabla editable
+function poblarSelectPersonas() {
+  const sel = document.getElementById('personSelect');
+  sel.innerHTML = '<option value="">-- Selecciona --</option>';
+  geojsonData.features.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f._id;
+    opt.text = `${f.properties.NOMBRE} (${f.properties.CODIGO})`;
+    sel.appendChild(opt);
+  });
+}
+
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -70,11 +78,9 @@ function mostrarTabla(data) {
   });
   html += `</tbody></table>`;
   cont.innerHTML = html;
-
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 7. Asignar edición en celdas
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -98,14 +104,12 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. Mostrar puntos en el mapa
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
     pointToLayer: (f, latlng) => L.circleMarker(latlng, {
       radius: 6,
-      fillColor: getComputedStyle(document.documentElement)
-                  .getPropertyValue('--color-primario').trim() || '#004d99',
+      fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99',
       color: "#000",
       weight: 1,
       opacity: 1,
@@ -121,12 +125,9 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 9. Centrar el mapa según datos
 function centrarMapa(data) {
   if (!data.features.length) return;
-  const coords = data.features
-    .map(f => f.geometry?.coordinates)
-    .filter(c => Array.isArray(c));
+  const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
   const lats = coords.map(c => c[1]);
   const lngs = coords.map(c => c[0]);
   const bounds = [
@@ -136,7 +137,6 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. Filtrar datos
 document.getElementById("searchInput").addEventListener("input", filtrarDatos);
 document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
@@ -151,7 +151,6 @@ function filtrarDatos() {
   centrarMapa({ type: "FeatureCollection", features: filtrados });
 }
 
-// 11. Añadir nuevo personal
 document.getElementById("addForm").addEventListener("submit", e => {
   e.preventDefault();
   const nuevo = {
@@ -174,9 +173,9 @@ document.getElementById("addForm").addEventListener("submit", e => {
   mostrarMapa(geojsonData);
   centrarMapa(geojsonData);
   e.target.reset();
+  poblarSelectPersonas();
 });
 
-// 12. Descargar GeoJSON
 document.getElementById("downloadBtn").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -187,7 +186,6 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-// 13. Login / Logout
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -220,19 +218,6 @@ logoutBtn.addEventListener("click", () => {
   mostrarTabla(geojsonData);
 });
 
-// 14. Poblado de select de personas
-function poblarSelectPersonas() {
-  const sel = document.getElementById('personSelect');
-  sel.innerHTML = '<option value="">-- Selecciona --</option>';
-  geojsonData.features.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f._id;
-    opt.text = `${f.properties.NOMBRE} (${f.properties.CODIGO})`;
-    sel.appendChild(opt);
-  });
-}
-
-// 15. Cargar rutas de carpetas y control de capas
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -245,16 +230,19 @@ async function cargarIndexYCapas() {
       if (!idxRes.ok) throw new Error('Índice no encontrado');
       const lista = await idxRes.json();
       const grupo = L.layerGroup();
-      lista.forEach(file => {
-        fetch(`${dir}/${encodeURIComponent(file)}`)
-          .then(r => r.json())
-          .then(data => {
-            L.geoJSON(data, {
-              style: { color, weight: 3 }
-            }).addTo(grupo);
-          })
-          .catch(() => console.warn('No se pudo cargar', file));
-      });
+
+      for (const file of lista) {
+        const url = `${dir}/${encodeURIComponent(file)}`;
+        try {
+          const data = await fetch(url).then(r => r.json());
+          const capa = L.geoJSON(data, { style: { color, weight: 3 } });
+          capa.addTo(grupo);
+          capa.eachLayer(l => l.feature = data); // Para turf.js
+        } catch {
+          console.warn('No se pudo cargar', url);
+        }
+      }
+
       rutasCapas[name] = grupo;
       grupo.addTo(map);
     } catch (e) {
@@ -264,16 +252,18 @@ async function cargarIndexYCapas() {
   L.control.layers(null, rutasCapas, { collapsed: false }).addTo(map);
 }
 
-// 16. Buscar y resaltar ruta más cercana
 function encontrarRuta() {
   const id = document.getElementById('personSelect').value;
   if (!id) return alert('Seleccione una persona');
   const persona = geojsonData.features.find(f => f._id == id);
+  if (!persona || !persona.geometry) return alert('Persona sin ubicación válida');
+
   const punto = turf.point(persona.geometry.coordinates);
   let minDist = Infinity, selLayer = null;
 
   Object.values(rutasCapas).forEach(grupo => {
     grupo.eachLayer(layer => {
+      if (!layer.feature) return;
       const dist = turf.pointToLineDistance(punto, layer.feature, { units: 'meters' });
       if (dist < minDist) {
         minDist = dist;
@@ -285,11 +275,9 @@ function encontrarRuta() {
   if (selLayer) {
     map.fitBounds(selLayer.getBounds(), { padding: [20, 20] });
     selLayer.setStyle({ color: '#ff0000', weight: 5 });
-    setTimeout(() => selLayer.setStyle({ color: rutasCapas[selLayer.options.name]?.options.color || '#007acc', weight: 3 }), 5000);
+    setTimeout(() => selLayer.setStyle({ color: '#007acc', weight: 3 }), 5000);
   }
 }
 
-// Iniciar carga de rutas y asignar evento
-cargarIndexYCapas();
 document.getElementById('findRouteBtn').addEventListener('click', encontrarRuta);
-
+cargarIndexYCapas();
