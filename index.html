@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>IDE TRANSPORTE</title>
+  <title>Editor GeoJSON de Personal</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
       --main-color: #2c3e50;
@@ -99,6 +99,7 @@
     th, td {
       padding: 10px;
       border: 1px solid #e0e0e0;
+      text-align: left;
     }
 
     th {
@@ -108,6 +109,7 @@
 
     td[contenteditable="true"] {
       background-color: #fefbd8;
+      outline: none;
     }
 
     #controls {
@@ -138,7 +140,7 @@
 <body>
 
   <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+    <h1><i class="fa-solid fa-map-location-dot"></i> Editor GeoJSON de Personal</h1>
   </header>
 
   <div class="container">
@@ -209,6 +211,7 @@
         document.getElementById("addForm").classList.remove("hidden");
         document.getElementById("logoutBtn").classList.remove("hidden");
         alert("¡Bienvenido!");
+        mostrarTabla(geojsonData); // Refrescar tabla con edición habilitada
       } else {
         alert("Credenciales incorrectas");
       }
@@ -246,25 +249,44 @@
       cont.innerHTML = html;
 
       if(usuarioLogueado){
-        document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-          td.addEventListener('input', () => {
-            const fila = td.dataset.feature;
-            const campo = td.dataset.attr;
-            const valor = td.textContent.trim().toUpperCase();
-            geojsonData.features[fila].properties[campo] = valor;
-
-            if(campo === "LATITUD" || campo === "LONGITUD"){
-              let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
-              let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
-              geojsonData.features[fila].geometry = {
-                type: "Point",
-                coordinates: [lng, lat]
-              };
-              mostrarMapa(geojsonData);
-            }
-          });
-        });
+        asignarEventosEdicion();
       }
+    }
+
+    // Función para asignar listeners a celdas editables y actualizar mapa
+    function asignarEventosEdicion(){
+      const tdsEditables = document.querySelectorAll('td[contenteditable="true"]');
+      // Limpiar listeners anteriores para evitar duplicados (opcional)
+      tdsEditables.forEach(td => {
+        td.oninput = null;
+      });
+
+      // Debounce para evitar actualizaciones excesivas del mapa
+      let timeoutId = null;
+
+      tdsEditables.forEach(td => {
+        td.addEventListener('input', () => {
+          const fila = td.dataset.feature;
+          const campo = td.dataset.attr;
+          const valor = td.textContent.trim().toUpperCase();
+          geojsonData.features[fila].properties[campo] = valor;
+
+          if(campo === "LATITUD" || campo === "LONGITUD"){
+            let lat = parseFloat(geojsonData.features[fila].properties["LATITUD"]) || 0;
+            let lng = parseFloat(geojsonData.features[fila].properties["LONGITUD"]) || 0;
+
+            geojsonData.features[fila].geometry = {
+              type: "Point",
+              coordinates: [lng, lat]
+            };
+
+            if(timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              mostrarMapa(geojsonData);
+            }, 300); // actualiza mapa 300ms después de dejar de escribir
+          }
+        });
+      });
     }
 
     function mostrarMapa(data) {
@@ -291,6 +313,7 @@
 
     document.getElementById("searchInput").addEventListener("input", filtrarDatos);
     document.getElementById("filterField").addEventListener("change", filtrarDatos);
+
     function filtrarDatos() {
       const campo = document.getElementById("filterField").value;
       const texto = document.getElementById("searchInput").value.trim().toLowerCase();
@@ -306,6 +329,7 @@
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
     }
 
+    const addForm = document.getElementById("addForm");
     addForm.addEventListener("submit", e => {
       e.preventDefault();
       const nuevaFeature = {
