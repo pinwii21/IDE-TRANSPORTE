@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>Editor GeoJSON de Personal</title>
+  <!-- Carga estilos y librería Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
+    /* Estilos visuales para el formulario, tabla y mapa */
     body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
     h1, h2 { font-weight: 600; color: #333; }
     form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -24,8 +26,10 @@
 <body>
   <h1>Editor GeoJSON de Personal</h1>
 
+  <!-- Formulario para añadir nuevo personal -->
   <form id="addForm">
     <h2>Agregar nuevo personal</h2>
+    <!-- Campos con IDs iguales a sus nombres, se usan en JavaScript -->
     <label>CODIGO: <input type="text" id="CODIGO" required /></label>
     <label>NOMBRE: <input type="text" id="NOMBRE" required /></label>
     <label>RUTA: <input type="text" id="RUTA" /></label>
@@ -46,6 +50,7 @@
     <br><button type="submit">Agregar</button>
   </form>
 
+  <!-- Filtros y descarga -->
   <div id="controls">
     <label for="filterField">Filtrar por:</label>
     <select id="filterField">
@@ -60,15 +65,20 @@
   <div id="tableContainer"></div>
 
   <script>
+    // Lista de todos los campos de la base de datos
     const campos = ["CODIGO","NOMBRE","RUTA","CEDULA","TELEFONO","DISCAPACIDAD","TIPO HORARIO","CARGO","AREA","MODALIDAD DE CONTRATO","DIRECCION","HORARIO","LUGAR TRABAJO","LONGITUD","LATITUD","CONTRATO LUZ","TRANSPORTE"];
     let geojsonData = { type: "FeatureCollection", features: [] };
+
+    // Inicializa el mapa
     let map = L.map('map').setView([0, 0], 2);
     let geojsonLayer = null;
 
+    // Añade fondo de mapa con OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    // Cargar archivo GeoJSON desde GitHub
     fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson")
       .then(r => r.json())
       .then(data => {
@@ -77,6 +87,7 @@
         mostrarMapa(geojsonData);
       });
 
+    // Construye y muestra la tabla de datos
     function mostrarTabla(data) {
       const cont = document.getElementById("tableContainer");
       let html = `<table><thead><tr><th>#</th>` + campos.map(c => `<th>${c}</th>`).join("") + `</tr></thead><tbody>`;
@@ -85,6 +96,8 @@
       });
       html += `</tbody></table>`;
       cont.innerHTML = html;
+
+      // Editar valores directamente en la tabla
       cont.querySelectorAll("td[contenteditable='true']").forEach(td => {
         td.addEventListener("input", e => {
           const fila = e.target.dataset.feature;
@@ -95,6 +108,7 @@
       });
     }
 
+    // Muestra los puntos en el mapa con popups
     function mostrarMapa(data) {
       if (geojsonLayer) map.removeLayer(geojsonLayer);
       geojsonLayer = L.geoJSON(data, {
@@ -108,6 +122,7 @@
       try { map.fitBounds(geojsonLayer.getBounds()); } catch { map.setView([0, 0], 2); }
     }
 
+    // Evento: agregar nuevo personal desde formulario
     document.getElementById("addForm").addEventListener("submit", e => {
       e.preventDefault();
       const nueva = { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [0,0] } };
@@ -125,6 +140,7 @@
       e.target.reset();
     });
 
+    // Eventos de filtrado por campo y texto
     document.getElementById("searchInput").addEventListener("input", filtrarDatos);
     document.getElementById("filterField").addEventListener("change", filtrarDatos);
 
@@ -143,6 +159,7 @@
       mostrarMapa({ type: "FeatureCollection", features: filtrados });
     }
 
+    // Descargar el archivo actualizado
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -157,4 +174,5 @@
   </script>
 </body>
 </html>
+
 
