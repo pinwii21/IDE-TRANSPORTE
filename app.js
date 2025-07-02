@@ -37,9 +37,6 @@ const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/service
   attribution: 'Tiles © Esri'
 });
 
-// Google Streets (requiere plugin GoogleMutant más abajo)
-let googleStreets; // se define después al cargar el plugin
-
 // Crear el mapa con capa base inicial
 const map = L.map('map', {
   center: [-0.180653, -78.467838],
@@ -51,7 +48,6 @@ const map = L.map('map', {
 const baseMaps = {
   "OpenStreetMap": osm,
   "Esri Satelital": esriSat,
-  // Google Streets se añadirá dinámicamente
 };
 
 // 3. CARGAR ARCHIVO GEOJSON DE PERSONAL DESDE GITHUB
