@@ -297,33 +297,72 @@ if (addForm) {
   });
 }
 
-// 14. Buscar ruta más cercana
-const btnRutaCercana = document.getElementById("findRouteBtn");
-btnRutaCercana.addEventListener("click", () => {
-  const id = document.getElementById("personSelect").value;
-  const persona = geojsonData.features.find(f => f._id == id);
-  if (!persona || !persona.geometry) return alert("Seleccione una persona válida");
+// Función para encontrar la ruta más cercana a una persona seleccionada
+document.getElementById('findRouteBtn').addEventListener('click', () => {
+  const select = document.getElementById('personSelect');
+  const selectedId = select.value;
 
-  const punto = turf.point(persona.geometry.coordinates);
-  let rutaMasCercana = null;
-  let distanciaMin = Infinity;
-
-  rutasTodas.forEach(ruta => {
-    const distancia = turf.pointToLineDistance(punto, ruta, { units: "kilometers" });
-    if (distancia < distanciaMin) {
-      distanciaMin = distancia;
-      rutaMasCercana = ruta;
-    }
-  });
-
-  if (rutaMasCercana) {
-    if (window.rutaLayer) map.removeLayer(window.rutaLayer);
-    window.rutaLayer = L.geoJSON(rutaMasCercana, {
-      style: { color: "#0000ff", weight: 5 }
-    }).addTo(map);
-    map.fitBounds(L.geoJSON(rutaMasCercana).getBounds(), { padding: [40, 40] });
-    alert(`Ruta más cercana encontrada a ${distanciaMin.toFixed(3)} km`);
-  } else {
-    alert("No se encontró ruta cercana");
+  if (!selectedId) {
+    alert('Por favor selecciona una persona.');
+    return;
   }
+
+  // Buscar el feature de la persona seleccionada
+  const persona = geojsonData.features.find(f => f._id == selectedId);
+  if (!persona) {
+    alert('Persona no encontrada.');
+    return;
+  }
+
+  const puntoPersona = persona.geometry;
+
+  // Variables para guardar la ruta más cercana y distancia mínima
+  let rutaMasCercana = null;
+  let distanciaMinima = Infinity;
+
+  // Iterar cada grupo de rutas en capasOverlay
+  for (const nombreGrupo in capasOverlay) {
+    const grupo = capasOverlay[nombreGrupo];
+
+    // Para cada capa dentro del grupo (cada ruta)
+    grupo.eachLayer(capa => {
+      // Usamos turf para calcular la distancia entre el punto y la línea
+      const linea = capa.toGeoJSON();
+
+      // turf.pointToLineDistance necesita un punto y una línea
+      const distancia = turf.pointToLineDistance(puntoPersona, linea, { units: 'meters' });
+
+      if (distancia < distanciaMinima) {
+        distanciaMinima = distancia;
+        rutaMasCercana = capa;
+      }
+    });
+  }
+
+  if (!rutaMasCercana) {
+    alert('No se encontró ninguna ruta cercana.');
+    return;
+  }
+
+  // Resaltar la ruta más cercana (cambiar estilo temporalmente)
+  // Primero, eliminar resaltado previo si existe
+  if (window.rutaResaltada) {
+    rutaResaltada.setStyle({ weight: 3, color: rutaResaltada.defaultColor || '#3388ff' });
+  }
+
+  rutaMasCercana.defaultColor = rutaMasCercana.options.color; // Guardar color original
+  rutaMasCercana.setStyle({ color: '#FFD700', weight: 6 }); // Dorado y más grueso
+
+  window.rutaResaltada = rutaMasCercana; // Guardar referencia
+
+  // Centrar mapa en la persona y ruta
+  const bounds = L.latLngBounds([
+    [puntoPersona.coordinates[1], puntoPersona.coordinates[0]],
+    rutaMasCercana.getBounds().getNorthEast(),
+    rutaMasCercana.getBounds().getSouthWest()
+  ]);
+  map.fitBounds(bounds.pad(1));
+
+  alert(`Ruta más cercana resaltada. Distancia: ${distanciaMinima.toFixed(2)} metros.`);
 });
+
