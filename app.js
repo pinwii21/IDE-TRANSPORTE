@@ -1,5 +1,4 @@
 // 1. CONFIGURACIÓN DE USUARIOS Y CAMPOS
-
 const usuarios = {
   admin: "1234",
   kevin: "admin2025"
@@ -23,7 +22,6 @@ const GITHUB_TOKEN = 'github_pat_11BOUGNZA0QsN9dCbASgKW_XXJgXDzchVBhYP80W4Y1RLeL
 
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
-
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
@@ -356,39 +354,44 @@ async function subirGeoJSONAGithub() {
   const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
-  // Obtener SHA actual del archivo para actualizarlo
-  const resGet = await fetch(url, {
-    headers: { Authorization: `token ${GITHUB_TOKEN}` }
-  });
+  try {
+    // Obtener SHA actual del archivo para actualizarlo
+    const resGet = await fetch(url, {
+      headers: { Authorization: `token ${GITHUB_TOKEN}` }
+    });
 
-  if (!resGet.ok) {
-    throw new Error("Error al obtener el archivo desde GitHub.");
-  }
+    if (!resGet.ok) {
+      const errorText = await resGet.text();
+      throw new Error(`Error al obtener el archivo desde GitHub: ${errorText}`);
+    }
 
-  const info = await resGet.json();
-  const sha = info.sha;
+    const info = await resGet.json();
+    const sha = info.sha;
 
-  // Crear contenido nuevo codificado en base64
-  const contenido = JSON.stringify(geojsonData, null, 2);
-  const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+    // Crear contenido nuevo codificado en base64
+    const contenido = JSON.stringify(geojsonData, null, 2);
+    const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
 
-  // Hacer PUT para actualizar archivo
-  const respuesta = await fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "Actualizar base de datos GeoJSON desde la aplicación web",
-      content: contenidoBase64,
-      sha: sha
-    })
-  });
+    // Hacer PUT para actualizar archivo
+    const respuesta = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Actualizar base de datos GeoJSON desde la aplicación web",
+        content: contenidoBase64,
+        sha: sha
+      })
+    });
 
-  if (!respuesta.ok) {
-    const errorText = await respuesta.text();
-    console.error(errorText);
-    throw new Error("Error al subir el archivo a GitHub.");
+    if (!respuesta.ok) {
+      const errorText = await respuesta.text();
+      throw new Error(`Error al subir el archivo a GitHub: ${errorText}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 }
