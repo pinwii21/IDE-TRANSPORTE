@@ -241,3 +241,8 @@ td[contenteditable="true"] {
   background-color: #004d99;
   border-radius: 4px;
 }
+
+#panelDerecho::-webkit-scrollbar-thumb {
+  background-color: #004d99;
+  border-radius: 4px;
+}
