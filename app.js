@@ -17,7 +17,7 @@ let geojsonLayer = null;
 const capasOverlay = {};
 
 // -------------- TOKEN DE GITHUB -----------------
-const GITHUB_TOKEN = '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'; 
+const GITHUB_TOKEN = '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'; 
 // -----------------------------------------------
 
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
