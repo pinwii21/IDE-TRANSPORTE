@@ -1,139 +1,131 @@
-/* === style.css === */
-:root {
-  --color-primario: #004d99;
-  --color-secundario: #e6f0ff;
-}
+// 1. Configuración usuarios y campos
+const usuarios = {
+  admin: "1234",
+  kevin: "admin2025"
+};
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f7f9fc;
-  color: #333;
-}
+const campos = [
+  "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
+  "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
+  "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
+];
 
-header {
-  background: var(--color-primario);
-  color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
+// Variables globales
+let geojsonData = null;
+let usuarioLogueado = false;
+let geojsonLayer = null;
+const capasOverlay = {};
+const rutasTodas = [];
 
-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+// 2. Inicializar mapa Leaflet
+const map = L.map('map').setView([-0.180653, -78.467838], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
 
-#loginContainer, #logoutBtn {
-  margin-top: 0.5rem;
-}
+// 3. Cargar GeoJSON desde GitHub
+fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
+  .then(res => res.json())
+  .then(data => {
+    data.features.forEach((f, i) => f._id = i);
+    geojsonData = data;
+    crearCamposFormulario();
+    mostrarTabla(data);
+    mostrarMapa(data);
+    centrarMapa(data);
+    actualizarListaPersonas(data.features);
+  });
 
-#loginForm input, #loginForm button {
-  margin: 0 5px;
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: none;
-  outline: none;
-}
+// === CONFIGURACIÓN DE RUTAS ===
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
+];
 
-#loginForm button {
-  background: #28a745;
-  color: white;
-  cursor: pointer;
-}
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const idxRes = await fetch(indexUrl);
+      if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
-#logoutBtn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-}
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
 
-main {
-  display: flex;
-  flex-direction: row;
-}
+      for (const fichero of lista) {
+        try {
+          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+          const res = await fetch(geojsonUrl);
+          if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
+          const data = await res.json();
+          rutasTodas.push(...data.features);
 
-#map {
-  flex: 2;
-  height: 90vh;
-}
+          const capa = L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          });
 
-#panelDerecho {
-  flex: 1;
-  padding: 10px;
-  background: white;
-  border-left: 1px solid #ccc;
-  overflow-y: auto;
-  height: 90vh;
-}
+          capa.addTo(grupo);
+        } catch (error) {
+          console.warn(`Error en ${fichero}:`, error.message);
+        }
+      }
 
-#controles label, #controles select, #controles input, #controles button {
-  display: block;
-  margin: 5px 0;
-  width: 100%;
-  box-sizing: border-box;
-}
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
+    } catch (error) {
+      console.error(`Error en carpeta ${dir}:`, error.message);
+    }
+  }
 
-#controles button {
-  padding: 6px;
-  background: var(--color-primario);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
+cargarIndexYCapas();
 
-#tabla {
-  margin-top: 15px;
-  overflow-x: auto;
-}
+// Buscar ruta más cercana
+const btnRutaCercana = document.getElementById("findRouteBtn");
+btnRutaCercana.addEventListener("click", () => {
+  const id = document.getElementById("personSelect").value;
+  const persona = geojsonData.features.find(f => f._id == id);
+  if (!persona || !persona.geometry) return alert("Seleccione una persona válida");
 
-#tabla table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
+  const punto = turf.point(persona.geometry.coordinates);
+  let rutaMasCercana = null;
+  let distanciaMin = Infinity;
 
-#tabla th, #tabla td {
-  border: 1px solid #ccc;
-  padding: 5px;
-  text-align: left;
-}
+  rutasTodas.forEach(ruta => {
+    const distancia = turf.pointToLineDistance(punto, ruta, { units: "kilometers" });
+    if (distancia < distanciaMin) {
+      distanciaMin = distancia;
+      rutaMasCercana = ruta;
+    }
+  });
 
-#addForm h2 {
-  margin-top: 20px;
-  font-size: 1.2rem;
-}
+  if (rutaMasCercana) {
+    const capa = L.geoJSON(rutaMasCercana, {
+      style: { color: "blue", weight: 5, dashArray: '5, 10' }
+    });
+    capa.addTo(map);
+    map.fitBounds(capa.getBounds(), { padding: [30, 30] });
+  } else {
+    alert("No se encontró ruta cercana");
+  }
+});
 
-#camposForm label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-#camposForm input {
-  width: 100%;
-  padding: 6px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-#addForm button {
-  padding: 8px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-}
+// Descargar archivo actualizado
+const btnDescargar = document.getElementById("downloadBtn");
+btnDescargar.addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "personal_actualizado.geojson";
+  a.click();
+  URL.revokeObjectURL(url);
+});
