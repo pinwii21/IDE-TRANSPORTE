@@ -4,83 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IDE TRANSPORTE</title>
-  <!-- Estilos generales -->
   <link rel="stylesheet" href="style.css" />
-  <!-- Leaflet CSS para mapas -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Font Awesome para íconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
 
-  <!-- Encabezado con título e inicio de sesión -->
-  <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-    <form id="loginForm">
-      <div id="loginContainer">
-        <input id="usuario" type="text" placeholder="Usuario" required />
-        <input id="clave" type="password" placeholder="Clave" required />
-        <button type="submit">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar
-        </button>
-      </div>
-      <button id="logoutBtn" type="button" style="display:none;">
-        <i class="fa-solid fa-right-from-bracket"></i> Salir
-      </button>
-    </form>
-  </header>
+<header>
+  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+  <form id="loginForm">
+    <div id="loginContainer">
+      <input id="usuario" type="text" placeholder="Usuario" required />
+      <input id="clave" type="password" placeholder="Clave" required />
+      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    </div>
+    <button id="logoutBtn" type="button" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+  </form>
+</header>
 
-  <!-- Contenedor principal con mapa y panel derecho -->
-  <main>
-    <!-- Mapa Leaflet -->
-    <div id="map"></div>
+<main>
+  <div id="map"></div>
 
-    <!-- Panel derecho con controles, tabla y formulario -->
-    <section id="panelDerecho">
-      
-      <!-- Controles de filtro, selección y acciones -->
-      <section id="controles">
-        <label for="filterField">Filtrar por:</label>
-        <select id="filterField" aria-label="Campo para filtrar datos">
-          <option value="CODIGO">Código</option>
-          <option value="NOMBRE" selected>Nombre</option>
-        </select>
-
-        <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar personal" />
-
-        <label for="personSelect">Persona:</label>
-        <select id="personSelect" aria-label="Seleccionar persona">
-          <option value="">-- Selecciona persona --</option>
-        </select>
-
-        <button id="findRouteBtn" type="button">
-          <i class="fa-solid fa-route"></i> Ruta más cercana
-        </button>
-
-        <button id="downloadBtn" type="button">
-          <i class="fa-solid fa-download"></i> Descargar
-        </button>
-      </section>
-
-      <!-- Tabla de datos -->
-      <div id="tabla" role="region" aria-live="polite"></div>
-
-      <!-- Formulario para agregar nuevo personal, oculto inicialmente -->
-      <form id="addForm" style="display:none;">
-        <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-        <div id="camposForm"></div>
-        <button type="submit">
-          <i class="fa-solid fa-plus"></i> Agregar Personal
-        </button>
-      </form>
-
+  <section id="panelDerecho">
+    <section id="controles">
+      <label for="filterField">Filtrar por:</label>
+      <select id="filterField">
+        <option value="CODIGO">Código</option>
+        <option value="NOMBRE" selected>Nombre</option>
+      </select>
+      <input id="searchInput" type="search" placeholder="Buscar..." />
+      <label for="personSelect">Persona:</label>
+      <select id="personSelect">
+        <option value="">-- Selecciona persona --</option>
+      </select>
+      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
-  </main>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-  <script src="app.js"></script>
+    <div id="tabla"></div>
 
+    <form id="addForm" style="display:none;">
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <div id="camposForm"></div>
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+    </form>
+  </section>
+</main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
