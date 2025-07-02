@@ -102,7 +102,6 @@ async function cargarIndexYCapas() {
 
   // Agrega control para alternar visibilidad de grupos de rutas
 L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
-L.control.layers(baseMaps, capasOverlay, { collapsed: false }).addTo(map);
 }
 
 cargarIndexYCapas();  // Ejecuta la función al cargar la página
