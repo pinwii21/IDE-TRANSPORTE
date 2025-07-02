@@ -15,7 +15,6 @@ let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
 const capasOverlay = {};
-const rutasTodas = [];
 
 // 2. Inicializar mapa Leaflet
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
@@ -23,7 +22,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 3. Cargar GeoJSON desde GitHub (personal)
+// 3. Cargar GeoJSON desde GitHub
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
@@ -45,7 +44,7 @@ const carpetas = [
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
-      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/Rutas_de_entrada/index.json`;
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
@@ -54,12 +53,10 @@ async function cargarIndexYCapas() {
 
       for (const fichero of lista) {
         try {
-          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main//Rutas_de_entrada/${fichero}`;
           const res = await fetch(geojsonUrl);
           if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
           const data = await res.json();
-
-          rutasTodas.push(...data.features);
 
           const capa = L.geoJSON(data, {
             style: { color, weight: 3 },
@@ -222,6 +219,7 @@ function actualizarListaPersonas(lista) {
 }
 
 // 12. Login y logout
+
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', function(e) {
@@ -298,48 +296,3 @@ if (addForm) {
     document.getElementById('addForm').reset();
   });
 }
-
-// 14. Buscar ruta más cercana
-const btnRutaCercana = document.getElementById("findRouteBtn");
-btnRutaCercana.addEventListener("click", () => {
-  const id = document.getElementById("personSelect").value;
-  const persona = geojsonData.features.find(f => f._id == id);
-  if (!persona || !persona.geometry) return alert("Seleccione una persona válida");
-
-  const punto = turf.point(persona.geometry.coordinates);
-  let rutaMasCercana = null;
-  let distanciaMin = Infinity;
-
-  rutasTodas.forEach(ruta => {
-    const distancia = turf.pointToLineDistance(punto, ruta, { units: "kilometers" });
-    if (distancia < distanciaMin) {
-      distanciaMin = distancia;
-      rutaMasCercana = ruta;
-    }
-  });
-
-  if (rutaMasCercana) {
-    if (window.rutaLayer) map.removeLayer(window.rutaLayer);
-    window.rutaLayer = L.geoJSON(rutaMasCercana, {
-      style: { color: "#0000ff", weight: 5 }
-    }).addTo(map);
-    map.fitBounds(L.geoJSON(rutaMasCercana).getBounds(), { padding: [40, 40] });
-    alert(`Ruta más cercana encontrada a ${distanciaMin.toFixed(3)} km`);
-  } else {
-    alert("No se encontró ruta cercana");
-  }
-});
-
-// 15. Descargar GeoJSON
-const btnDownload = document.getElementById("downloadBtn");
-btnDownload.addEventListener("click", () => {
-  if (!geojsonData) return alert("No hay datos para descargar");
-
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojsonData));
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", "BASE_DATOS_TRANSPORTE_2025_editado.geojson");
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
-});
