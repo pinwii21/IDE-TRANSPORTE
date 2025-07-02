@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<!-- LOGIN SOLO PARA EDICIÓN -->
+<!-- Login container -->
 <div id="loginContainer">
   <header>
     <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
@@ -22,11 +22,13 @@
   </header>
 </div>
 
-<!-- APLICACIÓN SIEMPRE VISIBLE -->
+<!-- App container visible siempre -->
 <div id="appContainer">
   <header>
     <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-    <button id="logoutBtn" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+    <button id="logoutBtn" style="display:none;">
+      <i class="fa-solid fa-right-from-bracket"></i> Salir
+    </button>
   </header>
 
   <main>
@@ -50,8 +52,8 @@
 
       <div id="tabla"></div>
 
-      <!-- Solo visible tras login -->
-      <form id="addForm" style="display: none;">
+      <!-- Formulario agregar personal, oculto inicialmente -->
+      <form id="addForm" style="display:none;">
         <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
         <div id="camposForm"></div>
         <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
@@ -60,7 +62,6 @@
   </main>
 </div>
 
-<!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
