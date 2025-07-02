@@ -1,134 +1,139 @@
+/* === style.css === */
 :root {
-  --color-primario: #007bff;
+  --color-primario: #004d99;
+  --color-secundario: #e6f0ff;
 }
 
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  background: #f7f9fc;
+  color: #333;
 }
 
 header {
-  background-color: #004d99;
-  color: #fff;
-  padding: 10px 20px;
+  background: var(--color-primario);
+  color: white;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 header h1 {
   margin: 0;
   font-size: 1.5rem;
-}
-
-header form {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-#loginForm input[type="text"],
-#loginForm input[type="password"] {
-  padding: 5px;
-  border: none;
+#loginContainer, #logoutBtn {
+  margin-top: 0.5rem;
+}
+
+#loginForm input, #loginForm button {
+  margin: 0 5px;
+  padding: 6px 10px;
   border-radius: 4px;
+  border: none;
+  outline: none;
 }
 
 #loginForm button {
-  background-color: #fff;
-  color: #004d99;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
+  background: #28a745;
+  color: white;
   cursor: pointer;
+}
+
+#logoutBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 main {
   display: flex;
-  flex: 1;
-  height: 100%;
+  flex-direction: row;
 }
 
 #map {
   flex: 2;
-  height: 100%;
+  height: 90vh;
 }
 
 #panelDerecho {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   padding: 10px;
+  background: white;
+  border-left: 1px solid #ccc;
   overflow-y: auto;
-  background: #f9f9f9;
-  border-left: 2px solid #ddd;
+  height: 90vh;
 }
 
-#controles {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 15px;
+#controles label, #controles select, #controles input, #controles button {
+  display: block;
+  margin: 5px 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-#controles input,
-#controles select,
 #controles button {
   padding: 6px;
-  border: 1px solid #ccc;
+  background: var(--color-primario);
+  color: white;
+  border: none;
   border-radius: 4px;
+  cursor: pointer;
+}
+
+#tabla {
+  margin-top: 15px;
+  overflow-x: auto;
 }
 
 #tabla table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
+  font-size: 0.9rem;
 }
 
-#tabla th,
-#tabla td {
+#tabla th, #tabla td {
   border: 1px solid #ccc;
-  padding: 6px;
+  padding: 5px;
   text-align: left;
 }
 
-#tabla th {
-  background-color: #e9ecef;
+#addForm h2 {
+  margin-top: 20px;
+  font-size: 1.2rem;
 }
 
-#addForm {
-  margin-top: 15px;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-#addForm label {
+#camposForm label {
   display: block;
-  margin-top: 8px;
-  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-#addForm input[type="text"] {
+#camposForm input {
   width: 100%;
-  padding: 5px;
-  margin-top: 2px;
+  padding: 6px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 #addForm button {
-  margin-top: 10px;
-  background-color: #007bff;
-  color: #fff;
   padding: 8px;
+  background: #007bff;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  width: 100%;
 }
