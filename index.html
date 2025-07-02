@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IDE TRANSPORTE</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -10,57 +10,46 @@
 </head>
 <body>
 
-<!-- Login container -->
-<div id="loginContainer">
-  <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-    <form id="loginForm">
+<header>
+  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+  <form id="loginForm">
+    <div id="loginContainer">
       <input id="usuario" type="text" placeholder="Usuario" required />
       <input id="clave" type="password" placeholder="Clave" required />
       <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
-    </form>
-  </header>
-</div>
+    </div>
+    <button id="logoutBtn" type="button" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+  </form>
+</header>
 
-<!-- App container visible siempre -->
-<div id="appContainer">
-  <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-    <button id="logoutBtn" style="display:none;">
-      <i class="fa-solid fa-right-from-bracket"></i> Salir
-    </button>
-  </header>
+<main>
+  <div id="map"></div>
 
-  <main>
-    <div id="map"></div>
-
-    <section id="panelDerecho">
-      <section id="controles">
-        <label for="filterField">Filtrar por:</label>
-        <select id="filterField">
-          <option value="CODIGO">Código</option>
-          <option value="NOMBRE" selected>Nombre</option>
-        </select>
-        <input id="searchInput" type="search" placeholder="Buscar..." />
-        <label for="personSelect">Persona:</label>
-        <select id="personSelect">
-          <option value="">-- Selecciona persona --</option>
-        </select>
-        <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
-        <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
-      </section>
-
-      <div id="tabla"></div>
-
-      <!-- Formulario agregar personal, oculto inicialmente -->
-      <form id="addForm" style="display:none;">
-        <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
-        <div id="camposForm"></div>
-        <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-      </form>
+  <section id="panelDerecho">
+    <section id="controles">
+      <label for="filterField">Filtrar por:</label>
+      <select id="filterField">
+        <option value="CODIGO">Código</option>
+        <option value="NOMBRE" selected>Nombre</option>
+      </select>
+      <input id="searchInput" type="search" placeholder="Buscar..." />
+      <label for="personSelect">Persona:</label>
+      <select id="personSelect">
+        <option value="">-- Selecciona persona --</option>
+      </select>
+      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
-  </main>
-</div>
+
+    <div id="tabla"></div>
+
+    <form id="addForm" style="display:none;">
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <div id="camposForm"></div>
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+    </form>
+  </section>
+</main>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
