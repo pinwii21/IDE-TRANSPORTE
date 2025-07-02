@@ -296,3 +296,34 @@ if (addForm) {
     document.getElementById('addForm').reset();
   });
 }
+
+// 14. Buscar ruta más cercana
+const btnRutaCercana = document.getElementById("findRouteBtn");
+btnRutaCercana.addEventListener("click", () => {
+  const id = document.getElementById("personSelect").value;
+  const persona = geojsonData.features.find(f => f._id == id);
+  if (!persona || !persona.geometry) return alert("Seleccione una persona válida");
+
+  const punto = turf.point(persona.geometry.coordinates);
+  let rutaMasCercana = null;
+  let distanciaMin = Infinity;
+
+  rutasTodas.forEach(ruta => {
+    const distancia = turf.pointToLineDistance(punto, ruta, { units: "kilometers" });
+    if (distancia < distanciaMin) {
+      distanciaMin = distancia;
+      rutaMasCercana = ruta;
+    }
+  });
+
+  if (rutaMasCercana) {
+    if (window.rutaLayer) map.removeLayer(window.rutaLayer);
+    window.rutaLayer = L.geoJSON(rutaMasCercana, {
+      style: { color: "#0000ff", weight: 5 }
+    }).addTo(map);
+    map.fitBounds(L.geoJSON(rutaMasCercana).getBounds(), { padding: [40, 40] });
+    alert(`Ruta más cercana encontrada a ${distanciaMin.toFixed(3)} km`);
+  } else {
+    alert("No se encontró ruta cercana");
+  }
+});
