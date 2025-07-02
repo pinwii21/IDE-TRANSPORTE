@@ -1,12 +1,10 @@
 // 1. CONFIGURACIÓN DE USUARIOS Y CAMPOS
 
-// Usuarios autorizados con sus claves
 const usuarios = {
   admin: "1234",
   kevin: "admin2025"
 };
 
-// Campos que forman parte de cada registro de personal
 const campos = [
   "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
   "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
@@ -14,37 +12,34 @@ const campos = [
 ];
 
 // Variables globales
-let geojsonData = null;             // Almacena los datos cargados desde el GeoJSON
-let usuarioLogueado = false;        // Controla si el usuario está autenticado
-let geojsonLayer = null;            // Capa de puntos en el mapa
-const capasOverlay = {};            // Capa de rutas agrupadas por tipo (entrada/salida)
+let geojsonData = null;
+let usuarioLogueado = false;
+let geojsonLayer = null;
+const capasOverlay = {};
 
+// -------------- TOKEN DE GITHUB (Pon aquí tu token personal) -----------------
+const GITHUB_TOKEN = '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'; 
+// --------------------------------------------------------------------------------
 
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
-
-// Crea el mapa centrado en Quito con nivel de zoom 13
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 
-// Agrega la capa base de OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-
-// 3. CARGAR ARCHIVO GEOJSON DE PERSONAL DESDE GITHUB
-
+// 3. CARGAR GEOJSON
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
-    data.features.forEach((f, i) => f._id = i);  // Se asigna un ID único a cada feature
-    geojsonData = data;                          // Se guarda el dataset para uso global
-    crearCamposFormulario();                     // Se generan los inputs del formulario
-    mostrarTabla(data);                          // Se muestra la tabla de personal
-    mostrarMapa(data);                           // Se dibujan los puntos en el mapa
-    centrarMapa(data);                           // Se ajusta el mapa para mostrar todos los puntos
-    actualizarListaPersonas(data.features);      // Se actualiza el select de personas
+    data.features.forEach((f, i) => f._id = i);
+    geojsonData = data;
+    crearCamposFormulario();
+    mostrarTabla(data);
+    mostrarMapa(data);
+    centrarMapa(data);
+    actualizarListaPersonas(data.features);
   });
-
 
 // 4. CARGAR RUTAS DE ENTRADA Y SALIDA DESDE CARPETAS EN GITHUB
 
@@ -299,58 +294,12 @@ if (logoutBtn) {
   });
 }
 
-
-// 13. AGREGAR NUEVO PERSONAL
-const addForm = document.getElementById('addForm');
-if (addForm) {
-  addForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const nuevo = {};
-    let valid = true;
-
-    for (const campo of campos) {
-      const val = document.getElementById(campo).value.trim();
-      if (["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
-        alert(`El campo ${campo} es obligatorio`);
-        valid = false;
-        break;
-      }
-      nuevo[campo] = val.toUpperCase();
-    }
-
-    if (!valid) return;
-
-    const lat = parseFloat(nuevo["LATITUD"]);
-    const lng = parseFloat(nuevo["LONGITUD"]);
-    if (isNaN(lat) || isNaN(lng)) {
-      alert("LATITUD y LONGITUD deben ser números válidos");
-      return;
-    }
-
-    const nuevoFeature = {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [lng, lat] },
-      properties: nuevo,
-      _id: geojsonData.features.length
-    };
-
-    geojsonData.features.push(nuevoFeature);
-    mostrarTabla(geojsonData);
-    mostrarMapa(geojsonData);
-    centrarMapa(geojsonData);
-    actualizarListaPersonas(geojsonData.features);
-
-    document.getElementById('addForm').reset();
-  });
-}
-
+// BOTÓN PARA GUARDAR EN GITHUB
 document.getElementById("guardarGitHubBtn").addEventListener("click", subirGeoJSONAGithub);
 
 async function subirGeoJSONAGithub() {
-  const token = localStorage.getItem("github_token");
-  if (!token) {
-    alert("Token de GitHub no encontrado. Usa localStorage.setItem('github_token', 'TU_TOKEN') en la consola.");
+  if (!GITHUB_TOKEN) {
+    alert("El token de GitHub no está configurado. Por favor agrega tu token en la variable GITHUB_TOKEN.");
     return;
   }
 
@@ -359,28 +308,28 @@ async function subirGeoJSONAGithub() {
   const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
-  // 1. Obtener SHA del archivo actual
+  // Obtener SHA actual del archivo para actualizarlo
   const resGet = await fetch(url, {
-    headers: { Authorization: `token ${token}` }
+    headers: { Authorization: `token ${GITHUB_TOKEN}` }
   });
 
   if (!resGet.ok) {
-    alert("Error al obtener el archivo de GitHub.");
+    alert("Error al obtener el archivo desde GitHub.");
     return;
   }
 
   const info = await resGet.json();
   const sha = info.sha;
 
-  // 2. Crear el contenido actualizado
+  // Crear contenido nuevo codificado en base64
   const contenido = JSON.stringify(geojsonData, null, 2);
   const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
 
-  // 3. Hacer PUT
+  // Hacer PUT para actualizar archivo
   const respuesta = await fetch(url, {
     method: "PUT",
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `token ${GITHUB_TOKEN}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
