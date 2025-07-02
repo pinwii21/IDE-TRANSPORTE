@@ -44,7 +44,7 @@ const carpetas = [
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
-      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/Rutas_de_entrada/index.json`;
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
@@ -53,7 +53,7 @@ async function cargarIndexYCapas() {
 
       for (const fichero of lista) {
         try {
-          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main//Rutas_de_entrada/${fichero}`;
           const res = await fetch(geojsonUrl);
           if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
           const data = await res.json();
