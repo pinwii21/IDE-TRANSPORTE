@@ -17,9 +17,9 @@ let usuarioLogueado = false;
 let geojsonLayer = null;
 const capasOverlay = {};
 
-// -------------- TOKEN DE GITHUB (Pon aquí tu token personal) -----------------
+// -------------- TOKEN DE GITHUB -----------------
 const GITHUB_TOKEN = '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'; 
-// --------------------------------------------------------------------------------
+// -----------------------------------------------
 
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
@@ -41,8 +41,7 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     actualizarListaPersonas(data.features);
   });
 
-// 4. CARGAR RUTAS DE ENTRADA Y SALIDA DESDE CARPETAS EN GITHUB
-
+// 4. CARGAR RUTAS DE ENTRADA Y SALIDA DESDE GITHUB
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -51,27 +50,23 @@ const carpetas = [
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
-      // Obtiene el índice de archivos (index.json) dentro de cada carpeta
       const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
-      const lista = await idxRes.json();  // Lista de archivos GeoJSON
-      const grupo = L.layerGroup();       // Grupo de capas para esa categoría
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
 
       for (const fichero of lista) {
         try {
-          // Construye la URL completa de cada ruta
           const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
           const res = await fetch(geojsonUrl);
           if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
           const data = await res.json();
 
-          // Crea una capa para la ruta con estilo personalizado
           const capa = L.geoJSON(data, {
             style: { color, weight: 3 },
             onEachFeature: (feature, layer) => {
-              // Genera un popup con la información de la ruta
               let popup = `<b>${fichero}</b><br>`;
               for (const k in feature.properties) {
                 popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
@@ -80,28 +75,26 @@ async function cargarIndexYCapas() {
             }
           });
 
-          capa._nombreArchivo = fichero;  // Guarda el nombre del archivo para poder filtrar
-          capa.addTo(grupo);              // Agrega la capa al grupo correspondiente
+          capa._nombreArchivo = fichero;
+          capa.addTo(grupo);
         } catch (error) {
           console.warn(`Error en ${fichero}:`, error.message);
         }
       }
 
-      capasOverlay[name] = grupo;   // Agrega el grupo al objeto global
-      grupo.addTo(map);             // Muestra el grupo en el mapa
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
     } catch (error) {
       console.error(`Error en carpeta ${dir}:`, error.message);
     }
   }
 
-  // Agrega control para alternar visibilidad de grupos de rutas
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
-cargarIndexYCapas();  // Ejecuta la función al cargar la página
+cargarIndexYCapas();
 
-
-// FILTRAR RUTAS POR TEXTO (nombre del archivo)
+// FILTRAR RUTAS POR TEXTO
 const inputFiltroRuta = document.getElementById("filterRouteInput");
 if (inputFiltroRuta) {
   inputFiltroRuta.addEventListener("input", () => {
@@ -121,7 +114,6 @@ if (inputFiltroRuta) {
   });
 }
 
-
 // 5. CREAR CAMPOS DEL FORMULARIO DE NUEVO PERSONAL
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
@@ -138,8 +130,7 @@ function crearCamposFormulario() {
   });
 }
 
-
-// 6. MOSTRAR TABLA DE PERSONAL EDITABLE (SI SE INICIÓ SESIÓN)
+// 6. MOSTRAR TABLA DE PERSONAL EDITABLE (SI HAY SESIÓN)
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -162,11 +153,10 @@ function mostrarTabla(data) {
   html += `</tbody></table>`;
   cont.innerHTML = html;
 
-  if (usuarioLogueado) asignarEventosEdicion();  // Permite editar si hay sesión iniciada
+  if (usuarioLogueado) asignarEventosEdicion();
 }
 
-
-// 7. DETECTAR CAMBIOS EN LAS CELDAS Y ACTUALIZAR DATOS GEOJSON
+// 7. DETECTAR CAMBIOS EN TABLA Y ACTUALIZAR GEOJSON
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -191,7 +181,6 @@ function asignarEventosEdicion() {
   });
 }
 
-
 // 8. MOSTRAR PUNTOS DE PERSONAL EN EL MAPA
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
@@ -214,8 +203,7 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-
-// 9. CENTRAR EL MAPA A TODOS LOS PUNTOS
+// 9. CENTRAR EL MAPA EN TODOS LOS PUNTOS
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -224,7 +212,6 @@ function centrarMapa(data) {
   const bounds = [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]];
   map.fitBounds(bounds, { padding: [40, 40] });
 }
-
 
 // 10. FILTRAR PERSONAL POR CAMPO Y TEXTO
 const searchInput = document.getElementById("searchInput");
@@ -243,7 +230,6 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-
 // 11. ACTUALIZAR SELECT CON LISTA DE PERSONAS
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
@@ -259,7 +245,6 @@ function actualizarListaPersonas(lista) {
     select.appendChild(option);
   });
 }
-
 
 // 12. LOGIN Y LOGOUT DE USUARIOS
 const loginForm = document.getElementById('loginForm');
@@ -359,3 +344,51 @@ if (addForm) {
   });
 }
 
+// 14. FUNCIÓN PARA SUBIR EL ARCHIVO GEOJSON A GITHUB
+async function subirGeoJSONAGithub() {
+  if (!GITHUB_TOKEN) {
+    alert("El token de GitHub no está configurado. Por favor agrega tu token en la variable GITHUB_TOKEN.");
+    return;
+  }
+
+  const owner = "pinwii21";
+  const repo = "IDE-TRANSPORTE";
+  const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+  // Obtener SHA actual del archivo para actualizarlo
+  const resGet = await fetch(url, {
+    headers: { Authorization: `token ${GITHUB_TOKEN}` }
+  });
+
+  if (!resGet.ok) {
+    throw new Error("Error al obtener el archivo desde GitHub.");
+  }
+
+  const info = await resGet.json();
+  const sha = info.sha;
+
+  // Crear contenido nuevo codificado en base64
+  const contenido = JSON.stringify(geojsonData, null, 2);
+  const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+
+  // Hacer PUT para actualizar archivo
+  const respuesta = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${GITHUB_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "Actualizar base de datos GeoJSON desde la aplicación web",
+      content: contenidoBase64,
+      sha: sha
+    })
+  });
+
+  if (!respuesta.ok) {
+    const errorText = await respuesta.text();
+    console.error(errorText);
+    throw new Error("Error al subir el archivo a GitHub.");
+  }
+}
