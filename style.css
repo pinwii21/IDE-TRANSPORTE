@@ -1,14 +1,20 @@
 /* === style.css === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 :root {
   --color-primario: #004d99;
   --color-secundario: #e6f0ff;
+  --color-acento: #007bff;
+  --color-exito: #28a745;
+  --color-peligro: #dc3545;
+  --fondo-claro: #f7f9fc;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background: #f7f9fc;
+  background: var(--fondo-claro);
   color: #333;
 }
 
@@ -24,32 +30,35 @@ header {
 
 header h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-#loginContainer, #logoutBtn {
+#loginContainer,
+#logoutBtn {
   margin-top: 0.5rem;
 }
 
-#loginForm input, #loginForm button {
+#loginForm input,
+#loginForm button {
   margin: 0 5px;
   padding: 6px 10px;
   border-radius: 4px;
   border: none;
   outline: none;
+  font-family: 'Poppins', sans-serif;
 }
 
 #loginForm button {
-  background: #28a745;
+  background: var(--color-exito);
   color: white;
   cursor: pointer;
 }
 
 #logoutBtn {
-  background: #dc3545;
+  background: var(--color-peligro);
   color: white;
   border: none;
   padding: 6px 12px;
@@ -69,27 +78,43 @@ main {
 
 #panelDerecho {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   background: white;
   border-left: 1px solid #ccc;
   overflow-y: auto;
   height: 90vh;
 }
 
-#controles label, #controles select, #controles input, #controles button {
+#controles label,
+#controles select,
+#controles input,
+#controles button {
   display: block;
-  margin: 5px 0;
+  margin: 6px 0;
   width: 100%;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+#controles input,
+#controles select {
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 #controles button {
-  padding: 6px;
+  padding: 8px;
   background: var(--color-primario);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+#controles button:hover {
+  background: #003366;
 }
 
 #tabla {
@@ -103,10 +128,21 @@ main {
   font-size: 0.9rem;
 }
 
-#tabla th, #tabla td {
+#tabla th,
+#tabla td {
   border: 1px solid #ccc;
-  padding: 5px;
+  padding: 6px;
   text-align: left;
+}
+
+#tabla th {
+  background: var(--color-secundario);
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+#tabla td[contenteditable="true"] {
+  background: #fff8dc;
 }
 
 #addForm h2 {
@@ -117,6 +153,7 @@ main {
 #camposForm label {
   display: block;
   margin-bottom: 5px;
+  font-weight: 500;
 }
 
 #camposForm input {
@@ -129,11 +166,17 @@ main {
 }
 
 #addForm button {
-  padding: 8px;
-  background: #007bff;
+  padding: 10px;
+  background: var(--color-acento);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
+  font-size: 0.95rem;
+  transition: background 0.3s;
+}
+
+#addForm button:hover {
+  background: #0056b3;
 }
