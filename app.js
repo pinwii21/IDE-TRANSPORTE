@@ -20,35 +20,17 @@ let geojsonLayer = null;            // Capa de puntos en el mapa
 const capasOverlay = {};            // Capa de rutas agrupadas por tipo (entrada/salida)
 
 
+
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
 
 // Crea el mapa centrado en Quito con nivel de zoom 13
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 
-// Agrega la capa base
+// Agrega la capa base de OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
 
-// OpenStreetMap
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-});
-
-// Esri World Imagery
-const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles © Esri'
-});
-
-// Crear el mapa con capa base inicial
-const map = L.map('map', {
-  center: [-0.180653, -78.467838],
-  zoom: 13,
-  layers: [osm] // Capa base inicial
-});
-
-// Diccionario de mapas base
-const baseMaps = {
-  "OpenStreetMap": osm,
-  "Esri Satelital": esriSat,
-};
 
 // 3. CARGAR ARCHIVO GEOJSON DE PERSONAL DESDE GITHUB
 
