@@ -34,6 +34,19 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     centrarMapa(data);
     actualizarListaPersonas(data.features);
   });
+// Carga rutas 
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
+];
+
+const capasOverlay = {};
+
+async function cargarIndexYCapas() {
+  // ... código para cargar index.json, crear capas y agregarlas
+}
+
+cargarIndexYCapas();
 
 // 4. Crear formulario agregar personal
 function crearCamposFormulario() {
