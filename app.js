@@ -245,3 +245,59 @@ document.getElementById('addForm').addEventListener('submit', (e) => {
   // Limpiar formulario
   document.getElementById('addForm').reset();
 });
+
+
+// Carpetas con rutas y su configuración
+const carpetas = [
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' }, // verde
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }    // rojo
+];
+
+const capasOverlay = {};  // Objeto global para guardar capas
+
+async function cargarIndexYCapas() {
+  for (const { dir, name, color } of carpetas) {
+    try {
+      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const idxRes = await fetch(indexUrl);
+      if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
+
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
+
+      for (const fichero of lista) {
+        try {
+          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+          const r = await fetch(geojsonUrl);
+          if (!r.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
+
+          const data = await r.json();
+          const layer = L.geoJSON(data, {
+            style: { color, weight: 3 },
+            onEachFeature: (feature, layer) => {
+              let popup = `<b>${fichero}</b><br>`;
+              for (const k in feature.properties) {
+                popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
+              }
+              layer.bindPopup(popup);
+            }
+          });
+          layer.addTo(grupo);
+        } catch (err) {
+          console.warn("GeoJSON inválido o no accesible:", err.message);
+        }
+      }
+
+      capasOverlay[name] = grupo;
+      grupo.addTo(map);
+    } catch (err) {
+      console.error(`Error en carpeta ${dir}:`, err.message);
+    }
+  }
+
+  // Añadir control de capas para activar/desactivar
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+}
+
+// Ejecutar carga de rutas
+cargarIndexYCapas();
