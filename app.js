@@ -20,7 +20,6 @@ let geojsonLayer = null;            // Capa de puntos en el mapa
 const capasOverlay = {};            // Capa de rutas agrupadas por tipo (entrada/salida)
 
 
-
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
 
 // Crea el mapa centrado en Quito con nivel de zoom 13
@@ -101,7 +100,7 @@ async function cargarIndexYCapas() {
   }
 
   // Agrega control para alternar visibilidad de grupos de rutas
-L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
 cargarIndexYCapas();  // Ejecuta la función al cargar la página
@@ -343,6 +342,3 @@ if (addForm) {
     document.getElementById('addForm').reset();
   });
 }
-
-
-
