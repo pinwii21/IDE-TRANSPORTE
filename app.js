@@ -1,5 +1,3 @@
-// app.js
-
 // 1. Configuración de usuarios y campos
 const usuarios = {
   admin: "1234",
@@ -213,30 +211,26 @@ async function cargarIndexYCapas() {
       console.error(`Error en carpeta ${dir}:`, err.message);
     }
   }
-  // 14. Manejar inicio de sesión
-document.getElementById('loginForm').addEventListener('submit', function (e) {
-  e.preventDefault(); // Evita recargar la página
-
-  const usuario = document.getElementById('usuario').value.trim();
-  const clave = document.getElementById('clave').value.trim();
-
-  if (usuarios[usuario] && usuarios[usuario] === clave) {
-    usuarioLogueado = true;
-
-    // Ocultar login, mostrar app
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'block';
-
-    // Volver a cargar tabla con edición activada
-    mostrarTabla(geojsonData);
-  } else {
-    alert('Usuario o clave incorrectos');
-  }
-});
-
 
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
 // Iniciar carga de rutas
 cargarIndexYCapas();
+
+// 13. Manejar inicio de sesión
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const usuario = document.getElementById('usuario').value.trim();
+  const clave = document.getElementById('clave').value.trim();
+
+  if (usuarios[usuario] && usuarios[usuario] === clave) {
+    usuarioLogueado = true;
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    mostrarTabla(geojsonData);
+  } else {
+    alert('Usuario o clave incorrectos');
+  }
+});
