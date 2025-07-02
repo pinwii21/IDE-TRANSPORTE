@@ -245,3 +245,4 @@ document.getElementById('addForm').addEventListener('submit', (e) => {
   // Limpiar formulario
   document.getElementById('addForm').reset();
 });
+
