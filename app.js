@@ -16,10 +16,6 @@ let usuarioLogueado = false;
 let geojsonLayer = null;
 const capasOverlay = {};
 
-// -------------- TOKEN DE GITHUB -----------------
-const GITHUB_TOKEN = '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'; 
-// -----------------------------------------------
-
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -39,7 +35,7 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     actualizarListaPersonas(data.features);
   });
 
-// 4. CARGAR RUTAS DE ENTRADA Y SALIDA DESDE GITHUB
+// 4. CARGAR RUTAS
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -51,7 +47,6 @@ async function cargarIndexYCapas() {
       const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
-
       const lista = await idxRes.json();
       const grupo = L.layerGroup();
 
@@ -89,15 +84,13 @@ async function cargarIndexYCapas() {
 
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
-
 cargarIndexYCapas();
 
-// FILTRAR RUTAS POR TEXTO
+// FILTRO POR TEXTO DE RUTA
 const inputFiltroRuta = document.getElementById("filterRouteInput");
 if (inputFiltroRuta) {
   inputFiltroRuta.addEventListener("input", () => {
     const texto = inputFiltroRuta.value.toLowerCase();
-
     for (const grupoNombre in capasOverlay) {
       const grupo = capasOverlay[grupoNombre];
       grupo.eachLayer(capa => {
@@ -112,7 +105,7 @@ if (inputFiltroRuta) {
   });
 }
 
-// 5. CREAR CAMPOS DEL FORMULARIO DE NUEVO PERSONAL
+// 5. CREAR CAMPOS DEL FORMULARIO
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -128,7 +121,7 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. MOSTRAR TABLA DE PERSONAL EDITABLE (SI HAY SESIÓN)
+// 6. MOSTRAR TABLA
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -154,7 +147,7 @@ function mostrarTabla(data) {
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 7. DETECTAR CAMBIOS EN TABLA Y ACTUALIZAR GEOJSON
+// 7. EDICIÓN EN TABLA
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -179,7 +172,7 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. MOSTRAR PUNTOS DE PERSONAL EN EL MAPA
+// 8. MOSTRAR PUNTOS EN MAPA
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -201,7 +194,7 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 9. CENTRAR EL MAPA EN TODOS LOS PUNTOS
+// 9. CENTRAR MAPA
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -211,7 +204,7 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. FILTRAR PERSONAL POR CAMPO Y TEXTO
+// 10. FILTRAR PERSONAL
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -228,7 +221,7 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-// 11. ACTUALIZAR SELECT CON LISTA DE PERSONAS
+// 11. ACTUALIZAR SELECT
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -244,7 +237,7 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. LOGIN Y LOGOUT DE USUARIOS
+// 12. LOGIN/LOGOUT
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', function(e) {
@@ -257,7 +250,7 @@ if (loginForm) {
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('addForm').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline-block';
-      document.getElementById("guardarGitHubBtn").style.display = 'inline-block';
+      document.getElementById("descargarGeoJSONBtn").style.display = 'inline-block';
       mostrarTabla(geojsonData);
     } else {
       alert('Usuario o clave incorrectos');
@@ -272,12 +265,12 @@ if (logoutBtn) {
     document.getElementById('loginContainer').style.display = 'block';
     document.getElementById('addForm').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById("guardarGitHubBtn").style.display = 'none';
+    document.getElementById("descargarGeoJSONBtn").style.display = 'none';
     mostrarTabla(geojsonData);
   });
 }
 
-// 13. AGREGAR NUEVO PERSONAL y SUBIR A GITHUB AUTOMÁTICAMENTE
+// 13. AGREGAR NUEVO PERSONAL
 const addForm = document.getElementById('addForm');
 if (addForm) {
   addForm.addEventListener('submit', async (e) => {
@@ -319,79 +312,25 @@ if (addForm) {
     actualizarListaPersonas(geojsonData.features);
 
     document.getElementById('addForm').reset();
-
-    // Deshabilitar botón y mostrar estado guardando
-    const guardarBtn = document.getElementById("guardarGitHubBtn");
-    if (guardarBtn) {
-      guardarBtn.disabled = true;
-      guardarBtn.textContent = "Guardando...";
-    }
-
-    try {
-      await subirGeoJSONAGithub();
-      alert("Nuevo personal agregado y archivo actualizado en GitHub ✅");
-    } catch (error) {
-      alert("Error al guardar en GitHub: " + error.message);
-      console.error(error);
-    } finally {
-      if (guardarBtn) {
-        guardarBtn.disabled = false;
-        guardarBtn.textContent = "Guardar en GitHub";
-      }
-    }
+    alert("Nuevo personal agregado correctamente. Ahora puedes descargar el archivo actualizado.");
   });
 }
 
-// 14. FUNCIÓN PARA SUBIR EL ARCHIVO GEOJSON A GITHUB
-async function subirGeoJSONAGithub() {
-  if (!GITHUB_TOKEN) {
-    alert("El token de GitHub no está configurado. Por favor agrega tu token en la variable GITHUB_TOKEN.");
-    return;
-  }
+// 14. DESCARGAR GEOJSON
+function descargarGeoJSON() {
+  if (!geojsonData) return;
+  const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/geo+json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "BASE_DATOS_TRANSPORTE_2025_actualizado.geojson";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
-  const owner = "pinwii21";
-  const repo = "IDE-TRANSPORTE";
-  const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-  try {
-    // Obtener SHA actual del archivo para actualizarlo
-    const resGet = await fetch(url, {
-      headers: { Authorization: `token ${GITHUB_TOKEN}` }
-    });
-
-    if (!resGet.ok) {
-      const errorText = await resGet.text();
-      throw new Error(`Error al obtener el archivo desde GitHub: ${errorText}`);
-    }
-
-    const info = await resGet.json();
-    const sha = info.sha;
-
-    // Crear contenido nuevo codificado en base64
-    const contenido = JSON.stringify(geojsonData, null, 2);
-    const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
-
-    // Hacer PUT para actualizar archivo
-    const respuesta = await fetch(url, {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Actualizar base de datos GeoJSON desde la aplicación web",
-        content: contenidoBase64,
-        sha: sha
-      })
-    });
-
-    if (!respuesta.ok) {
-      const errorText = await respuesta.text();
-      throw new Error(`Error al subir el archivo a GitHub: ${errorText}`);
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+const descargarBtn = document.getElementById('descargarGeoJSONBtn');
+if (descargarBtn) {
+  descargarBtn.addEventListener('click', descargarGeoJSON);
 }
