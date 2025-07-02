@@ -34,16 +34,13 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     centrarMapa(data);
     actualizarListaPersonas(data.features);
   });
-// Carga rutas 
-// === CONFIGURACIÓN DE RUTAS ===
+
+// 4. Cargar rutas desde carpetas en GitHub
 const carpetas = [
-  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' }, // Verde
-  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }    // Rojo
+  { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
+  { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
 ];
 
-const capasOverlay = {}; // Almacena las capas para control Leaflet
-
-// Función para cargar rutas desde index.json en GitHub
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
@@ -51,8 +48,8 @@ async function cargarIndexYCapas() {
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
-      const lista = await idxRes.json(); // Lista de archivos GeoJSON
-      const grupo = L.layerGroup(); // Grupo para esta carpeta
+      const lista = await idxRes.json();
+      const grupo = L.layerGroup();
 
       for (const fichero of lista) {
         try {
@@ -85,15 +82,12 @@ async function cargarIndexYCapas() {
     }
   }
 
-  // Agrega el control de capas al mapa (para activar/desactivar rutas)
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
-// Ejecutar la función
 cargarIndexYCapas();
 
-
-// 4. Crear formulario agregar personal
+// 5. Crear formulario agregar personal
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -103,13 +97,13 @@ function crearCamposFormulario() {
     const input = document.createElement('input');
     input.id = campo;
     input.type = 'text';
-    input.required = ["CODIGO","NOMBRE","LATITUD","LONGITUD"].includes(campo);
+    input.required = ["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo);
     label.appendChild(input);
     cont.appendChild(label);
   });
 }
 
-// 5. Mostrar tabla editable
+// 6. Mostrar tabla editable
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -135,7 +129,7 @@ function mostrarTabla(data) {
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 6. Asignar edición en celdas
+// 7. Asignar edición en celdas
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -159,7 +153,7 @@ function asignarEventosEdicion() {
   });
 }
 
-// 7. Mostrar puntos en el mapa
+// 8. Mostrar puntos en el mapa
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -181,7 +175,7 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 8. Centrar mapa según datos
+// 9. Centrar mapa según datos
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -191,7 +185,7 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 9. Filtrar datos
+// 10. Filtrar datos
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -208,7 +202,7 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-// 10. Lista desplegable personas
+// 11. Lista desplegable personas
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -224,83 +218,81 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 11. Login y logout
+// 12. Login y logout
 
-document.getElementById('loginForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const usuario = document.getElementById('usuario').value.trim();
-  const clave = document.getElementById('clave').value.trim();
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value.trim();
+    const clave = document.getElementById('clave').value.trim();
 
-  if(usuarios[usuario] && usuarios[usuario] === clave){
-    usuarioLogueado = true;
+    if (usuarios[usuario] && usuarios[usuario] === clave) {
+      usuarioLogueado = true;
 
-    // Ocultar login, mostrar formulario agregar personal y botón logout
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('addForm').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('addForm').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
 
-    mostrarTabla(geojsonData); // Mostrar tabla editable
-
-  } else {
-    alert('Usuario o clave incorrectos');
-  }
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  usuarioLogueado = false;
-
-  document.getElementById('loginContainer').style.display = 'block';
-  document.getElementById('addForm').style.display = 'none';
-  document.getElementById('logoutBtn').style.display = 'none';
-
-  mostrarTabla(geojsonData); // Mostrar tabla solo lectura
-});
-
-// 12. Agregar nuevo personal
-
-document.getElementById('addForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  // Leer valores de inputs
-  const nuevo = {};
-  let valid = true;
-
-  for(const campo of campos){
-    const val = document.getElementById(campo).value.trim();
-    if(["CODIGO","NOMBRE","LATITUD","LONGITUD"].includes(campo) && !val){
-      alert(`El campo ${campo} es obligatorio`);
-      valid = false;
-      break;
+      mostrarTabla(geojsonData);
+    } else {
+      alert('Usuario o clave incorrectos');
     }
-    nuevo[campo] = val.toUpperCase();
-  }
+  });
+}
 
-  if(!valid) return;
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    usuarioLogueado = false;
+    document.getElementById('loginContainer').style.display = 'block';
+    document.getElementById('addForm').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    mostrarTabla(geojsonData);
+  });
+}
 
-  // Validar que LATITUD y LONGITUD sean números
-  const lat = parseFloat(nuevo["LATITUD"]);
-  const lng = parseFloat(nuevo["LONGITUD"]);
-  if(isNaN(lat) || isNaN(lng)){
-    alert("LATITUD y LONGITUD deben ser números válidos");
-    return;
-  }
+// 13. Agregar nuevo personal
+const addForm = document.getElementById('addForm');
+if (addForm) {
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-  // Crear nuevo feature GeoJSON
-  const nuevoFeature = {
-    type: "Feature",
-    geometry: { type: "Point", coordinates: [lng, lat] },
-    properties: nuevo,
-    _id: geojsonData.features.length
-  };
+    const nuevo = {};
+    let valid = true;
 
-  // Añadir al array y actualizar vistas
-  geojsonData.features.push(nuevoFeature);
-  mostrarTabla(geojsonData);
-  mostrarMapa(geojsonData);
-  centrarMapa(geojsonData);
-  actualizarListaPersonas(geojsonData.features);
+    for (const campo of campos) {
+      const val = document.getElementById(campo).value.trim();
+      if (["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
+        alert(`El campo ${campo} es obligatorio`);
+        valid = false;
+        break;
+      }
+      nuevo[campo] = val.toUpperCase();
+    }
 
-  // Limpiar formulario
-  document.getElementById('addForm').reset();
-});
+    if (!valid) return;
 
+    const lat = parseFloat(nuevo["LATITUD"]);
+    const lng = parseFloat(nuevo["LONGITUD"]);
+    if (isNaN(lat) || isNaN(lng)) {
+      alert("LATITUD y LONGITUD deben ser números válidos");
+      return;
+    }
+
+    const nuevoFeature = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [lng, lat] },
+      properties: nuevo,
+      _id: geojsonData.features.length
+    };
+
+    geojsonData.features.push(nuevoFeature);
+    mostrarTabla(geojsonData);
+    mostrarMapa(geojsonData);
+    centrarMapa(geojsonData);
+    actualizarListaPersonas(geojsonData.features);
+
+    document.getElementById('addForm').reset();
+  });
+}
