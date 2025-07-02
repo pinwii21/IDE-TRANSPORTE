@@ -1,62 +1,116 @@
 <!DOCTYPE html>
+<!-- Indica que este documento es un archivo HTML5 -->
 <html lang="es">
+<!-- Establece el idioma del documento como español -->
+
 <head>
   <meta charset="UTF-8" />
+  <!-- Establece el conjunto de caracteres como UTF-8 para admitir acentos y símbolos -->
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Asegura que la página sea responsiva en móviles -->
+
   <title>IDE TRANSPORTE</title>
+  <!-- Título que aparece en la pestaña del navegador -->
+
+  <!-- Enlace a tu archivo de estilos personalizados -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Estilos necesarios para Leaflet (el visor de mapas) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Íconos de Font Awesome (usados en botones y títulos) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
+<!-- Cuerpo de la aplicación -->
 
 <header>
+  <!-- Encabezado principal de la app -->
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+  <!-- Título del visor con un ícono -->
+
   <form id="loginForm">
+    <!-- Formulario de inicio de sesión -->
+
     <div id="loginContainer">
+      <!-- Campos de login -->
       <input id="usuario" type="text" placeholder="Usuario" required />
       <input id="clave" type="password" placeholder="Clave" required />
       <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+      <!-- Botón para iniciar sesión -->
     </div>
-    <button id="logoutBtn" type="button" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+
+    <button id="logoutBtn" type="button" style="display:none;">
+      <!-- Botón para cerrar sesión (oculto al inicio) -->
+      <i class="fa-solid fa-right-from-bracket"></i> Salir
+    </button>
   </form>
 </header>
 
 <main>
+  <!-- Contenido principal -->
+
   <div id="map"></div>
+  <!-- Contenedor donde se cargará el mapa Leaflet -->
 
   <section id="panelDerecho">
+    <!-- Panel lateral derecho con controles y formulario -->
+
     <section id="controles">
+      <!-- Controles superiores del panel lateral -->
+
+      <!-- Filtro por campo (Nombre o Código) -->
       <label for="filterField">Filtrar por:</label>
       <select id="filterField">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
       </select>
+
+      <!-- Campo de búsqueda para filtrar datos personales -->
       <input id="searchInput" type="search" placeholder="Buscar..." />
-      
-        <label for="filterRouteInput">Filtrar rutas:</label>
-  <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
-      
+
+      <!-- Campo adicional para filtrar rutas por nombre de archivo -->
+      <label for="filterRouteInput">Filtrar rutas:</label>
+      <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
+
+      <!-- Lista desplegable de personas para seleccionar una y buscar ruta -->
       <label for="personSelect">Persona:</label>
       <select id="personSelect">
         <option value="">-- Selecciona persona --</option>
       </select>
+
+      <!-- Botón para encontrar ruta más cercana (requiere lógica en JS) -->
       <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
+
+      <!-- Botón para descargar datos (requiere lógica en JS) -->
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
     <div id="tabla"></div>
+    <!-- Aquí se mostrará la tabla con datos del personal -->
 
     <form id="addForm" style="display:none;">
+      <!-- Formulario oculto para agregar nuevo personal (solo visible si hay login) -->
       <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+
       <div id="camposForm"></div>
+      <!-- Aquí se insertarán dinámicamente los campos del formulario -->
+
       <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
     </form>
   </section>
 </main>
 
+<!-- Librería Leaflet para el mapa -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Librería Turf.js para análisis espacial (rutas, distancias, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+<!-- Script principal de tu aplicación (aquí va toda la lógica JS) -->
 <script src="app.js"></script>
+
 </body>
 </html>
