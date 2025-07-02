@@ -294,56 +294,68 @@ if (logoutBtn) {
   });
 }
 
-// BOTÓN PARA GUARDAR EN GITHUB
-document.getElementById("guardarGitHubBtn").addEventListener("click", subirGeoJSONAGithub);
+// 13. AGREGAR NUEVO PERSONAL y SUBIR A GITHUB AUTOMÁTICAMENTE
+const addForm = document.getElementById('addForm');
+if (addForm) {
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-async function subirGeoJSONAGithub() {
-  if (!GITHUB_TOKEN) {
-    alert("El token de GitHub no está configurado. Por favor agrega tu token en la variable GITHUB_TOKEN.");
-    return;
-  }
+    const nuevo = {};
+    let valid = true;
 
-  const owner = "pinwii21";
-  const repo = "IDE-TRANSPORTE";
-  const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    for (const campo of campos) {
+      const val = document.getElementById(campo).value.trim();
+      if (["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
+        alert(`El campo ${campo} es obligatorio`);
+        valid = false;
+        break;
+      }
+      nuevo[campo] = val.toUpperCase();
+    }
 
-  // Obtener SHA actual del archivo para actualizarlo
-  const resGet = await fetch(url, {
-    headers: { Authorization: `token ${GITHUB_TOKEN}` }
+    if (!valid) return;
+
+    const lat = parseFloat(nuevo["LATITUD"]);
+    const lng = parseFloat(nuevo["LONGITUD"]);
+    if (isNaN(lat) || isNaN(lng)) {
+      alert("LATITUD y LONGITUD deben ser números válidos");
+      return;
+    }
+
+    const nuevoFeature = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [lng, lat] },
+      properties: nuevo,
+      _id: geojsonData.features.length
+    };
+
+    geojsonData.features.push(nuevoFeature);
+    mostrarTabla(geojsonData);
+    mostrarMapa(geojsonData);
+    centrarMapa(geojsonData);
+    actualizarListaPersonas(geojsonData.features);
+
+    document.getElementById('addForm').reset();
+
+    // Deshabilitar botón y mostrar estado guardando
+    const guardarBtn = document.getElementById("guardarGitHubBtn");
+    if (guardarBtn) {
+      guardarBtn.disabled = true;
+      guardarBtn.textContent = "Guardando...";
+    }
+
+    try {
+      await subirGeoJSONAGithub();
+      alert("Nuevo personal agregado y archivo actualizado en GitHub ✅");
+    } catch (error) {
+      alert("Error al guardar en GitHub: " + error.message);
+      console.error(error);
+    } finally {
+      if (guardarBtn) {
+        guardarBtn.disabled = false;
+        guardarBtn.textContent = "Guardar en GitHub";
+      }
+    }
   });
-
-  if (!resGet.ok) {
-    alert("Error al obtener el archivo desde GitHub.");
-    return;
-  }
-
-  const info = await resGet.json();
-  const sha = info.sha;
-
-  // Crear contenido nuevo codificado en base64
-  const contenido = JSON.stringify(geojsonData, null, 2);
-  const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
-
-  // Hacer PUT para actualizar archivo
-  const respuesta = await fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "Actualizar base de datos GeoJSON desde la aplicación web",
-      content: contenidoBase64,
-      sha: sha
-    })
-  });
-
-  if (respuesta.ok) {
-    alert("Archivo actualizado exitosamente en GitHub ✅");
-  } else {
-    alert("Error al subir el archivo a GitHub ❌");
-    console.error(await respuesta.text());
-  }
 }
 
