@@ -25,11 +25,34 @@ const capasOverlay = {};            // Capa de rutas agrupadas por tipo (entrada
 // Crea el mapa centrado en Quito con nivel de zoom 13
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 
-// Agrega la capa base de OpenStreetMap
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
-}).addTo(map);
+// Agrega la capa base
 
+// OpenStreetMap
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+});
+
+// Esri World Imagery
+const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles © Esri'
+});
+
+// Google Streets (requiere plugin GoogleMutant más abajo)
+let googleStreets; // se define después al cargar el plugin
+
+// Crear el mapa con capa base inicial
+const map = L.map('map', {
+  center: [-0.180653, -78.467838],
+  zoom: 13,
+  layers: [osm] // Capa base inicial
+});
+
+// Diccionario de mapas base
+const baseMaps = {
+  "OpenStreetMap": osm,
+  "Esri Satelital": esriSat,
+  // Google Streets se añadirá dinámicamente
+};
 
 // 3. CARGAR ARCHIVO GEOJSON DE PERSONAL DESDE GITHUB
 
