@@ -72,12 +72,12 @@ main {
 }
 
 #map {
-  flex: 2;
+  flex: 1.5;
   height: 90vh;
 }
 
 #panelDerecho {
-  flex: 1;
+  flex: 1.5;
   padding: 12px;
   background: white;
   border-left: 1px solid #ccc;
