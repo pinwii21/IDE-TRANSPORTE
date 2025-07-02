@@ -279,6 +279,7 @@ if (loginForm) {
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('addForm').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById("guardarGitHubBtn").style.display = 'inline-block';
       mostrarTabla(geojsonData);
     } else {
       alert('Usuario o clave incorrectos');
@@ -293,6 +294,7 @@ if (logoutBtn) {
     document.getElementById('loginContainer').style.display = 'block';
     document.getElementById('addForm').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById("guardarGitHubBtn").style.display = 'none';
     mostrarTabla(geojsonData);
   });
 }
@@ -342,3 +344,57 @@ if (addForm) {
     document.getElementById('addForm').reset();
   });
 }
+
+document.getElementById("guardarGitHubBtn").addEventListener("click", subirGeoJSONAGithub);
+
+async function subirGeoJSONAGithub() {
+  const token = localStorage.getItem("github_token");
+  if (!token) {
+    alert("Token de GitHub no encontrado. Usa localStorage.setItem('github_token', 'TU_TOKEN') en la consola.");
+    return;
+  }
+
+  const owner = "pinwii21";
+  const repo = "IDE-TRANSPORTE";
+  const path = "BASE_DATOS_TRANSPORTE_2025.geojson";
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+  // 1. Obtener SHA del archivo actual
+  const resGet = await fetch(url, {
+    headers: { Authorization: `token ${token}` }
+  });
+
+  if (!resGet.ok) {
+    alert("Error al obtener el archivo de GitHub.");
+    return;
+  }
+
+  const info = await resGet.json();
+  const sha = info.sha;
+
+  // 2. Crear el contenido actualizado
+  const contenido = JSON.stringify(geojsonData, null, 2);
+  const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+
+  // 3. Hacer PUT
+  const respuesta = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "Actualizar base de datos GeoJSON desde la aplicación web",
+      content: contenidoBase64,
+      sha: sha
+    })
+  });
+
+  if (respuesta.ok) {
+    alert("Archivo actualizado exitosamente en GitHub ✅");
+  } else {
+    alert("Error al subir el archivo a GitHub ❌");
+    console.error(await respuesta.text());
+  }
+}
+
