@@ -1,3 +1,5 @@
+// app.js
+
 // 1. Configuración de usuarios y campos
 const usuarios = {
   admin: "1234",
@@ -10,19 +12,18 @@ const campos = [
   "LONGITUD", "LATITUD", "CONTRATO LUZ", "TRANSPORTE"
 ];
 
-// 2. Variables globales
 let geojsonData = null;
 let usuarioLogueado = false;
 let geojsonLayer = null;
 const capasOverlay = {};
 
-// 3. Inicializar mapa Leaflet
+// 2. Inicializar mapa
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 4. Cargar GeoJSON de personal desde GitHub
+// 3. Cargar GeoJSON
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
@@ -35,7 +36,7 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     actualizarListaPersonas(data.features);
   });
 
-// 5. Crear formulario de alta
+// 4. Crear campos del formulario
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -51,7 +52,7 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. Mostrar tabla editable
+// 5. Mostrar tabla
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -77,7 +78,7 @@ function mostrarTabla(data) {
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 7. Asignar edición en celdas
+// 6. Editar celdas
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -101,7 +102,7 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. Mostrar puntos en el mapa
+// 7. Mostrar mapa
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -123,7 +124,7 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 9. Centrar el mapa según datos
+// 8. Centrar mapa
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -133,7 +134,7 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. Filtrar datos
+// 9. Filtro de datos
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -150,7 +151,7 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-// 11. Lista desplegable de personas
+// 10. Lista de personas
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -166,7 +167,7 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. Cargar rutas desde carpetas
+// 11. Cargar rutas desde carpetas
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -211,26 +212,71 @@ async function cargarIndexYCapas() {
       console.error(`Error en carpeta ${dir}:`, err.message);
     }
   }
-
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
-
-// Iniciar carga de rutas
 cargarIndexYCapas();
 
-// 13. Manejar inicio de sesión
-document.getElementById('loginForm').addEventListener('submit', function (e) {
+// 12. Login
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', function (e) {
   e.preventDefault();
-
   const usuario = document.getElementById('usuario').value.trim();
   const clave = document.getElementById('clave').value.trim();
 
   if (usuarios[usuario] && usuarios[usuario] === clave) {
     usuarioLogueado = true;
     document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    document.getElementById('addForm').style.display = 'block';
     mostrarTabla(geojsonData);
   } else {
     alert('Usuario o clave incorrectos');
   }
+});
+
+// 13. Logout
+const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn.addEventListener('click', () => {
+  usuarioLogueado = false;
+  document.getElementById('loginContainer').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('addForm').style.display = 'none';
+  mostrarTabla(geojsonData);
+});
+
+// 14. Agregar nuevo personal
+const addForm = document.getElementById('addForm');
+addForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!usuarioLogueado) return;
+
+  const nuevaPersona = {
+    type: "Feature",
+    properties: {},
+    geometry: { type: "Point", coordinates: [0, 0] }
+  };
+
+  campos.forEach(campo => {
+    const val = document.getElementById(campo).value.trim().toUpperCase();
+    nuevaPersona.properties[campo] = val;
+  });
+
+  const lat = parseFloat(nuevaPersona.properties["LATITUD"]);
+  const lng = parseFloat(nuevaPersona.properties["LONGITUD"]);
+  if (!isNaN(lat) && !isNaN(lng)) {
+    nuevaPersona.geometry.coordinates = [lng, lat];
+  } else {
+    alert("LATITUD y LONGITUD deben ser valores numéricos válidos.");
+    return;
+  }
+
+  nuevaPersona._id = geojsonData.features.length;
+  geojsonData.features.push(nuevaPersona);
+
+  mostrarTabla(geojsonData);
+  mostrarMapa(geojsonData);
+  centrarMapa(geojsonData);
+  actualizarListaPersonas(geojsonData.features);
+
+  addForm.reset();
 });
