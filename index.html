@@ -44,7 +44,7 @@
 
     <!-- Controles para filtrar y buscar -->
     <section id="controles">
-      <label for="filterField">Filtrar por:</label>
+      <label for="filterField">Filtrar usuarios por:</label>
       <select id="filterField">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
@@ -55,7 +55,7 @@
 
       <input id="searchInput" type="search" placeholder="Buscar..." />
 
-      <label for="filterRouteInput">Filtrar rutas:</label>
+      <label for="filterRouteInput">Filtrar rutas por:</label>
       <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
 
       <label for="personSelect">Persona:</label>
@@ -76,8 +76,10 @@
       <div id="camposForm"></div>
 
       <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-      <button type="button" id="guardarGitHubBtn" style="display:none;">
-        <i class="fa-solid fa-cloud-upload-alt"></i> Guardar en GitHub
+      
+      <!-- Nuevo botón para descargar archivo GeoJSON -->
+      <button type="button" id="descargarGeoJSONBtn" style="display:none;">
+        <i class="fa-solid fa-download"></i> Descargar archivo GeoJSON
       </button>
     </form>
 
@@ -93,4 +95,3 @@
 
 </body>
 </html>
-
