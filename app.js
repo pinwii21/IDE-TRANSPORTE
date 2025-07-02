@@ -1,9 +1,12 @@
-// 1. Configuración usuarios y campos
+// 1. CONFIGURACIÓN DE USUARIOS Y CAMPOS
+
+// Usuarios autorizados con sus claves
 const usuarios = {
   admin: "1234",
   kevin: "admin2025"
 };
 
+// Campos que forman parte de cada registro de personal
 const campos = [
   "CODIGO", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "TIPO HORARIO",
   "CARGO", "AREA", "MODALIDAD DE CONTRATO", "DIRECCION", "HORARIO", "LUGAR TRABAJO",
@@ -11,31 +14,40 @@ const campos = [
 ];
 
 // Variables globales
-let geojsonData = null;
-let usuarioLogueado = false;
-let geojsonLayer = null;
-const capasOverlay = {};
+let geojsonData = null;             // Almacena los datos cargados desde el GeoJSON
+let usuarioLogueado = false;        // Controla si el usuario está autenticado
+let geojsonLayer = null;            // Capa de puntos en el mapa
+const capasOverlay = {};            // Capa de rutas agrupadas por tipo (entrada/salida)
 
-// 2. Inicializar mapa Leaflet
+
+// 2. INICIALIZACIÓN DEL MAPA LEAFLET
+
+// Crea el mapa centrado en Quito con nivel de zoom 13
 const map = L.map('map').setView([-0.180653, -78.467838], 13);
+
+// Agrega la capa base de OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 3. Cargar GeoJSON desde GitHub
+
+// 3. CARGAR ARCHIVO GEOJSON DE PERSONAL DESDE GITHUB
+
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
-    data.features.forEach((f, i) => f._id = i);
-    geojsonData = data;
-    crearCamposFormulario();
-    mostrarTabla(data);
-    mostrarMapa(data);
-    centrarMapa(data);
-    actualizarListaPersonas(data.features);
+    data.features.forEach((f, i) => f._id = i);  // Se asigna un ID único a cada feature
+    geojsonData = data;                          // Se guarda el dataset para uso global
+    crearCamposFormulario();                     // Se generan los inputs del formulario
+    mostrarTabla(data);                          // Se muestra la tabla de personal
+    mostrarMapa(data);                           // Se dibujan los puntos en el mapa
+    centrarMapa(data);                           // Se ajusta el mapa para mostrar todos los puntos
+    actualizarListaPersonas(data.features);      // Se actualiza el select de personas
   });
 
-// 4. Cargar rutas desde carpetas en GitHub
+
+// 4. CARGAR RUTAS DE ENTRADA Y SALIDA DESDE CARPETAS EN GITHUB
+
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -44,23 +56,27 @@ const carpetas = [
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
+      // Obtiene el índice de archivos (index.json) dentro de cada carpeta
       const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
       const idxRes = await fetch(indexUrl);
       if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
 
-      const lista = await idxRes.json();
-      const grupo = L.layerGroup();
+      const lista = await idxRes.json();  // Lista de archivos GeoJSON
+      const grupo = L.layerGroup();       // Grupo de capas para esa categoría
 
       for (const fichero of lista) {
         try {
+          // Construye la URL completa de cada ruta
           const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
           const res = await fetch(geojsonUrl);
           if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
           const data = await res.json();
 
+          // Crea una capa para la ruta con estilo personalizado
           const capa = L.geoJSON(data, {
             style: { color, weight: 3 },
             onEachFeature: (feature, layer) => {
+              // Genera un popup con la información de la ruta
               let popup = `<b>${fichero}</b><br>`;
               for (const k in feature.properties) {
                 popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
@@ -69,26 +85,28 @@ async function cargarIndexYCapas() {
             }
           });
 
-          capa._nombreArchivo = fichero; // guardar nombre para filtrar
-          capa.addTo(grupo);
+          capa._nombreArchivo = fichero;  // Guarda el nombre del archivo para poder filtrar
+          capa.addTo(grupo);              // Agrega la capa al grupo correspondiente
         } catch (error) {
           console.warn(`Error en ${fichero}:`, error.message);
         }
       }
 
-      capasOverlay[name] = grupo;
-      grupo.addTo(map);
+      capasOverlay[name] = grupo;   // Agrega el grupo al objeto global
+      grupo.addTo(map);             // Muestra el grupo en el mapa
     } catch (error) {
       console.error(`Error en carpeta ${dir}:`, error.message);
     }
   }
 
+  // Agrega control para alternar visibilidad de grupos de rutas
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
 }
 
-cargarIndexYCapas();
+cargarIndexYCapas();  // Ejecuta la función al cargar la página
 
-// Funcionalidad para filtrar rutas por nombre del archivo
+
+// FILTRAR RUTAS POR TEXTO (nombre del archivo)
 const inputFiltroRuta = document.getElementById("filterRouteInput");
 if (inputFiltroRuta) {
   inputFiltroRuta.addEventListener("input", () => {
@@ -108,7 +126,8 @@ if (inputFiltroRuta) {
   });
 }
 
-// 5. Crear formulario agregar personal
+
+// 5. CREAR CAMPOS DEL FORMULARIO DE NUEVO PERSONAL
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -124,7 +143,8 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. Mostrar tabla editable
+
+// 6. MOSTRAR TABLA DE PERSONAL EDITABLE (SI SE INICIÓ SESIÓN)
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -147,10 +167,11 @@ function mostrarTabla(data) {
   html += `</tbody></table>`;
   cont.innerHTML = html;
 
-  if (usuarioLogueado) asignarEventosEdicion();
+  if (usuarioLogueado) asignarEventosEdicion();  // Permite editar si hay sesión iniciada
 }
 
-// 7. Asignar edición en celdas
+
+// 7. DETECTAR CAMBIOS EN LAS CELDAS Y ACTUALIZAR DATOS GEOJSON
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -161,6 +182,7 @@ function asignarEventosEdicion() {
       if (!feature) return;
 
       feature.properties[campo] = valor;
+
       if (campo === "LATITUD" || campo === "LONGITUD") {
         const lat = parseFloat(feature.properties["LATITUD"]);
         const lng = parseFloat(feature.properties["LONGITUD"]);
@@ -174,7 +196,8 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. Mostrar puntos en el mapa
+
+// 8. MOSTRAR PUNTOS DE PERSONAL EN EL MAPA
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -196,7 +219,8 @@ function mostrarMapa(data) {
   }).addTo(map);
 }
 
-// 9. Centrar mapa según datos
+
+// 9. CENTRAR EL MAPA A TODOS LOS PUNTOS
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
@@ -206,7 +230,8 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. Filtrar datos
+
+// 10. FILTRAR PERSONAL POR CAMPO Y TEXTO
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -223,7 +248,8 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-// 11. Lista desplegable personas
+
+// 11. ACTUALIZAR SELECT CON LISTA DE PERSONAS
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -239,8 +265,8 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. Login y logout
 
+// 12. LOGIN Y LOGOUT DE USUARIOS
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', function(e) {
@@ -250,11 +276,9 @@ if (loginForm) {
 
     if (usuarios[usuario] && usuarios[usuario] === clave) {
       usuarioLogueado = true;
-
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('addForm').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline-block';
-
       mostrarTabla(geojsonData);
     } else {
       alert('Usuario o clave incorrectos');
@@ -273,7 +297,8 @@ if (logoutBtn) {
   });
 }
 
-// 13. Agregar nuevo personal
+
+// 13. AGREGAR NUEVO PERSONAL
 const addForm = document.getElementById('addForm');
 if (addForm) {
   addForm.addEventListener('submit', (e) => {
@@ -317,4 +342,6 @@ if (addForm) {
     document.getElementById('addForm').reset();
   });
 }
+
+
 
