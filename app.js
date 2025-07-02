@@ -250,7 +250,9 @@ if (loginForm) {
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('addForm').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline-block';
-      document.getElementById("descargarGeoJSONBtn").style.display = 'inline-block';
+      // Cambié guardarGitHubBtn por descargarGeoJSONBtn para mostrar el botón de descarga
+      const descargarBtn = document.getElementById("descargarGeoJSONBtn");
+      if (descargarBtn) descargarBtn.style.display = 'inline-block';
       mostrarTabla(geojsonData);
     } else {
       alert('Usuario o clave incorrectos');
@@ -265,7 +267,8 @@ if (logoutBtn) {
     document.getElementById('loginContainer').style.display = 'block';
     document.getElementById('addForm').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById("descargarGeoJSONBtn").style.display = 'none';
+    const descargarBtn = document.getElementById("descargarGeoJSONBtn");
+    if (descargarBtn) descargarBtn.style.display = 'none';
     mostrarTabla(geojsonData);
   });
 }
