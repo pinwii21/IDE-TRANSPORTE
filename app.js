@@ -53,7 +53,7 @@ async function cargarIndexYCapas() {
 
       for (const fichero of lista) {
         try {
-          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main//${dir}/${fichero}`;
+          const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
           const res = await fetch(geojsonUrl);
           if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
           const data = await res.json();
@@ -69,6 +69,7 @@ async function cargarIndexYCapas() {
             }
           });
 
+          capa._nombreArchivo = fichero; // guardar nombre para filtrar
           capa.addTo(grupo);
         } catch (error) {
           console.warn(`Error en ${fichero}:`, error.message);
@@ -86,6 +87,26 @@ async function cargarIndexYCapas() {
 }
 
 cargarIndexYCapas();
+
+// Funcionalidad para filtrar rutas por nombre del archivo
+const inputFiltroRuta = document.getElementById("filterRouteInput");
+if (inputFiltroRuta) {
+  inputFiltroRuta.addEventListener("input", () => {
+    const texto = inputFiltroRuta.value.toLowerCase();
+
+    for (const grupoNombre in capasOverlay) {
+      const grupo = capasOverlay[grupoNombre];
+      grupo.eachLayer(capa => {
+        const visible = (capa._nombreArchivo || "").toLowerCase().includes(texto);
+        if (visible) {
+          if (!map.hasLayer(capa)) capa.addTo(map);
+        } else {
+          if (map.hasLayer(capa)) map.removeLayer(capa);
+        }
+      });
+    }
+  });
+}
 
 // 5. Crear formulario agregar personal
 function crearCamposFormulario() {
