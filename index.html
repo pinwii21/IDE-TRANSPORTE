@@ -54,9 +54,17 @@
       </select>
 
       <input id="searchInput" type="search" placeholder="Buscar..." />
-
-      <label for="filterRouteInput">Filtrar rutas por:</label>
-      <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
+  <!-- Controles para filtrar y buscar RUTAS-->
+    <section id="controles">
+      <label for="filterField">Filtrar rutas por:</label>
+      <select id="filterField">
+        <option value="RUTA">Ruta</option>
+        <option value="DESTINO" selected>Lugar de trabajo</option>
+        <option value="NUMERO_RUTA">N° de Ruta</option>
+        <option value="LUGAR TRABAJO">Lugar de trabajo</option>
+        <option value="HORARIO">Horario de trabajo</option>
+      </select>
+           <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
 
       <label for="personSelect">Persona:</label>
       <select id="personSelect">
