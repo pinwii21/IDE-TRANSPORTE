@@ -187,7 +187,8 @@ main {
   box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
 }
 
-.contenedor-filtros h3 {
+.contenedor-filtros h3,
+.contenedor-filtros h2 {
   margin-top: 0;
   margin-bottom: 12px;
   color: var(--color-primario);
@@ -248,20 +249,9 @@ main {
 #tabla table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
-  min-width: 700px; /* Ajusta según columnas */
-}
-
-/* Primera columna con ancho fijo */
-#tabla th:nth-child(1),
-#tabla td:nth-child(1) {
-  width: 50px;
-}
-
-/* Resto columnas iguales */
-#tabla th:nth-child(n+2),
-#tabla td:nth-child(n+2) {
-  width: 350px; /* Para 3 columnas totales */
+  /* Eliminar table-layout fixed para ajustar columnas al contenido */
+  /* table-layout: fixed; */
+  min-width: 0;
 }
 
 #tabla th,
@@ -269,9 +259,9 @@ main {
   border: 1px solid #ccc;
   padding: 10px 12px;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* Para evitar quiebres y ajustar ancho al contenido */
+  overflow: visible;
+  text-overflow: clip;
   vertical-align: middle;
 }
 
