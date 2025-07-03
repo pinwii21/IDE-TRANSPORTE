@@ -4,114 +4,94 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IDE TRANSPORTE</title>
+
+  <!-- Estilos personalizados -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Estilos de Leaflet para mapas -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Font Awesome para íconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
-  <header>
-    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-  </header>
 
-  <main>
-    <div id="map" style="height: 600px;"></div>
+<header>
+  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-    <section id="filtros">
-      <label for="destinoFiltro">Destino:</label>
-      <select id="destinoFiltro"></select>
+  <!-- Formulario de login -->
+  <form id="loginForm">
+    <div id="loginContainer">
+      <input id="usuario" type="text" placeholder="Usuario" required />
+      <input id="clave" type="password" placeholder="Clave" required />
+      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    </div>
 
-      <label for="rutaFiltro">Ruta:</label>
-      <select id="rutaFiltro"></select>
+    <!-- Botón para cerrar sesión (oculto al inicio) -->
+    <button id="logoutBtn" type="button" style="display:none;">
+      <i class="fa-solid fa-right-from-bracket"></i> Salir
+    </button>
+  </form>
+</header>
 
-      <label for="horarioFiltro">Horario:</label>
-      <select id="horarioFiltro"></select>
+<main>
+  <!-- Contenedor del mapa -->
+  <div id="map" style="height: 500px;"></div>
+
+  <!-- Panel lateral derecho -->
+  <section id="panelDerecho">
+
+    <!-- Controles para filtrar y buscar -->
+    <section id="controles">
+      <label for="filterField">Filtrar usuarios por:</label>
+      <select id="filterField">
+        <option value="CODIGO">Código</option>
+        <option value="NOMBRE" selected>Nombre</option>
+        <option value="RUTA">N° de Ruta</option>
+        <option value="LUGAR TRABAJO">Lugar de trabajo</option>
+        <option value="HORARIO">Horario de trabajo</option>
+      </select>
+
+      <input id="searchInput" type="search" placeholder="Buscar..." />
+
+      <label for="filterRouteInput">Filtrar rutas por:</label>
+      <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
+
+      <label for="personSelect">Persona:</label>
+      <select id="personSelect">
+        <option value="">-- Selecciona persona --</option>
+      </select>
+
+      <button id="findRouteBtn"><i class="fa-solid fa-route"></i> Ruta más cercana</button>
+      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
-  </main>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map').setView([-0.2, -78.5], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    <!-- Tabla con datos del personal -->
+    <div id="tabla"></div>
 
-    const rutas = [];
-    const grupoRutas = L.layerGroup().addTo(map);
+    <!-- Formulario para agregar nuevo personal -->
+    <form id="addForm" style="display:none;">
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <div id="camposForm"></div>
 
-    async function cargarRutas() {
-      const indexUrl = 'https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/Rutas_de_SALIDA/index.json';
-      const archivos = await fetch(indexUrl).then(r => r.json());
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
+      
+      <!-- Nuevo botón para descargar archivo GeoJSON -->
+      <button type="button" id="descargarGeoJSONBtn" style="display:none;">
+        <i class="fa-solid fa-download"></i> Descargar archivo GeoJSON
+      </button>
+    </form>
 
-      for (const archivo of archivos) {
-        const rutaUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/Rutas_de_SALIDA/${archivo}`;
-        const datos = await fetch(rutaUrl).then(r => r.json());
-        datos.features.forEach(f => {
-          f._archivo = archivo;
-          rutas.push(f);
-        });
-      }
-      actualizarFiltros();
-      mostrarRutas(rutas);
-    }
+  </section>
+</main>
 
-    function mostrarRutas(rutasFiltradas) {
-      grupoRutas.clearLayers();
-      rutasFiltradas.forEach(f => {
-        const capa = L.geoJSON(f, {
-          style: { color: '#004d99', weight: 3 },
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            let popup = `<b>${f._archivo}</b><br>`;
-            for (const k in p) popup += `<b>${k}:</b> ${p[k]}<br>`;
-            layer.bindPopup(popup);
-          }
-        });
-        grupoRutas.addLayer(capa);
-      });
-    }
+<!-- Scripts externos -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
-    function actualizarFiltros() {
-      const destinos = [...new Set(rutas.map(f => f.properties.DESTINO).filter(Boolean))].sort();
-      const horarios = [...new Set(rutas.map(f => f.properties.HORARIO).filter(Boolean))].sort();
-      const numerosRuta = [...new Set(rutas.map(f => f.properties.NUMERO_RUTA).filter(Boolean))].sort((a, b) => a - b);
+<!-- Script principal -->
+<script src="app.js"></script>
 
-      const destinoFiltro = document.getElementById('destinoFiltro');
-      const horarioFiltro = document.getElementById('horarioFiltro');
-      const rutaFiltro = document.getElementById('rutaFiltro');
-
-      llenarSelect(destinoFiltro, destinos);
-      llenarSelect(horarioFiltro, horarios);
-      llenarSelect(rutaFiltro, numerosRuta);
-
-      destinoFiltro.addEventListener('change', filtrarRutas);
-      horarioFiltro.addEventListener('change', filtrarRutas);
-      rutaFiltro.addEventListener('change', filtrarRutas);
-    }
-
-    function llenarSelect(select, valores) {
-      select.innerHTML = '<option value="">-- Todos --</option>';
-      valores.forEach(v => {
-        const op = document.createElement('option');
-        op.value = v;
-        op.textContent = v;
-        select.appendChild(op);
-      });
-    }
-
-    function filtrarRutas() {
-      const destinoVal = document.getElementById('destinoFiltro').value;
-      const horarioVal = document.getElementById('horarioFiltro').value;
-      const rutaVal = document.getElementById('rutaFiltro').value;
-
-      const filtradas = rutas.filter(f => {
-        const p = f.properties;
-        return (!destinoVal || p.DESTINO === destinoVal) &&
-               (!horarioVal || p.HORARIO === horarioVal) &&
-               (!rutaVal || p.NUMERO_RUTA == rutaVal);
-      });
-
-      mostrarRutas(filtradas);
-    }
-
-    cargarRutas();
-  </script>
 </body>
 </html>
