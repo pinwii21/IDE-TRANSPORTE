@@ -273,7 +273,18 @@ main {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  min-width: 1000px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
+  table-layout: fixed; /* Ancho fijo para columnas */
+}
+
+/* Anchos personalizados para columnas */
+#tabla th:nth-child(1),
+#tabla td:nth-child(1) {
+  width: 250px; /* Primera columna más ancha */
+}
+
+#tabla th:nth-child(n+2),
+#tabla td:nth-child(n+2) {
+  width: calc((100% - 250px) / 4); /* Ajusta el divisor según número de columnas restantes */
 }
 
 /* Celdas y encabezados */
@@ -283,17 +294,6 @@ main {
   padding: 10px 12px;
   text-align: left;
   white-space: nowrap; /* Evita que el texto haga wrap y mantenga columnas alineadas */
-}
-
-/* Ancho personalizado para columnas */
-#tabla th:nth-child(1),
-#tabla td:nth-child(1) {
-  width: 200px; /* Primera columna más ancha */
-}
-
-#tabla th:nth-child(n+2),
-#tabla td:nth-child(n+2) {
-  width: 150px; /* Las demás columnas iguales */
 }
 
 /* Encabezados */
@@ -408,6 +408,10 @@ main {
     margin-top: 1.5rem;
     padding-bottom: 3rem;
   }
+  /* Permitir scroll horizontal en la tabla en móviles */
+  #tabla {
+    overflow-x: auto;
+  }
 }
 
 /* Mejorar accesibilidad para enfoque de teclado */
@@ -423,3 +427,4 @@ select:focus-visible {
 html {
   scroll-behavior: smooth;
 }
+
