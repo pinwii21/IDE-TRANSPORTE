@@ -270,7 +270,7 @@ main {
 
 /* Tabla */
 #tabla table {
-  width: 100%;
+  width: 40%;
   border-collapse: collapse;
   font-size: 0.9rem;
   min-width: 1000px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
