@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* Variables generales de diseño */
+/* ==================== VARIABLES ==================== */
 :root {
   --color-primario: #004d99;
   --color-secundario: #e6f0ff;
@@ -13,6 +13,7 @@
   --transicion: 0.3s ease-in-out;
 }
 
+/* ==================== RESET ==================== */
 * {
   box-sizing: border-box;
 }
@@ -27,7 +28,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* HEADER */
+/* ==================== HEADER ==================== */
 header {
   background: var(--color-primario);
   color: white;
@@ -49,7 +50,7 @@ header h1 {
   user-select: none;
 }
 
-/* Login y Logout */
+/* ==================== LOGIN ==================== */
 #loginContainer,
 #logoutBtn {
   margin-top: 0.5rem;
@@ -109,7 +110,7 @@ header h1 {
   box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
 }
 
-/* Estructura principal */
+/* ==================== CONTENEDOR PRINCIPAL ==================== */
 main {
   display: flex;
   height: calc(100vh - 70px);
@@ -119,7 +120,7 @@ main {
   background: var(--fondo-claro);
 }
 
-/* MAPA */
+/* ==================== MAPA ==================== */
 #map {
   flex: 1.8;
   height: 100%;
@@ -128,7 +129,7 @@ main {
   border: 2px solid var(--color-primario);
 }
 
-/* PANEL DERECHO */
+/* ==================== PANEL DERECHO ==================== */
 #panelDerecho {
   flex: 1.2;
   background: white;
@@ -136,14 +137,13 @@ main {
   box-shadow: 0 4px 12px var(--sombra-suave);
   padding: 20px 16px;
   overflow-y: auto;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   min-width: 300px;
 }
 
-/* Scroll personalizado panel derecho */
+/* Scroll personalizado */
 #panelDerecho::-webkit-scrollbar {
   width: 8px;
 }
@@ -159,7 +159,7 @@ main {
   background: var(--color-acento);
 }
 
-/* CONTENEDOR DE FILTROS */
+/* ==================== FILTROS ==================== */
 .contenedor-filtros {
   background: var(--color-secundario);
   padding: 18px 22px;
@@ -206,7 +206,6 @@ main {
   cursor: pointer;
   user-select: text;
   max-width: 100%;
-  box-sizing: border-box;
 }
 
 .grupo-control select:hover,
@@ -221,7 +220,6 @@ main {
   box-shadow: 0 0 8px var(--color-acento);
 }
 
-/* Input de búsqueda específico */
 input#filterRouteInput {
   width: 100%;
   margin-top: 10px;
@@ -230,7 +228,6 @@ input#filterRouteInput {
   padding: 10px 14px;
   border-radius: var(--radio-borde);
   border: 2px solid var(--color-primario);
-  user-select: text;
   transition: border-color var(--transicion), box-shadow var(--transicion);
 }
 
@@ -243,24 +240,23 @@ input#filterRouteInput:focus {
   box-shadow: 0 0 10px var(--color-acento);
 }
 
-/* TABLA DE PERSONAL CENTRADA */
+/* ==================== TABLA DE PERSONAL (DEBAJO DEL MAPA) ==================== */
 #tabla {
-  display: flex;
-  justify-content: center; /* CENTRA la tabla horizontalmente */
-  padding: 8px;
+  margin: 1rem auto;
+  width: 95%;
+  max-width: 1000px;
   overflow-x: auto;
   border-radius: var(--radio-borde);
-  box-shadow: 0 0 10px var(--sombra-suave);
+  box-shadow: 0 0 12px var(--sombra-suave);
   background: white;
+  padding: 1rem;
 }
 
 #tabla table {
-  width: auto; /* ancho según contenido */
-  max-width: 100%;
+  width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
   user-select: none;
-  table-layout: auto;
 }
 
 #tabla th,
@@ -290,7 +286,7 @@ input#filterRouteInput:focus {
   background-color: #ffffe0;
 }
 
-/* FORMULARIO PARA AGREGAR PERSONAL */
+/* ==================== FORMULARIO ==================== */
 #addForm {
   background: white;
   padding: 18px 24px;
@@ -331,6 +327,7 @@ input#filterRouteInput:focus {
 #camposForm input:hover {
   border-color: var(--color-primario);
 }
+
 #camposForm input:focus {
   outline: none;
   border-color: var(--color-acento);
@@ -356,27 +353,28 @@ input#filterRouteInput:focus {
   box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
 }
 
-/* RESPONSIVE MOBILE */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 900px) {
   main {
     flex-direction: column;
     padding: 1rem;
     height: auto;
   }
+
   #map, #panelDerecho {
     flex: none;
     width: 100%;
     height: 400px;
   }
+
   #panelDerecho {
     margin-top: 1.5rem;
     height: auto;
     padding-bottom: 3rem;
-    overflow-x: hidden;
   }
 }
 
-/* Accesibilidad para focus visible */
+/* ==================== ACCESIBILIDAD ==================== */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -385,7 +383,7 @@ select:focus-visible {
   transition: outline-offset 0.3s;
 }
 
-/* Scroll suave */
 html {
   scroll-behavior: smooth;
 }
+
