@@ -159,7 +159,7 @@ main {
 
 /* Estilos para scrollbar personalizado en panel derecho (solo WebKit) */
 #panelDerecho::-webkit-scrollbar {
-  width: 1.5px;               /* Ancho del scrollbar */
+  width: 6px;               /* Ancho del scrollbar */
 }
 
 #panelDerecho::-webkit-scrollbar-track {
@@ -245,15 +245,15 @@ main {
   box-shadow: 0 0 8px var(--color-acento); /* Resplandor azul */
 }
 
-/* Estilos para tabla dentro del panel izquierdo */
+/* Estilos para tabla dentro del panel derecho */
 #tabla {
   background: white;
   border-radius: var(--radio-borde);
   box-shadow: 0 2px 10px var(--sombra-suave);
   padding: 1rem;
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 300px; /* Altura máxima para que aparezca scroll vertical */
+  max-height: 300px; /* Altura máxima para scroll vertical */
+  overflow-y: auto;  /* Scroll vertical si necesario */
+  overflow-x: auto;  /* Scroll horizontal si necesario */
 }
 
 /* Título dentro de la sección tabla */
@@ -273,6 +273,7 @@ main {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  min-width: 600px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
 }
 
 /* Celdas y encabezados */
@@ -281,6 +282,7 @@ main {
   border: 1px solid #ccc;
   padding: 10px 12px;
   text-align: left;
+  white-space: nowrap; /* Evita que el texto haga wrap y mantenga columnas alineadas */
 }
 
 /* Encabezados */
@@ -288,6 +290,7 @@ main {
   background-color: var(--color-secundario);
   color: var(--color-primario);
   font-weight: 600;
+  user-select: none;
 }
 
 /* Celdas editables */
