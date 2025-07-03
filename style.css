@@ -1,197 +1,219 @@
+/* Importa la fuente 'Poppins' desde Google Fonts para usar en toda la página */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+/* Variables CSS personalizadas para usar colores, radios, sombras y transiciones de forma consistente */
 :root {
-  --color-primario: #004d99;
-  --color-secundario: #e6f0ff;
-  --color-acento: #007bff;
-  --color-exito: #28a745;
-  --color-peligro: #dc3545;
-  --fondo-claro: #f7f9fc;
-  --sombra-suave: rgba(0, 0, 0, 0.1);
-  --radio-borde: 8px;
-  --transicion: 0.3s ease-in-out;
+  --color-primario: #004d99;       /* Color principal azul oscuro */
+  --color-secundario: #e6f0ff;     /* Color secundario azul muy claro */
+  --color-acento: #007bff;          /* Color para acentos y destacados (azul vivo) */
+  --color-exito: #28a745;           /* Color verde para indicar éxito */
+  --color-peligro: #dc3545;         /* Color rojo para indicar peligro o error */
+  --fondo-claro: #f7f9fc;           /* Fondo claro para la página */
+  --sombra-suave: rgba(0, 0, 0, 0.1); /* Sombra negra muy ligera */
+  --radio-borde: 8px;               /* Radio para bordes redondeados */
+  --transicion: 0.3s ease-in-out;   /* Tiempo y efecto para transiciones suaves */
 }
 
+/* Aplica box-sizing para que el padding y border se incluyan en el ancho y alto de los elementos */
 * {
   box-sizing: border-box;
 }
 
+/* Estilos base para el body (cuerpo de la página) */
 body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: var(--fondo-claro);
-  color: #2e2e2e;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Poppins', sans-serif;  /* Usa la fuente Poppins */
+  margin: 0;                           /* Sin margen externo */
+  padding: 0;                          /* Sin padding */
+  background: var(--fondo-claro);     /* Fondo claro definido en variable */
+  color: #2e2e2e;                     /* Color de texto gris oscuro */
+  -webkit-font-smoothing: antialiased; /* Suaviza fuente en navegadores WebKit */
+  -moz-osx-font-smoothing: grayscale;  /* Suaviza fuente en Firefox en Mac */
 }
 
+/* Estilos para el header (barra superior) */
 header {
-  background: var(--color-primario);
-  color: white;
-  padding: 1.25rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 5px var(--sombra-suave);
+  background: var(--color-primario);   /* Fondo azul oscuro */
+  color: white;                        /* Texto blanco */
+  padding: 1.25rem 2rem;               /* Espaciado interno vertical y horizontal */
+  display: flex;                      /* Flexbox para layout */
+  justify-content: space-between;     /* Separar contenido a extremos */
+  align-items: center;                /* Centrar verticalmente */
+  flex-wrap: wrap;                   /* Permite que elementos se ajusten en varias filas si es necesario */
+  box-shadow: 0 2px 5px var(--sombra-suave); /* Sombra debajo del header */
 }
 
+/* Estilo para el título dentro del header */
 header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
-  user-select: none;
+  margin: 0;                        /* Sin margen */
+  font-size: 1.8rem;               /* Tamaño de fuente */
+  display: flex;                   /* Flexbox para íconos/textos juntos */
+  align-items: center;             /* Centrar vertical */
+  gap: 12px;                      /* Espacio entre elementos hijos */
+  font-weight: 600;               /* Grosor de fuente seminegrita */
+  user-select: none;              /* Impide seleccionar el texto */
 }
 
+/* Contenedores para login y botón de logout */
 #loginContainer,
 #logoutBtn {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  margin-top: 0.5rem;             /* Margen arriba pequeño */
+  display: flex;                 /* Flexbox */
+  gap: 10px;                    /* Separación entre elementos */
+  align-items: center;          /* Centrar vertical */
 }
 
+/* Estilos para inputs y botones dentro del formulario de login y botón logout */
 #loginForm input,
 #loginForm button,
 #logoutBtn {
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: var(--radio-borde);
-  border: none;
-  padding: 8px 14px;
-  outline: none;
-  transition: background var(--transicion), box-shadow var(--transicion);
-  cursor: pointer;
+  font-family: inherit;          /* Usa misma fuente que body */
+  font-size: 1rem;               /* Tamaño de fuente */
+  border-radius: var(--radio-borde); /* Bordes redondeados */
+  border: none;                 /* Sin borde por defecto */
+  padding: 8px 14px;            /* Espaciado interno */
+  outline: none;                /* Quita outline por defecto */
+  transition: background var(--transicion), box-shadow var(--transicion); /* Transiciones suaves */
+  cursor: pointer;              /* Cursor tipo mano para indicar clicable */
 }
 
+/* Estilo para inputs de login */
 #loginForm input {
-  width: 130px;
-  background: white;
-  color: #444;
-  box-shadow: 0 1px 4px var(--sombra-suave);
-  border: 1px solid #ddd;
+  width: 130px;                 /* Ancho fijo */
+  background: white;            /* Fondo blanco */
+  color: #444;                  /* Texto gris oscuro */
+  box-shadow: 0 1px 4px var(--sombra-suave); /* Sombra ligera */
+  border: 1px solid #ddd;       /* Borde gris claro */
 }
 
+/* Estilo al enfocar inputs de login */
 #loginForm input:focus {
-  border-color: var(--color-acento);
-  box-shadow: 0 0 8px var(--color-acento);
+  border-color: var(--color-acento);          /* Borde azul vivo */
+  box-shadow: 0 0 8px var(--color-acento);   /* Resplandor azul */
 }
 
+/* Botón de login */
 #loginForm button {
-  background: var(--color-exito);
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4);
+  background: var(--color-exito);              /* Fondo verde */
+  color: white;                               /* Texto blanco */
+  font-weight: 600;                           /* Negrita */
+  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4); /* Sombra verde */
 }
 
+/* Hover para botón login */
 #loginForm button:hover {
-  background: #218838;
-  box-shadow: 0 6px 10px rgba(33, 136, 56, 0.6);
+  background: #218838;                         /* Verde oscuro */
+  box-shadow: 0 6px 10px rgba(33, 136, 56, 0.6); /* Sombra más intensa */
 }
 
+/* Botón logout */
 #logoutBtn {
-  background: var(--color-peligro);
-  color: white;
-  font-weight: 600;
-  padding: 8px 18px;
-  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
+  background: var(--color-peligro);           /* Fondo rojo */
+  color: white;                               /* Texto blanco */
+  font-weight: 600;                           /* Negrita */
+  padding: 8px 18px;                          /* Espaciado interno más ancho */
+  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4); /* Sombra roja */
 }
 
+/* Hover para botón logout */
 #logoutBtn:hover {
-  background: #b02a37;
-  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
+  background: #b02a37;                         /* Rojo oscuro */
+  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6); /* Sombra más intensa */
 }
 
+/* Estilos para el main que contiene mapa y panel derecho */
 main {
-  display: flex;
-  height: calc(100vh - 70px);
-  overflow: hidden;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: var(--fondo-claro);
+  display: flex;                           /* Flexbox para contenedor horizontal */
+  height: calc(100vh - 70px);             /* Altura total de la ventana menos header */
+  overflow: hidden;                       /* Oculta scroll fuera del contenedor */
+  gap: 1.5rem;                            /* Espacio entre hijos */
+  padding: 1.5rem;                        /* Espacio interno */
+  background: var(--fondo-claro);         /* Fondo claro */
 }
 
+/* Estilo para el contenedor del mapa */
 #map {
-  flex: 1.8;
-  height: 100%;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 4px 12px var(--sombra-suave);
-  border: 2px solid var(--color-primario);
+  flex: 1.8;                             /* Proporción de espacio (más ancho que panel) */
+  height: 100%;                         /* Altura total de main */
+  border-radius: var(--radio-borde);    /* Bordes redondeados */
+  box-shadow: 0 4px 12px var(--sombra-suave); /* Sombra alrededor */
+  border: 2px solid var(--color-primario); /* Borde azul oscuro */
 }
 
+/* Estilo para el panel derecho con filtros y tabla */
 #panelDerecho {
-  flex: 1.2;
-  background: white;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 4px 12px var(--sombra-suave);
-  padding: 20px 24px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex: 1.2;                             /* Proporción menos que mapa */
+  background: white;                    /* Fondo blanco */
+  border-radius: var(--radio-borde);    /* Bordes redondeados */
+  box-shadow: 0 4px 12px var(--sombra-suave); /* Sombra */
+  padding: 20px 24px;                   /* Espaciado interno */
+  overflow-y: auto;                    /* Scroll vertical si contenido excede */
+  display: flex;                      /* Flexbox */
+  flex-direction: column;             /* Elementos apilados verticalmente */
+  gap: 1.5rem;                       /* Espacio entre elementos hijos */
 }
 
-/* Scroll personalizado panel derecho */
+/* Personalización del scroll en panel derecho para navegadores WebKit */
 #panelDerecho::-webkit-scrollbar {
-  width: 8px;
+  width: 8px;                        /* Ancho del scrollbar */
 }
 
 #panelDerecho::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
+  background: #f0f0f0;              /* Fondo del track */
+  border-radius: 10px;              /* Bordes redondeados */
 }
 
 #panelDerecho::-webkit-scrollbar-thumb {
-  background: var(--color-primario);
+  background: var(--color-primario); /* Color del pulgar (barra desplazable) */
   border-radius: 10px;
   transition: background 0.3s;
 }
 
 #panelDerecho::-webkit-scrollbar-thumb:hover {
-  background: var(--color-acento);
+  background: var(--color-acento);   /* Cambia color al pasar el mouse */
 }
 
-/* Contenedores filtros */
+/* Estilos para el contenedor de filtros */
 .contenedor-filtros {
-  background: var(--color-secundario);
-  padding: 18px 22px;
-  border-radius: var(--radio-borde);
-  box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
-  transition: box-shadow var(--transicion);
-  user-select: none;
+  background: var(--color-secundario);        /* Fondo azul muy claro */
+  padding: 18px 22px;                         /* Espaciado interno */
+  border-radius: var(--radio-borde);           /* Bordes redondeados */
+  box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15); /* Sombra interna suave azul */
+  transition: box-shadow var(--transicion);  /* Transición suave */
+  user-select: none;                          /* No permite selección de texto */
 }
 
+/* Efecto hover para contenedor de filtros */
 .contenedor-filtros:hover {
-  box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
+  box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3); /* Sombra interna más fuerte */
 }
 
+/* Título de los filtros */
 .contenedor-filtros h3 {
   margin-top: 0;
   margin-bottom: 12px;
-  color: var(--color-primario);
+  color: var(--color-primario);     /* Azul oscuro */
   font-weight: 600;
   font-size: 1.25rem;
-  border-bottom: 2px solid var(--color-acento);
+  border-bottom: 2px solid var(--color-acento); /* Línea inferior azul vivo */
   padding-bottom: 6px;
 }
 
+/* Agrupa controles dentro de filtros */
 .grupo-control {
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
 
+/* Etiquetas para inputs/select */
 .grupo-control label {
   font-weight: 600;
   margin-bottom: 5px;
   color: #222;
-  user-select: text;
+  user-select: text; /* Permite seleccionar texto */
 }
 
+/* Estilo para select e inputs de búsqueda */
 .grupo-control select,
 .grupo-control input[type="search"] {
   padding: 8px 12px;
@@ -204,11 +226,13 @@ main {
   user-select: text;
 }
 
+/* Hover en select e inputs */
 .grupo-control select:hover,
 .grupo-control input[type="search"]:hover {
   border-color: var(--color-primario);
 }
 
+/* Focus en select e inputs */
 .grupo-control select:focus,
 .grupo-control input[type="search"]:focus {
   outline: none;
@@ -216,6 +240,7 @@ main {
   box-shadow: 0 0 8px var(--color-acento);
 }
 
+/* Input específico para filtro de rutas */
 input#filterRouteInput {
   width: 100%;
   margin-top: 10px;
@@ -228,32 +253,36 @@ input#filterRouteInput {
   user-select: text;
 }
 
+/* Hover para input filtro ruta */
 input#filterRouteInput:hover {
   border-color: var(--color-acento);
 }
 
+/* Focus para input filtro ruta */
 input#filterRouteInput:focus {
   outline: none;
   border-color: var(--color-acento);
   box-shadow: 0 0 10px var(--color-acento);
 }
 
-/* Tabla de personal */
+/* Contenedor que envuelve tabla de personal */
 #tabla {
-  overflow-x: auto;
+  overflow-x: auto;                   /* Scroll horizontal si la tabla es muy ancha */
   border-radius: var(--radio-borde);
   box-shadow: 0 0 10px var(--sombra-suave);
   background: white;
   padding: 8px;
 }
 
+/* Estilos para la tabla */
 #tabla table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse;       /* Elimina espacios entre celdas */
   font-size: 0.9rem;
-  user-select: none;
+  user-select: none;                /* No selecciona texto por defecto */
 }
 
+/* Estilos para celdas y encabezados */
 #tabla th,
 #tabla td {
   border: 1px solid #ccc;
@@ -262,6 +291,7 @@ input#filterRouteInput:focus {
   vertical-align: middle;
 }
 
+/* Encabezados */
 #tabla th {
   background: var(--color-secundario);
   color: var(--color-primario);
@@ -269,28 +299,31 @@ input#filterRouteInput:focus {
   user-select: none;
 }
 
+/* Celdas editables */
 #tabla td[contenteditable="true"] {
-  background: #fff8dc;
-  cursor: text;
-  user-select: text;
+  background: #fff8dc;             /* Color amarillo pálido */
+  cursor: text;                   /* Cursor de texto */
+  user-select: text;              /* Permite seleccionar texto */
   transition: background-color 0.25s ease;
 }
 
+/* Celdas editables al tener foco */
 #tabla td[contenteditable="true"]:focus {
   outline: 2px solid var(--color-acento);
-  background-color: #ffffe0;
+  background-color: #ffffe0;       /* Amarillo muy claro */
 }
 
-/* Formulario agregar personal */
+/* Formulario para agregar personal */
 #addForm {
   background: white;
   padding: 18px 24px;
   border-radius: var(--radio-borde);
   box-shadow: 0 0 15px var(--sombra-suave);
   user-select: none;
-  flex-shrink: 0;
+  flex-shrink: 0;                 /* Evita que se reduzca en flexbox */
 }
 
+/* Título del formulario */
 #addForm h2 {
   margin-top: 0;
   font-size: 1.4rem;
@@ -299,6 +332,7 @@ input#filterRouteInput:focus {
   user-select: none;
 }
 
+/* Etiquetas dentro del formulario */
 #camposForm label {
   font-weight: 600;
   color: #444;
@@ -307,6 +341,7 @@ input#filterRouteInput:focus {
   user-select: text;
 }
 
+/* Inputs dentro del formulario */
 #camposForm input {
   width: 100%;
   padding: 10px 14px;
@@ -319,16 +354,19 @@ input#filterRouteInput:focus {
   user-select: text;
 }
 
+/* Hover en inputs formulario */
 #camposForm input:hover {
   border-color: var(--color-primario);
 }
 
+/* Focus en inputs formulario */
 #camposForm input:focus {
   outline: none;
   border-color: var(--color-acento);
   box-shadow: 0 0 10px var(--color-acento);
 }
 
+/* Botón para agregar personal */
 #addForm button {
   width: 100%;
   background: var(--color-acento);
@@ -343,12 +381,13 @@ input#filterRouteInput:focus {
   user-select: none;
 }
 
+/* Hover botón agregar */
 #addForm button:hover {
   background: #0056b3;
   box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
 }
 
-/* Responsive - panel derecho apila abajo en móvil */
+/* Responsive: en pantallas menores a 900px apila el main verticalmente */
 @media (max-width: 900px) {
   main {
     flex-direction: column;
@@ -358,7 +397,7 @@ input#filterRouteInput:focus {
   #map, #panelDerecho {
     flex: none;
     width: 100%;
-    height: 400px;
+    height: 1000px; /* Altura fija para mapa y panel */
   }
   #panelDerecho {
     margin-top: 1.5rem;
@@ -367,7 +406,7 @@ input#filterRouteInput:focus {
   }
 }
 
-/* Mejor interacción botón hover */
+/* Mejor interacción para focus accesible en botones, inputs y selects */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -376,7 +415,7 @@ select:focus-visible {
   transition: outline-offset 0.3s;
 }
 
-/* Scroll suave para todo el sitio */
+/* Scroll suave para toda la página */
 html {
   scroll-behavior: smooth;
 }
