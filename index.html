@@ -30,16 +30,19 @@
       min-width: 320px;
       box-sizing: border-box;
     }
-    /* Tabla fija y que no se desborde */
+    /* Tabla con scroll horizontal si es necesario */
     #tabla {
       overflow-x: auto;
       margin-top: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     #tabla table {
-      width: 100%;
+      width: auto;
       border-collapse: collapse;
-      table-layout: fixed;
-      min-width: 600px;
+      table-layout: auto; /* Ajuste automático de columnas */
+      max-width: 100%;
     }
     #tabla th, #tabla td {
       padding: 0.6rem 0.8rem;
@@ -48,11 +51,13 @@
       text-overflow: ellipsis;
       border: 1px solid #ccc;
       text-align: left;
+      vertical-align: middle;
     }
     #tabla th {
       background-color: #e6f0ff;
       color: #004d99;
       font-weight: 600;
+      user-select: none;
     }
   </style>
 </head>
@@ -61,12 +66,10 @@
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-  <form id="loginForm" aria-label="Formulario de inicio de sesión">
-    <div id="loginContainer" style="display:flex; gap:0.5rem; flex-wrap: wrap; align-items:center;">
-      <input id="usuario" name="usuario" type="text" placeholder="Usuario" required aria-required="true" autocomplete="username" />
-      <input id="clave" name="clave" type="password" placeholder="Clave" required aria-required="true" autocomplete="current-password" />
-      <button type="submit" aria-label="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
-    </div>
+  <form id="loginForm" aria-label="Formulario de inicio de sesión" style="display:flex; gap:0.5rem; flex-wrap: wrap; align-items:center;">
+    <input id="usuario" name="usuario" type="text" placeholder="Usuario" required aria-required="true" autocomplete="username" />
+    <input id="clave" name="clave" type="password" placeholder="Clave" required aria-required="true" autocomplete="current-password" />
+    <button type="submit" aria-label="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     <button id="logoutBtn" type="button" style="display:none;" aria-label="Cerrar sesión">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
@@ -102,7 +105,7 @@
       <h2 id="filtro-personal-label"><i class="fa-solid fa-users"></i> Filtrar Personal</h2>
       <div class="grupo-control">
         <label for="filterField">Buscar por campo:</label>
-        <select id="filterField" name="filterField">
+        <select id="filterField" name="filterField" aria-describedby="searchInput">
           <option value="CODIGO">Código</option>
           <option value="NOMBRE" selected>Nombre</option>
           <option value="RUTA">Ruta</option>
@@ -154,4 +157,3 @@
 
 </body>
 </html>
-
