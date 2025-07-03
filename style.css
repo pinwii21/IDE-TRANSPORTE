@@ -237,7 +237,7 @@ main {
 
 /* Estilos para tabla dentro del panel izquierdo */
 #tabla {
-  max-width: 100%;
+  max-width: 90%;
   overflow-x: auto;
   background: white;
   padding: 1rem;
@@ -246,7 +246,7 @@ main {
 }
 
 #tabla table {
-  width: 100%;
+  width: 90%;
   border-collapse: collapse;
   table-layout: fixed;
   min-width: 700px; /* Ajusta según columnas */
