@@ -13,6 +13,33 @@
 
   <!-- Iconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Ajustes extra para mejorar responsividad y evitar zoom -->
+  <style>
+    /* Evitar que main se desborde */
+    main {
+      max-width: 100vw;
+      overflow-x: auto;
+    }
+
+    /* Tabla con layout fijo para mejor control de columnas */
+    #tabla table {
+      table-layout: fixed;
+      width: 100%;
+      word-wrap: break-word;
+      border-collapse: collapse;
+    }
+
+    /* Que celdas rompan texto largo */
+    #tabla th, #tabla td {
+      word-break: break-word;
+    }
+
+    /* Opcional: evitar que inputs y selects sean muy anchos */
+    select, input[type="search"] {
+      min-width: 0; /* Para evitar problemas en flexbox */
+    }
+  </style>
 </head>
 <body>
 
