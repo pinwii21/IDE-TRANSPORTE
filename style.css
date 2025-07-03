@@ -261,7 +261,7 @@ main {
 /* Resto columnas iguales */
 #tabla th:nth-child(n+2),
 #tabla td:nth-child(n+2) {
-  width: 250px; /* Para 3 columnas totales */
+  width: 350px; /* Para 3 columnas totales */
 }
 
 #tabla th,
