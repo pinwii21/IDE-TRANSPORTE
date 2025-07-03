@@ -270,7 +270,7 @@ main {
 
 /* Tabla */
 #tabla table {
-  width: 40%;
+  width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
   min-width: 1000px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
@@ -283,6 +283,17 @@ main {
   padding: 10px 12px;
   text-align: left;
   white-space: nowrap; /* Evita que el texto haga wrap y mantenga columnas alineadas */
+}
+
+/* Ancho personalizado para columnas */
+#tabla th:nth-child(1),
+#tabla td:nth-child(1) {
+  width: 200px; /* Primera columna más ancha */
+}
+
+#tabla th:nth-child(n+2),
+#tabla td:nth-child(n+2) {
+  width: 150px; /* Las demás columnas iguales */
 }
 
 /* Encabezados */
