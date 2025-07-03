@@ -16,6 +16,7 @@
 </head>
 <body>
 
+<!-- ========== ENCABEZADO ========== -->
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
@@ -33,11 +34,12 @@
   </form>
 </header>
 
+<!-- ========== CUERPO PRINCIPAL ========== -->
 <main>
   <!-- Mapa -->
   <div id="map" style="height: 500px;"></div>
 
-  <!-- Panel lateral -->
+  <!-- Panel lateral derecho -->
   <section id="panelDerecho">
 
     <!-- Filtro de personal -->
@@ -81,9 +83,6 @@
       </div>
     </section>
 
-    <!-- Tabla de personal -->
-    <div id="tabla"></div>
-
     <!-- Formulario para agregar -->
     <form id="addForm" style="display:none;">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
@@ -97,7 +96,27 @@
   </section>
 </main>
 
-<!-- JS externos -->
+<!-- ========== TABLA DE CONTENIDO DE PERSONAL (DEBAJO DEL MAPA) ========== -->
+<div id="tabla">
+  <table>
+    <thead>
+      <tr>
+        <th>CÓDIGO</th>
+        <th>NOMBRE</th>
+        <th>RUTA</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1111</td>
+        <td>Kevin Pilliza</td>
+        <td>RUTA 24</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ========== JS externos ========== -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
