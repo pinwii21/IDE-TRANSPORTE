@@ -54,8 +54,15 @@
       </select>
 
       <input id="searchInput" type="search" placeholder="Buscar..." />
+<!-- Controles para filtrar y buscar POR RUTA -->
+          <section id="controles">
+       <label for="filterRouteInput">Filtrar rutas por:</label>
+      <select id="filterField">
+        <option value="NUMERO_RUTA">N° RUTA</option>
+        <option value="DESTINO" selected>DESTINO</option>
 
-      <label for="filterRouteInput">Filtrar rutas por:</label>
+      </select>
+     
       <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
 
       <label for="personSelect">Persona:</label>
