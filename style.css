@@ -1,7 +1,5 @@
-/* Importar fuente de Google Fonts: Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* Variables CSS */
 :root {
   --color-primario: #004d99;
   --color-secundario: #e6f0ff;
@@ -14,12 +12,10 @@
   --transicion: 0.3s ease-in-out;
 }
 
-/* Box sizing global */
 * {
   box-sizing: border-box;
 }
 
-/* Estilos base */
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -30,7 +26,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header */
 header {
   background: var(--color-primario);
   color: white;
@@ -49,10 +44,8 @@ header h1 {
   align-items: center;
   gap: 12px;
   font-weight: 600;
-  user-select: none;
 }
 
-/* Login y logout */
 #loginContainer,
 #logoutBtn {
   margin-top: 0.5rem;
@@ -69,17 +62,16 @@ header h1 {
   border-radius: var(--radio-borde);
   border: none;
   padding: 8px 14px;
-  outline: none;
-  transition: background var(--transicion), box-shadow var(--transicion);
   cursor: pointer;
+  transition: var(--transicion);
 }
 
 #loginForm input {
   width: 130px;
   background: white;
   color: #444;
-  box-shadow: 0 1px 4px var(--sombra-suave);
   border: 1px solid #ddd;
+  box-shadow: 0 1px 4px var(--sombra-suave);
 }
 
 #loginForm input:focus {
@@ -91,12 +83,10 @@ header h1 {
   background: var(--color-exito);
   color: white;
   font-weight: 600;
-  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4);
 }
 
 #loginForm button:hover {
   background: #218838;
-  box-shadow: 0 6px 10px rgba(33, 136, 56, 0.6);
 }
 
 #logoutBtn {
@@ -104,15 +94,12 @@ header h1 {
   color: white;
   font-weight: 600;
   padding: 8px 18px;
-  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
 }
 
 #logoutBtn:hover {
   background: #b02a37;
-  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
 }
 
-/* Main área con paneles */
 main {
   display: flex;
   gap: 1.5rem;
@@ -123,16 +110,14 @@ main {
   flex-wrap: wrap;
 }
 
-/* Panel izquierdo: más ancho */
 #panelIzquierdo {
-  flex: 2;
+  flex: 3;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   min-width: 600px;
 }
 
-/* Mapa */
 #map {
   height: 600px;
   border-radius: var(--radio-borde);
@@ -140,66 +125,47 @@ main {
   border: 2px solid var(--color-primario);
 }
 
-/* Panel derecho: más pequeño */
 #panelDerecho {
   flex: 1;
   background: white;
   border-radius: var(--radio-borde);
   box-shadow: 0 4px 8px var(--sombra-suave);
-  padding: 20px 24px;
+  padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  font-size: 0.85rem;
   min-width: 250px;
 }
 
-/* Scrollbar personalizado panel derecho (WebKit) */
 #panelDerecho::-webkit-scrollbar {
   width: 6px;
 }
-
-#panelDerecho::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
 #panelDerecho::-webkit-scrollbar-thumb {
   background: var(--color-primario);
   border-radius: 10px;
-  transition: background 0.3s;
 }
-
 #panelDerecho::-webkit-scrollbar-thumb:hover {
   background: var(--color-acento);
 }
 
-/* Contenedores de filtros */
 .contenedor-filtros {
   background: var(--color-secundario);
   padding: 18px 22px;
   border-radius: var(--radio-borde);
   box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
-  transition: box-shadow var(--transicion);
-  user-select: none;
 }
 
-.contenedor-filtros:hover {
-  box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
-}
-
-.contenedor-filtros h2,
-.contenedor-filtros h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
+.contenedor-filtros h2 {
+  margin: 0 0 12px;
   color: var(--color-primario);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   border-bottom: 2px solid var(--color-acento);
   padding-bottom: 6px;
 }
 
-/* Grupo control */
 .grupo-control {
   margin-bottom: 15px;
   display: flex;
@@ -210,37 +176,19 @@ main {
   font-weight: 600;
   margin-bottom: 5px;
   color: #222;
-  user-select: text;
 }
 
 .grupo-control select,
 .grupo-control input[type="search"],
 #camposForm input {
   padding: 8px 12px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border-radius: var(--radio-borde);
   border: 1.8px solid #bbb;
   box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
   transition: border-color var(--transicion), box-shadow var(--transicion);
-  cursor: pointer;
-  user-select: text;
 }
 
-.grupo-control select:hover,
-.grupo-control input[type="search"]:hover,
-#camposForm input:hover {
-  border-color: var(--color-primario);
-}
-
-.grupo-control select:focus,
-.grupo-control input[type="search"]:focus,
-#camposForm input:focus {
-  outline: none;
-  border-color: var(--color-acento);
-  box-shadow: 0 0 8px var(--color-acento);
-}
-
-/* Tabla */
 #tabla {
   max-width: 100%;
   overflow-x: auto;
@@ -248,14 +196,12 @@ main {
   padding: 1rem;
   border-radius: var(--radio-borde);
   box-shadow: 0 2px 10px var(--sombra-suave);
-  user-select: none;
 }
 
 #tabla table {
-  width: auto;           /* Ancho automático para ajuste */
+  width: auto;
   border-collapse: collapse;
-  table-layout: auto;    /* Ajuste automático de columnas */
-  max-width: 100%;
+  table-layout: auto;
 }
 
 #tabla th,
@@ -267,95 +213,64 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
-  user-select: text;
 }
 
-/* Encabezados */
 #tabla th {
   background-color: var(--color-secundario);
   color: var(--color-primario);
   font-weight: 600;
-  user-select: none;
 }
 
-/* Celdas editables (si usas) */
-#tabla td[contenteditable="true"] {
-  background-color: #fff8dc;
-  cursor: text;
-}
-
-#tabla td[contenteditable="true"]:focus {
-  outline: 2px solid var(--color-acento);
-  background-color: #ffffe0;
-}
-
-/* Formulario para añadir registros */
 #addForm {
   background: white;
   padding: 18px 24px;
   border-radius: var(--radio-borde);
   box-shadow: 0 0 15px var(--sombra-suave);
-  user-select: none;
-  flex-shrink: 0;
+  font-size: 0.85rem;
 }
 
 #addForm h2 {
   margin-top: 0;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--color-primario);
   font-weight: 700;
-  user-select: none;
 }
 
 #addForm button {
   width: 100%;
   background: var(--color-acento);
   border: none;
-  padding: 14px;
+  padding: 12px;
   border-radius: var(--radio-borde);
   color: white;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background var(--transicion), box-shadow var(--transicion);
-  user-select: none;
 }
 
 #addForm button:hover {
   background: #0056b3;
-  box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
 }
 
-/* Responsive menor a 900px */
 @media (max-width: 900px) {
   main {
     flex-direction: column;
     padding: 1rem;
     height: auto;
   }
-  #panelIzquierdo, #panelDerecho {
+
+  #panelIzquierdo,
+  #panelDerecho {
     flex: none;
     width: 100%;
   }
+
   #map {
     height: 400px;
   }
+
   #panelDerecho {
     margin-top: 1.5rem;
     padding-bottom: 3rem;
   }
-}
-
-/* Accesibilidad: foco teclado */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 3px solid var(--color-acento);
-  outline-offset: 2px;
-  transition: outline-offset 0.3s;
-}
-
-/* Scroll suave para anclas */
-html {
-  scroll-behavior: smooth;
 }
