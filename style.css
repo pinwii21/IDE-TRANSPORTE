@@ -132,7 +132,7 @@ main {
   flex: 1.2;
   background: white;
   border-radius: var(--radio-borde);
-  box-shadow: 0 4px 12px var(--sombra-suave);
+  box-shadow: 0 4px 8px var(--sombra-suave);
   padding: 20px 24px;
   overflow-y: auto;
   display: flex;
@@ -141,7 +141,7 @@ main {
 }
 
 #panelDerecho::-webkit-scrollbar {
-  width: 8px;
+  width: 1.5px;
 }
 
 #panelDerecho::-webkit-scrollbar-track {
