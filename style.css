@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* Variables de diseño */
+/* Variables generales de diseño */
 :root {
   --color-primario: #004d99;
   --color-secundario: #e6f0ff;
@@ -27,7 +27,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header */
+/* HEADER */
 header {
   background: var(--color-primario);
   color: white;
@@ -49,6 +49,7 @@ header h1 {
   user-select: none;
 }
 
+/* Login y Logout */
 #loginContainer,
 #logoutBtn {
   margin-top: 0.5rem;
@@ -108,7 +109,7 @@ header h1 {
   box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
 }
 
-/* Contenedor principal */
+/* Estructura principal */
 main {
   display: flex;
   height: calc(100vh - 70px);
@@ -118,6 +119,7 @@ main {
   background: var(--fondo-claro);
 }
 
+/* MAPA */
 #map {
   flex: 1.8;
   height: 100%;
@@ -126,7 +128,7 @@ main {
   border: 2px solid var(--color-primario);
 }
 
-/* Panel derecho con filtros, tabla, formulario */
+/* PANEL DERECHO */
 #panelDerecho {
   flex: 1.2;
   background: white;
@@ -141,7 +143,7 @@ main {
   min-width: 300px;
 }
 
-/* Scroll personalizado */
+/* Scroll personalizado panel derecho */
 #panelDerecho::-webkit-scrollbar {
   width: 8px;
 }
@@ -152,24 +154,24 @@ main {
 #panelDerecho::-webkit-scrollbar-thumb {
   background: var(--color-primario);
   border-radius: 10px;
-  transition: background 0.3s;
 }
 #panelDerecho::-webkit-scrollbar-thumb:hover {
   background: var(--color-acento);
 }
 
-/* Contenedor de filtros */
+/* CONTENEDOR DE FILTROS */
 .contenedor-filtros {
   background: var(--color-secundario);
   padding: 18px 22px;
   border-radius: var(--radio-borde);
   box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
-  transition: box-shadow var(--transicion);
   user-select: none;
 }
+
 .contenedor-filtros:hover {
   box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
 }
+
 .contenedor-filtros h3 {
   margin-top: 0;
   margin-bottom: 12px;
@@ -185,12 +187,14 @@ main {
   display: flex;
   flex-direction: column;
 }
+
 .grupo-control label {
   font-weight: 600;
   margin-bottom: 5px;
   color: #222;
   user-select: text;
 }
+
 .grupo-control select,
 .grupo-control input[type="search"] {
   padding: 8px 12px;
@@ -217,6 +221,7 @@ main {
   box-shadow: 0 0 8px var(--color-acento);
 }
 
+/* Input de búsqueda específico */
 input#filterRouteInput {
   width: 100%;
   margin-top: 10px;
@@ -225,9 +230,10 @@ input#filterRouteInput {
   padding: 10px 14px;
   border-radius: var(--radio-borde);
   border: 2px solid var(--color-primario);
-  transition: border-color var(--transicion), box-shadow var(--transicion);
   user-select: text;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
 }
+
 input#filterRouteInput:hover {
   border-color: var(--color-acento);
 }
@@ -237,23 +243,24 @@ input#filterRouteInput:focus {
   box-shadow: 0 0 10px var(--color-acento);
 }
 
-/* Tabla de personal */
+/* TABLA DE PERSONAL CENTRADA */
 #tabla {
+  display: flex;
+  justify-content: center; /* CENTRA la tabla horizontalmente */
+  padding: 8px;
   overflow-x: auto;
-  max-width: 100%;
   border-radius: var(--radio-borde);
   box-shadow: 0 0 10px var(--sombra-suave);
   background: white;
-  padding: 8px;
 }
 
 #tabla table {
-  width: 100%;
+  width: auto; /* ancho según contenido */
+  max-width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
   user-select: none;
-  table-layout: fixed;
-  word-wrap: break-word;
+  table-layout: auto;
 }
 
 #tabla th,
@@ -283,7 +290,7 @@ input#filterRouteInput:focus {
   background-color: #ffffe0;
 }
 
-/* Formulario agregar personal */
+/* FORMULARIO PARA AGREGAR PERSONAL */
 #addForm {
   background: white;
   padding: 18px 24px;
@@ -324,7 +331,6 @@ input#filterRouteInput:focus {
 #camposForm input:hover {
   border-color: var(--color-primario);
 }
-
 #camposForm input:focus {
   outline: none;
   border-color: var(--color-acento);
@@ -350,7 +356,7 @@ input#filterRouteInput:focus {
   box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
 }
 
-/* Responsive: panel se apila debajo en pantallas pequeñas */
+/* RESPONSIVE MOBILE */
 @media (max-width: 900px) {
   main {
     flex-direction: column;
@@ -370,7 +376,7 @@ input#filterRouteInput:focus {
   }
 }
 
-/* Mejor interacción botón e inputs */
+/* Accesibilidad para focus visible */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -379,7 +385,7 @@ select:focus-visible {
   transition: outline-offset 0.3s;
 }
 
-/* Scroll suave para todo el sitio */
+/* Scroll suave */
 html {
   scroll-behavior: smooth;
 }
