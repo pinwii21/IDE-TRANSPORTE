@@ -1,4 +1,3 @@
-/* === style.css === */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 :root {
@@ -8,6 +7,13 @@
   --color-exito: #28a745;
   --color-peligro: #dc3545;
   --fondo-claro: #f7f9fc;
+  --sombra-suave: rgba(0, 0, 0, 0.1);
+  --radio-borde: 8px;
+  --transicion: 0.3s ease-in-out;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -15,168 +21,362 @@ body {
   margin: 0;
   padding: 0;
   background: var(--fondo-claro);
-  color: #333;
+  color: #2e2e2e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 header {
   background: var(--color-primario);
   color: white;
-  padding: 1rem;
+  padding: 1.25rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  box-shadow: 0 2px 5px var(--sombra-suave);
 }
 
 header h1 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-weight: 600;
+  user-select: none;
 }
 
 #loginContainer,
 #logoutBtn {
   margin-top: 0.5rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 #loginForm input,
-#loginForm button {
-  margin: 0 5px;
-  padding: 6px 10px;
-  border-radius: 4px;
+#loginForm button,
+#logoutBtn {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: var(--radio-borde);
   border: none;
+  padding: 8px 14px;
   outline: none;
-  font-family: 'Poppins', sans-serif;
+  transition: background var(--transicion), box-shadow var(--transicion);
+  cursor: pointer;
+}
+
+#loginForm input {
+  width: 130px;
+  background: white;
+  color: #444;
+  box-shadow: 0 1px 4px var(--sombra-suave);
+  border: 1px solid #ddd;
+}
+
+#loginForm input:focus {
+  border-color: var(--color-acento);
+  box-shadow: 0 0 8px var(--color-acento);
 }
 
 #loginForm button {
   background: var(--color-exito);
   color: white;
-  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4);
+}
+
+#loginForm button:hover {
+  background: #218838;
+  box-shadow: 0 6px 10px rgba(33, 136, 56, 0.6);
 }
 
 #logoutBtn {
   background: var(--color-peligro);
   color: white;
-  border: none;
-  padding: 6px 12px;
-  cursor: pointer;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 8px 18px;
+  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
+}
+
+#logoutBtn:hover {
+  background: #b02a37;
+  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
 }
 
 main {
   display: flex;
-  flex-direction: row;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--fondo-claro);
 }
 
 #map {
-  flex: 1.5;
-  height: 90vh;
+  flex: 1.8;
+  height: 100%;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 4px 12px var(--sombra-suave);
+  border: 2px solid var(--color-primario);
 }
 
 #panelDerecho {
-  flex: 1.5;
-  padding: 12px;
+  flex: 1.2;
   background: white;
-  border-left: 1px solid #ccc;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 4px 12px var(--sombra-suave);
+  padding: 20px 24px;
   overflow-y: auto;
-  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-#controles label,
-#controles select,
-#controles input,
-#controles button {
-  display: block;
-  margin: 6px 0;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+/* Scroll personalizado panel derecho */
+#panelDerecho::-webkit-scrollbar {
+  width: 8px;
 }
 
-#controles input,
-#controles select {
-  padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+#panelDerecho::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
 }
 
-#controles button {
-  padding: 8px;
+#panelDerecho::-webkit-scrollbar-thumb {
   background: var(--color-primario);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 10px;
   transition: background 0.3s;
 }
 
-#controles button:hover {
-  background: #003366;
+#panelDerecho::-webkit-scrollbar-thumb:hover {
+  background: var(--color-acento);
 }
 
+/* Contenedores filtros */
+.contenedor-filtros {
+  background: var(--color-secundario);
+  padding: 18px 22px;
+  border-radius: var(--radio-borde);
+  box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
+  transition: box-shadow var(--transicion);
+  user-select: none;
+}
+
+.contenedor-filtros:hover {
+  box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
+}
+
+.contenedor-filtros h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--color-primario);
+  font-weight: 600;
+  font-size: 1.25rem;
+  border-bottom: 2px solid var(--color-acento);
+  padding-bottom: 6px;
+}
+
+.grupo-control {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.grupo-control label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #222;
+  user-select: text;
+}
+
+.grupo-control select,
+.grupo-control input[type="search"] {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: var(--radio-borde);
+  border: 1.8px solid #bbb;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  cursor: pointer;
+  user-select: text;
+}
+
+.grupo-control select:hover,
+.grupo-control input[type="search"]:hover {
+  border-color: var(--color-primario);
+}
+
+.grupo-control select:focus,
+.grupo-control input[type="search"]:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 8px var(--color-acento);
+}
+
+input#filterRouteInput {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  padding: 10px 14px;
+  border-radius: var(--radio-borde);
+  border: 2px solid var(--color-primario);
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  user-select: text;
+}
+
+input#filterRouteInput:hover {
+  border-color: var(--color-acento);
+}
+
+input#filterRouteInput:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 10px var(--color-acento);
+}
+
+/* Tabla de personal */
 #tabla {
-  margin-top: 15px;
   overflow-x: auto;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 0 10px var(--sombra-suave);
+  background: white;
+  padding: 8px;
 }
 
 #tabla table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  user-select: none;
 }
 
 #tabla th,
 #tabla td {
   border: 1px solid #ccc;
-  padding: 6px;
+  padding: 10px 12px;
   text-align: left;
+  vertical-align: middle;
 }
 
 #tabla th {
   background: var(--color-secundario);
   color: var(--color-primario);
   font-weight: 600;
+  user-select: none;
 }
 
 #tabla td[contenteditable="true"] {
   background: #fff8dc;
+  cursor: text;
+  user-select: text;
+  transition: background-color 0.25s ease;
+}
+
+#tabla td[contenteditable="true"]:focus {
+  outline: 2px solid var(--color-acento);
+  background-color: #ffffe0;
+}
+
+/* Formulario agregar personal */
+#addForm {
+  background: white;
+  padding: 18px 24px;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 0 15px var(--sombra-suave);
+  user-select: none;
+  flex-shrink: 0;
 }
 
 #addForm h2 {
-  margin-top: 20px;
-  font-size: 1.2rem;
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: var(--color-primario);
+  font-weight: 700;
+  user-select: none;
 }
 
 #camposForm label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
   display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
+  user-select: text;
 }
 
 #camposForm input {
   width: 100%;
-  padding: 6px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radio-borde);
+  border: 1.8px solid #bbb;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.1);
+  font-size: 1rem;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  user-select: text;
+}
+
+#camposForm input:hover {
+  border-color: var(--color-primario);
+}
+
+#camposForm input:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 10px var(--color-acento);
 }
 
 #addForm button {
-  padding: 10px;
-  background: var(--color-acento);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   width: 100%;
-  font-size: 0.95rem;
-  transition: background 0.3s;
+  background: var(--color-acento);
+  border: none;
+  padding: 14px;
+  border-radius: var(--radio-borde);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transicion), box-shadow var(--transicion);
+  user-select: none;
 }
 
 #addForm button:hover {
   background: #0056b3;
+  box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
+}
+
+/* Responsive - panel derecho apila abajo en móvil */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+    padding: 1rem;
+    height: auto;
+  }
+  #map, #panelDerecho {
+    flex: none;
+    width: 100%;
+    height: 400px;
+  }
+  #panelDerecho {
+    margin-top: 1.5rem;
+    height: auto;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Mejor interacción botón hover */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 2px;
+  transition: outline-offset 0.3s;
+}
+
+/* Scroll suave para todo el sitio */
+html {
+  scroll-behavior: smooth;
 }
