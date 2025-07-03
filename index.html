@@ -8,19 +8,18 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Estilos de Leaflet para mapas -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <!-- Font Awesome para íconos -->
+  <!-- Iconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-
 <body>
 
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-  <!-- Formulario de login -->
+  <!-- Login -->
   <form id="loginForm">
     <div id="loginContainer">
       <input id="usuario" type="text" placeholder="Usuario" required />
@@ -28,7 +27,6 @@
       <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     </div>
 
-    <!-- Botón para cerrar sesión (oculto al inicio) -->
     <button id="logoutBtn" type="button" style="display:none;">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
@@ -36,77 +34,74 @@
 </header>
 
 <main>
-  <!-- Contenedor del mapa -->
+  <!-- Mapa -->
   <div id="map" style="height: 500px;"></div>
 
-  <!-- Panel lateral derecho -->
+  <!-- Panel lateral -->
   <section id="panelDerecho">
 
-    <!-- Controles para filtrar personal -->
-    <section class="controles">
-      <h3><i class="fa-solid fa-users"></i> Filtro de Personal</h3>
-      <label for="filterField">Filtrar usuarios por:</label>
-      <select id="filterField">
-        <option value="CODIGO">Código</option>
-        <option value="NOMBRE" selected>Nombre</option>
-        <option value="RUTA">N° de Ruta</option>
-        <option value="LUGAR TRABAJO">Lugar de trabajo</option>
-        <option value="HORARIO">Horario de trabajo</option>
-      </select>
+    <!-- Filtro de personal -->
+    <section class="contenedor-filtros">
+      <h3><i class="fa-solid fa-users"></i> Filtrar Personal</h3>
+      <div class="grupo-control">
+        <label for="filterField">Buscar por campo:</label>
+        <select id="filterField">
+          <option value="CODIGO">Código</option>
+          <option value="NOMBRE" selected>Nombre</option>
+          <option value="RUTA">Ruta</option>
+          <option value="LUGAR TRABAJO">Lugar de trabajo</option>
+          <option value="HORARIO">Horario</option>
+        </select>
+      </div>
       <input id="searchInput" type="search" placeholder="Buscar personal..." />
     </section>
 
-    <!-- Controles para filtrar rutas -->
-    <section class="controles">
-      <h3><i class="fa-solid fa-route"></i> Filtro de Rutas</h3>
+    <!-- Filtro de rutas -->
+    <section class="contenedor-filtros">
+      <h3><i class="fa-solid fa-route"></i> Filtrar Rutas</h3>
 
-      <label for="campo1">Campo 1:</label>
-      <select id="campo1"></select>
+      <div class="grupo-control">
+        <label for="campo1">Campo 1:</label>
+        <select id="campo1"></select>
+      </div>
 
-      <label for="valor1">Valor 1:</label>
-      <select id="valor1"></select>
+      <div class="grupo-control">
+        <label for="valor1">Valor 1:</label>
+        <select id="valor1"></select>
+      </div>
 
-      <label for="campo2">Campo 2:</label>
-      <select id="campo2"></select>
+      <div class="grupo-control">
+        <label for="campo2">Campo 2:</label>
+        <select id="campo2"></select>
+      </div>
 
-      <label for="valor2">Valor 2:</label>
-      <select id="valor2"></select>
+      <div class="grupo-control">
+        <label for="valor2">Valor 2:</label>
+        <select id="valor2"></select>
+      </div>
 
       <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
-
-      <label for="personSelect">Persona:</label>
-      <select id="personSelect">
-        <option value="">-- Selecciona persona --</option>
-      </select>
-
-      <button id="findRouteBtn"><i class="fa-solid fa-location-crosshairs"></i> Ruta más cercana</button>
-      <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
-    <!-- Tabla con datos del personal -->
+    <!-- Tabla de personal -->
     <div id="tabla"></div>
 
-    <!-- Formulario para agregar nuevo personal -->
+    <!-- Formulario para agregar -->
     <form id="addForm" style="display:none;">
-      <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
+      <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
       <div id="camposForm"></div>
 
-      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-      
-      <!-- Botón para descargar archivo GeoJSON -->
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
       <button type="button" id="descargarGeoJSONBtn" style="display:none;">
-        <i class="fa-solid fa-download"></i> Descargar archivo GeoJSON
+        <i class="fa-solid fa-download"></i> Descargar GeoJSON
       </button>
     </form>
-
   </section>
 </main>
 
-<!-- Scripts externos -->
+<!-- JS externos -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-
-<!-- Script principal -->
 <script src="app.js"></script>
 
 </body>
