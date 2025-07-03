@@ -273,7 +273,7 @@ main {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  min-width: 600px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
+  min-width: 1000px; /* Ancho mínimo para que el scroll horizontal aparezca si hay muchas columnas */
 }
 
 /* Celdas y encabezados */
