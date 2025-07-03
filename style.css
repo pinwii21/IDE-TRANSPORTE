@@ -1,6 +1,6 @@
+/* Importar fuente */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* ==================== VARIABLES ==================== */
 :root {
   --color-primario: #004d99;
   --color-secundario: #e6f0ff;
@@ -13,7 +13,6 @@
   --transicion: 0.3s ease-in-out;
 }
 
-/* ==================== RESET ==================== */
 * {
   box-sizing: border-box;
 }
@@ -28,7 +27,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ==================== HEADER ==================== */
 header {
   background: var(--color-primario);
   color: white;
@@ -50,7 +48,6 @@ header h1 {
   user-select: none;
 }
 
-/* ==================== LOGIN ==================== */
 #loginContainer,
 #logoutBtn {
   margin-top: 0.5rem;
@@ -110,61 +107,64 @@ header h1 {
   box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
 }
 
-/* ==================== CONTENEDOR PRINCIPAL ==================== */
 main {
   display: flex;
-  height: calc(100vh - 70px);
-  overflow: hidden;
   gap: 1.5rem;
   padding: 1.5rem;
   background: var(--fondo-claro);
 }
 
-/* ==================== MAPA ==================== */
-#map {
+#panelIzquierdo {
   flex: 1.8;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#map {
+  height: 400px;
   border-radius: var(--radio-borde);
   box-shadow: 0 4px 12px var(--sombra-suave);
   border: 2px solid var(--color-primario);
 }
 
-/* ==================== PANEL DERECHO ==================== */
 #panelDerecho {
   flex: 1.2;
   background: white;
   border-radius: var(--radio-borde);
   box-shadow: 0 4px 12px var(--sombra-suave);
-  padding: 20px 16px;
+  padding: 20px 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  min-width: 300px;
 }
 
-/* Scroll personalizado */
 #panelDerecho::-webkit-scrollbar {
   width: 8px;
 }
+
 #panelDerecho::-webkit-scrollbar-track {
   background: #f0f0f0;
   border-radius: 10px;
 }
+
 #panelDerecho::-webkit-scrollbar-thumb {
   background: var(--color-primario);
   border-radius: 10px;
+  transition: background 0.3s;
 }
+
 #panelDerecho::-webkit-scrollbar-thumb:hover {
   background: var(--color-acento);
 }
 
-/* ==================== FILTROS ==================== */
 .contenedor-filtros {
   background: var(--color-secundario);
   padding: 18px 22px;
   border-radius: var(--radio-borde);
   box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
+  transition: box-shadow var(--transicion);
   user-select: none;
 }
 
@@ -205,7 +205,6 @@ main {
   transition: border-color var(--transicion), box-shadow var(--transicion);
   cursor: pointer;
   user-select: text;
-  max-width: 100%;
 }
 
 .grupo-control select:hover,
@@ -220,43 +219,30 @@ main {
   box-shadow: 0 0 8px var(--color-acento);
 }
 
-input#filterRouteInput {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  font-size: 1rem;
-  padding: 10px 14px;
-  border-radius: var(--radio-borde);
-  border: 2px solid var(--color-primario);
-  transition: border-color var(--transicion), box-shadow var(--transicion);
-}
-
-input#filterRouteInput:hover {
-  border-color: var(--color-acento);
-}
-input#filterRouteInput:focus {
-  outline: none;
-  border-color: var(--color-acento);
-  box-shadow: 0 0 10px var(--color-acento);
-}
-
-/* ==================== TABLA DE PERSONAL (DEBAJO DEL MAPA) ==================== */
+/* Tabla dentro del panel izquierdo */
 #tabla {
-  margin: 1rem auto;
-  width: 95%;
-  max-width: 1000px;
-  overflow-x: auto;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 0 12px var(--sombra-suave);
   background: white;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 2px 10px var(--sombra-suave);
   padding: 1rem;
+  overflow-x: auto;
+}
+
+#tabla h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--color-primario);
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #tabla table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  user-select: none;
 }
 
 #tabla th,
@@ -264,21 +250,17 @@ input#filterRouteInput:focus {
   border: 1px solid #ccc;
   padding: 10px 12px;
   text-align: left;
-  vertical-align: middle;
 }
 
 #tabla th {
-  background: var(--color-secundario);
+  background-color: var(--color-secundario);
   color: var(--color-primario);
   font-weight: 600;
-  user-select: none;
 }
 
 #tabla td[contenteditable="true"] {
-  background: #fff8dc;
+  background-color: #fff8dc;
   cursor: text;
-  user-select: text;
-  transition: background-color 0.25s ease;
 }
 
 #tabla td[contenteditable="true"]:focus {
@@ -286,7 +268,6 @@ input#filterRouteInput:focus {
   background-color: #ffffe0;
 }
 
-/* ==================== FORMULARIO ==================== */
 #addForm {
   background: white;
   padding: 18px 24px;
@@ -353,28 +334,25 @@ input#filterRouteInput:focus {
   box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
 }
 
-/* ==================== RESPONSIVE ==================== */
 @media (max-width: 900px) {
   main {
     flex-direction: column;
     padding: 1rem;
     height: auto;
   }
-
-  #map, #panelDerecho {
+  #panelIzquierdo, #panelDerecho {
     flex: none;
     width: 100%;
+  }
+  #map {
     height: 400px;
   }
-
   #panelDerecho {
     margin-top: 1.5rem;
-    height: auto;
     padding-bottom: 3rem;
   }
 }
 
-/* ==================== ACCESIBILIDAD ==================== */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -386,4 +364,3 @@ select:focus-visible {
 html {
   scroll-behavior: smooth;
 }
-
