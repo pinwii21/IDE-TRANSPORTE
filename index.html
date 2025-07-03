@@ -95,7 +95,25 @@
     <!-- Formulario agregar -->
     <form id="addForm" style="display:none;" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
-      <div id="camposForm"></div>
+      <div class="form-grid">
+        <label for="codigo">CÓDIGO:</label><input id="codigo" name="codigo" type="text" />
+        <label for="nombre">NOMBRE:</label><input id="nombre" name="nombre" type="text" />
+        <label for="ruta">RUTA:</label><input id="ruta" name="ruta" type="text" />
+        <label for="cedula">CÉDULA:</label><input id="cedula" name="cedula" type="text" />
+        <label for="telefono">TELÉFONO:</label><input id="telefono" name="telefono" type="text" />
+        <label for="discapacidad">DISCAPACIDAD:</label><input id="discapacidad" name="discapacidad" type="text" />
+        <label for="tipoHorario">TIPO HORARIO:</label><input id="tipoHorario" name="tipoHorario" type="text" />
+        <label for="cargo">CARGO:</label><input id="cargo" name="cargo" type="text" />
+        <label for="area">ÁREA:</label><input id="area" name="area" type="text" />
+        <label for="modalidad">MODALIDAD DE CONTRATO:</label><input id="modalidad" name="modalidad" type="text" />
+        <label for="direccion">DIRECCIÓN:</label><input id="direccion" name="direccion" type="text" />
+        <label for="horario">HORARIO:</label><input id="horario" name="horario" type="text" />
+        <label for="lugar">LUGAR TRABAJO:</label><input id="lugar" name="lugar" type="text" />
+        <label for="longitud">LONGITUD:</label><input id="longitud" name="longitud" type="text" />
+        <label for="latitud">LATITUD:</label><input id="latitud" name="latitud" type="text" />
+        <label for="contratoLuz">CONTRATO LUZ:</label><input id="contratoLuz" name="contratoLuz" type="text" />
+        <label for="transporte">TRANSPORTE:</label><input id="transporte" name="transporte" type="text" />
+      </div>
 
       <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
       <button type="button" id="descargarGeoJSONBtn" style="display:none;">
