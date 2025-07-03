@@ -1,109 +1,365 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IDE TRANSPORTE</title>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-  <!-- Tu CSS personalizado -->
-  <link rel="stylesheet" href="style.css" />
+:root {
+  --color-primario: #004d99;
+  --color-secundario: #e6f0ff;
+  --color-acento: #007bff;
+  --color-exito: #28a745;
+  --color-peligro: #dc3545;
+  --fondo-claro: #f7f9fc;
+  --sombra-suave: rgba(0, 0, 0, 0.1);
+  --radio-borde: 8px;
+  --transicion: 0.3s ease-in-out;
+}
 
-  <!-- Leaflet CSS para mapas -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
+* {
+  box-sizing: border-box;
+}
 
-  <!-- FontAwesome para iconos -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  />
-</head>
-<body>
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--fondo-claro);
+  color: #2e2e2e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-<header>
-  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+header {
+  background: var(--color-primario);
+  color: white;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 5px var(--sombra-suave);
+}
 
-  <form id="loginForm">
-    <div id="loginContainer">
-      <input id="usuario" type="text" placeholder="Usuario" required />
-      <input id="clave" type="password" placeholder="Clave" required />
-      <button type="submit">
-        <i class="fa-solid fa-right-to-bracket"></i> Entrar
-      </button>
-    </div>
-    <button id="logoutBtn" type="button" style="display:none;">
-      <i class="fa-solid fa-right-from-bracket"></i> Salir
-    </button>
-  </form>
-</header>
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  user-select: none;
+}
 
-<main>
-  <!-- Panel izquierdo: Mapa + tabla -->
-  <section id="panelIzquierdo">
-    <div id="map"></div>
+#loginContainer,
+#logoutBtn {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-    <div id="tabla">
-      <h3><i class="fa-solid fa-table"></i> Personal en Ruta</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>CÓDIGO</th>
-            <th>NOMBRE</th>
-            <th>RUTA</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1111</td>
-            <td>Kevin Pilliza</td>
-            <td>Ruta 24</td>
-          </tr>
-          <!-- Más filas dinámicas -->
-        </tbody>
-      </table>
-    </div>
-  </section>
+#loginForm input,
+#loginForm button,
+#logoutBtn {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: var(--radio-borde);
+  border: none;
+  padding: 8px 14px;
+  outline: none;
+  transition: background var(--transicion), box-shadow var(--transicion);
+  cursor: pointer;
+}
 
-  <!-- Panel derecho: Filtros e info -->
-  <section id="panelDerecho">
-    <div class="contenedor-filtros">
-      <h3><i class="fa-solid fa-filter"></i> Filtros</h3>
+#loginForm input {
+  width: 130px;
+  background: white;
+  color: #444;
+  box-shadow: 0 1px 4px var(--sombra-suave);
+  border: 1px solid #ddd;
+}
 
-      <div class="grupo-control">
-        <label for="filtroDestino">Destino:</label>
-        <select id="filtroDestino">
-          <option value="">Todos</option>
-          <option value="Ruta 24">Ruta 24</option>
-          <option value="Ruta 12">Ruta 12</option>
-        </select>
-      </div>
+#loginForm input:focus {
+  border-color: var(--color-acento);
+  box-shadow: 0 0 8px var(--color-acento);
+}
 
-      <div class="grupo-control">
-        <label for="filtroHorario">Horario:</label>
-        <select id="filtroHorario">
-          <option value="">Todos</option>
-          <option value="08:00 - 16:30">08:00 - 16:30</option>
-          <option value="09:00 - 17:00">09:00 - 17:00</option>
-        </select>
-      </div>
-    </div>
+#loginForm button {
+  background: var(--color-exito);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4);
+}
 
-    <div id="infoDetalle">
-      <h3><i class="fa-solid fa-info-circle"></i> Información de Rutas</h3>
-      <p>Selecciona un filtro para ver detalles aquí.</p>
-    </div>
-  </section>
-</main>
+#loginForm button:hover {
+  background: #218838;
+  box-shadow: 0 6px 10px rgba(33, 136, 56, 0.6);
+}
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+#logoutBtn {
+  background: var(--color-peligro);
+  color: white;
+  font-weight: 600;
+  padding: 8px 18px;
+  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
+}
 
-<!-- Aquí puedes poner tu JS personalizado para funcionalidad -->
-<script>
-  // Código JS para inicializar mapa, filtros y tabla
-</script>
+#logoutBtn:hover {
+  background: #b02a37;
+  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.6);
+}
 
-</body>
-</html>
+main {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--fondo-claro);
+}
+
+#panelIzquierdo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#map {
+  height: 400px;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 4px 12px var(--sombra-suave);
+  border: 2px solid var(--color-primario);
+}
+
+#panelDerecho {
+  flex: 1;
+  background: white;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 4px 8px var(--sombra-suave);
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+#panelDerecho::-webkit-scrollbar {
+  width: 1.5px;
+}
+
+#panelDerecho::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+#panelDerecho::-webkit-scrollbar-thumb {
+  background: var(--color-primario);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+#panelDerecho::-webkit-scrollbar-thumb:hover {
+  background: var(--color-acento);
+}
+
+.contenedor-filtros {
+  background: var(--color-secundario);
+  padding: 18px 22px;
+  border-radius: var(--radio-borde);
+  box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
+  transition: box-shadow var(--transicion);
+  user-select: none;
+}
+
+.contenedor-filtros:hover {
+  box-shadow: inset 0 0 10px rgba(0, 77, 153, 0.3);
+}
+
+.contenedor-filtros h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--color-primario);
+  font-weight: 600;
+  font-size: 1.25rem;
+  border-bottom: 2px solid var(--color-acento);
+  padding-bottom: 6px;
+}
+
+.grupo-control {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.grupo-control label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #222;
+  user-select: text;
+}
+
+.grupo-control select,
+.grupo-control input[type="search"] {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: var(--radio-borde);
+  border: 1.8px solid #bbb;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  cursor: pointer;
+  user-select: text;
+}
+
+.grupo-control select:hover,
+.grupo-control input[type="search"]:hover {
+  border-color: var(--color-primario);
+}
+
+.grupo-control select:focus,
+.grupo-control input[type="search"]:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 8px var(--color-acento);
+}
+
+#tabla {
+  background: white;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 2px 10px var(--sombra-suave);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+#tabla h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--color-primario);
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+#tabla th,
+#tabla td {
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+#tabla th {
+  background-color: var(--color-secundario);
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+#tabla td[contenteditable="true"] {
+  background-color: #fff8dc;
+  cursor: text;
+}
+
+#tabla td[contenteditable="true"]:focus {
+  outline: 2px solid var(--color-acento);
+  background-color: #ffffe0;
+}
+
+#addForm {
+  background: white;
+  padding: 18px 24px;
+  border-radius: var(--radio-borde);
+  box-shadow: 0 0 15px var(--sombra-suave);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+#addForm h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: var(--color-primario);
+  font-weight: 700;
+  user-select: none;
+}
+
+#camposForm label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+  display: block;
+  user-select: text;
+}
+
+#camposForm input {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radio-borde);
+  border: 1.8px solid #bbb;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  user-select: text;
+}
+
+#camposForm input:hover {
+  border-color: var(--color-primario);
+}
+
+#camposForm input:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 10px var(--color-acento);
+}
+
+#addForm button {
+  width: 100%;
+  background: var(--color-acento);
+  border: none;
+  padding: 14px;
+  border-radius: var(--radio-borde);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transicion), box-shadow var(--transicion);
+  user-select: none;
+}
+
+#addForm button:hover {
+  background: #0056b3;
+  box-shadow: 0 5px 12px rgba(0, 86, 179, 0.7);
+}
+
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+    padding: 1rem;
+    height: auto;
+  }
+  #panelIzquierdo,
+  #panelDerecho {
+    flex: none;
+    width: 100%;
+  }
+  #map {
+    height: 400px;
+  }
+  #panelDerecho {
+    margin-top: 1.5rem;
+    padding-bottom: 3rem;
+  }
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 2px;
+  transition: outline-offset 0.3s;
+}
+
+html {
+  scroll-behavior: smooth;
+}
