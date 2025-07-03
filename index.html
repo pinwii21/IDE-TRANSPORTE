@@ -8,10 +8,10 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Estilos de Leaflet para mapas -->
+  <!-- Leaflet para mapas -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <!-- Font Awesome para íconos -->
+  <!-- Íconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
@@ -20,7 +20,7 @@
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-  <!-- Formulario de login -->
+  <!-- Login -->
   <form id="loginForm">
     <div id="loginContainer">
       <input id="usuario" type="text" placeholder="Usuario" required />
@@ -28,7 +28,7 @@
       <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     </div>
 
-    <!-- Botón para cerrar sesión (oculto al inicio) -->
+    <!-- Cerrar sesión -->
     <button id="logoutBtn" type="button" style="display:none;">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
@@ -36,15 +36,16 @@
 </header>
 
 <main>
-  <!-- Contenedor del mapa -->
+  <!-- Mapa -->
   <div id="map" style="height: 500px;"></div>
 
-  <!-- Panel lateral derecho -->
+  <!-- Panel lateral -->
   <section id="panelDerecho">
 
-    <!-- Controles para filtrar y buscar -->
-    <section id="controles">
-      <label for="filterField">Filtrar usuarios por:</label>
+    <!-- 🔍 FILTRO DE USUARIOS -->
+    <section id="controlesUsuarios">
+      <h3><i class="fa-solid fa-users"></i> Filtrar usuarios</h3>
+      <label for="filterField">Filtrar por:</label>
       <select id="filterField">
         <option value="CODIGO">Código</option>
         <option value="NOMBRE" selected>Nombre</option>
@@ -52,19 +53,26 @@
         <option value="LUGAR TRABAJO">Lugar de trabajo</option>
         <option value="HORARIO">Horario de trabajo</option>
       </select>
+      <input id="searchInput" type="search" placeholder="Buscar usuario..." />
+    </section>
 
-      <input id="searchInput" type="search" placeholder="Buscar..." />
-<!-- Controles para filtrar y buscar POR RUTA -->
-          <section id="controles">
-       <label for="filterRouteInput">Filtrar rutas por:</label>
-      <select id="filterField">
-        <option value="NUMERO_RUTA">N° RUTA</option>
-        <option value="DESTINO" selected>DESTINO</option>
+    <!-- 🚌 FILTRO DE RUTAS -->
+    <section id="controlesRutas">
+      <h3><i class="fa-solid fa-route"></i> Filtrar rutas</h3>
 
-      </select>
-     
-      <input id="filterRouteInput" type="text" placeholder="Filtrar rutas por nombre..." />
+      <!-- Filtro por número de ruta -->
+      <label for="filterRouteNum">N° Ruta:</label>
+      <input id="filterRouteNum" type="text" placeholder="Ej. 42" />
 
+      <!-- Filtro por destino -->
+      <label for="filterRouteDestino">Destino:</label>
+      <input id="filterRouteDestino" type="text" placeholder="Ej. OCCIDENTAL" />
+
+      <!-- Filtro por horario -->
+      <label for="filterRouteHorario">Horario:</label>
+      <input id="filterRouteHorario" type="text" placeholder="Ej. 07_00_a_15_00" />
+
+      <!-- Selector de persona -->
       <label for="personSelect">Persona:</label>
       <select id="personSelect">
         <option value="">-- Selecciona persona --</option>
@@ -74,17 +82,17 @@
       <button id="downloadBtn"><i class="fa-solid fa-download"></i> Descargar</button>
     </section>
 
-    <!-- Tabla con datos del personal -->
+    <!-- Tabla -->
     <div id="tabla"></div>
 
-    <!-- Formulario para agregar nuevo personal -->
+    <!-- Formulario de personal -->
     <form id="addForm" style="display:none;">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar nuevo personal</h2>
       <div id="camposForm"></div>
 
       <button type="submit"><i class="fa-solid fa-plus"></i> Agregar Personal</button>
-      
-      <!-- Nuevo botón para descargar archivo GeoJSON -->
+
+      <!-- Botón para exportar -->
       <button type="button" id="descargarGeoJSONBtn" style="display:none;">
         <i class="fa-solid fa-download"></i> Descargar archivo GeoJSON
       </button>
@@ -93,11 +101,9 @@
   </section>
 </main>
 
-<!-- Scripts externos -->
+<!-- Scripts -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-
-<!-- Script principal -->
 <script src="app.js"></script>
 
 </body>
