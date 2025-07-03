@@ -54,7 +54,7 @@
   </section>
 
   <!-- Panel Derecho: filtros y formulario -->
-  <aside id="panelDerecho" aria-label="Panel de filtros y formulario de personal">
+  <aside id="panelDerecho" aria-label="Panel de filtros y formulario de personal" style="min-width: 290px;">
     <!-- Filtro de personal -->
     <section class="contenedor-filtros" aria-labelledby="filtro-personal-label">
       <h2 id="filtro-personal-label"><i class="fa-solid fa-users"></i> Filtrar Personal</h2>
@@ -92,15 +92,12 @@
       </div>
     </section>
 
-    <!-- Formulario agregar con fuente más pequeña -->
+    <!-- Formulario agregar -->
     <form id="addForm" style="display:none; font-size: 0.85rem;" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
       <div id="camposForm"></div>
 
-      <button type="submit" aria-label="Agregar personal">
-        <i class="fa-solid fa-plus"></i> Agregar
-      </button>
-
+      <button type="submit" aria-label="Agregar personal"><i class="fa-solid fa-plus"></i> Agregar</button>
       <button type="button" id="descargarGeoJSONBtn" style="display:none;" aria-label="Descargar archivo GeoJSON">
         <i class="fa-solid fa-download"></i> Descargar GeoJSON
       </button>
