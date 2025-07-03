@@ -16,7 +16,6 @@
 </head>
 <body>
 
-<!-- ========== ENCABEZADO ========== -->
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
@@ -27,19 +26,41 @@
       <input id="clave" type="password" placeholder="Clave" required />
       <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     </div>
-
     <button id="logoutBtn" type="button" style="display:none;">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
   </form>
 </header>
 
-<!-- ========== CUERPO PRINCIPAL ========== -->
 <main>
-  <!-- Mapa -->
-  <div id="map" style="height: 500px;"></div>
+  <!-- Panel Izquierdo: Mapa + Tabla -->
+  <div id="panelIzquierdo">
+    <!-- Mapa -->
+    <div id="map" style="height: 400px;"></div>
 
-  <!-- Panel lateral derecho -->
+    <!-- Tabla -->
+    <div id="tabla">
+      <h3><i class="fa-solid fa-table"></i> Personal en Ruta</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>CÓDIGO</th>
+            <th>NOMBRE</th>
+            <th>RUTA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1111</td>
+            <td>Kevin Pilliza</td>
+            <td>RUTA 24</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Panel Derecho -->
   <section id="panelDerecho">
 
     <!-- Filtro de personal -->
@@ -61,29 +82,25 @@
     <!-- Filtro de rutas -->
     <section class="contenedor-filtros">
       <h3><i class="fa-solid fa-route"></i> Filtrar Rutas</h3>
-
       <div class="grupo-control">
         <label for="campo1">Campo 1:</label>
         <select id="campo1"></select>
       </div>
-
       <div class="grupo-control">
         <label for="valor1">Valor 1:</label>
         <select id="valor1"></select>
       </div>
-
       <div class="grupo-control">
         <label for="campo2">Campo 2:</label>
         <select id="campo2"></select>
       </div>
-
       <div class="grupo-control">
         <label for="valor2">Valor 2:</label>
         <select id="valor2"></select>
       </div>
     </section>
 
-    <!-- Formulario para agregar -->
+    <!-- Formulario agregar -->
     <form id="addForm" style="display:none;">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
       <div id="camposForm"></div>
@@ -96,30 +113,11 @@
   </section>
 </main>
 
-<!-- ========== TABLA DE CONTENIDO DE PERSONAL (DEBAJO DEL MAPA) ========== -->
-<div id="tabla">
-  <table>
-    <thead>
-      <tr>
-        <th>CÓDIGO</th>
-        <th>NOMBRE</th>
-        <th>RUTA</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1111</td>
-        <td>Kevin Pilliza</td>
-        <td>RUTA 24</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ========== JS externos ========== -->
+<!-- JS externos -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
 
 </body>
 </html>
+
