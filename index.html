@@ -21,11 +21,11 @@
 
   <form id="loginForm" aria-label="Formulario de inicio de sesión">
     <div id="loginContainer" style="display:flex; gap:0.5rem; flex-wrap: wrap; align-items:center;">
-      <input id="usuario" name="usuario" type="text" placeholder="Usuario" required aria-required="true" autocomplete="username" />
-      <input id="clave" name="clave" type="password" placeholder="Clave" required aria-required="true" autocomplete="current-password" />
-      <button type="submit" aria-label="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+      <input id="usuario" name="usuario" type="text" placeholder="Usuario" required autocomplete="username" />
+      <input id="clave" name="clave" type="password" placeholder="Clave" required autocomplete="current-password" />
+      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     </div>
-    <button id="logoutBtn" type="button" style="display:none;" aria-label="Cerrar sesión">
+    <button id="logoutBtn" type="button" style="display:none;">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
   </form>
@@ -34,7 +34,7 @@
 <main>
   <!-- Panel Izquierdo: Mapa + Tabla -->
   <section id="panelIzquierdo" aria-label="Panel de mapa y tabla de personal">
-    <div id="map" style="height: 400px; border-radius: 8px; border: 2px solid #004d99;"></div>
+    <div id="map" style="height: 600px; border-radius: 8px; border: 2px solid #004d99;"></div>
 
     <div id="tabla" aria-label="Tabla de personal en ruta">
       <h2><i class="fa-solid fa-table"></i> Personal en Ruta</h2>
@@ -54,7 +54,7 @@
   </section>
 
   <!-- Panel Derecho: filtros y formulario -->
-  <aside id="panelDerecho" aria-label="Panel de filtros y formulario de personal" style="min-width: 290px;">
+  <aside id="panelDerecho" aria-label="Panel de filtros y formulario de personal">
     <!-- Filtro de personal -->
     <section class="contenedor-filtros" aria-labelledby="filtro-personal-label">
       <h2 id="filtro-personal-label"><i class="fa-solid fa-users"></i> Filtrar Personal</h2>
@@ -76,29 +76,47 @@
       <h2 id="filtro-rutas-label"><i class="fa-solid fa-route"></i> Filtrar Rutas</h2>
       <div class="grupo-control">
         <label for="campo1">Campo 1:</label>
-        <select id="campo1" name="campo1" aria-label="Seleccionar campo 1 para filtro"></select>
+        <select id="campo1" name="campo1"></select>
       </div>
       <div class="grupo-control">
         <label for="valor1">Valor 1:</label>
-        <select id="valor1" name="valor1" aria-label="Seleccionar valor 1 para filtro"></select>
+        <select id="valor1" name="valor1"></select>
       </div>
       <div class="grupo-control">
         <label for="campo2">Campo 2:</label>
-        <select id="campo2" name="campo2" aria-label="Seleccionar campo 2 para filtro"></select>
+        <select id="campo2" name="campo2"></select>
       </div>
       <div class="grupo-control">
         <label for="valor2">Valor 2:</label>
-        <select id="valor2" name="valor2" aria-label="Seleccionar valor 2 para filtro"></select>
+        <select id="valor2" name="valor2"></select>
       </div>
     </section>
 
     <!-- Formulario agregar -->
-    <form id="addForm" style="display:none; font-size: 0.85rem;" aria-label="Formulario para agregar personal">
+    <form id="addForm" style="display:none;" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
-      <div id="camposForm"></div>
+      <div class="form-grid">
+        <label for="codigo">CÓDIGO:</label><input id="codigo" name="codigo" type="text" />
+        <label for="nombre">NOMBRE:</label><input id="nombre" name="nombre" type="text" />
+        <label for="ruta">RUTA:</label><input id="ruta" name="ruta" type="text" />
+        <label for="cedula">CÉDULA:</label><input id="cedula" name="cedula" type="text" />
+        <label for="telefono">TELÉFONO:</label><input id="telefono" name="telefono" type="text" />
+        <label for="discapacidad">DISCAPACIDAD:</label><input id="discapacidad" name="discapacidad" type="text" />
+        <label for="tipoHorario">TIPO HORARIO:</label><input id="tipoHorario" name="tipoHorario" type="text" />
+        <label for="cargo">CARGO:</label><input id="cargo" name="cargo" type="text" />
+        <label for="area">ÁREA:</label><input id="area" name="area" type="text" />
+        <label for="modalidad">MODALIDAD DE CONTRATO:</label><input id="modalidad" name="modalidad" type="text" />
+        <label for="direccion">DIRECCIÓN:</label><input id="direccion" name="direccion" type="text" />
+        <label for="horario">HORARIO:</label><input id="horario" name="horario" type="text" />
+        <label for="lugar">LUGAR TRABAJO:</label><input id="lugar" name="lugar" type="text" />
+        <label for="longitud">LONGITUD:</label><input id="longitud" name="longitud" type="text" />
+        <label for="latitud">LATITUD:</label><input id="latitud" name="latitud" type="text" />
+        <label for="contratoLuz">CONTRATO LUZ:</label><input id="contratoLuz" name="contratoLuz" type="text" />
+        <label for="transporte">TRANSPORTE:</label><input id="transporte" name="transporte" type="text" />
+      </div>
 
-      <button type="submit" aria-label="Agregar personal"><i class="fa-solid fa-plus"></i> Agregar</button>
-      <button type="button" id="descargarGeoJSONBtn" style="display:none;" aria-label="Descargar archivo GeoJSON">
+      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
+      <button type="button" id="descargarGeoJSONBtn" style="display:none;">
         <i class="fa-solid fa-download"></i> Descargar GeoJSON
       </button>
     </form>
