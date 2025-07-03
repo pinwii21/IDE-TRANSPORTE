@@ -22,7 +22,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// 3. CARGAR GEOJSON
+// 3. CARGAR GEOJSON PRINCIPAL
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
@@ -35,7 +35,7 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     actualizarListaPersonas(data.features);
   });
 
-// 4. CARGAR RUTAS
+// 4. CARGAR RUTAS (ENTRADA Y SALIDA)
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -83,29 +83,11 @@ async function cargarIndexYCapas() {
   }
 
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+  inicializarFiltrosRutas();
 }
 cargarIndexYCapas();
 
-// FILTRO POR TEXTO DE RUTA
-const inputFiltroRuta = document.getElementById("filterRouteInput");
-if (inputFiltroRuta) {
-  inputFiltroRuta.addEventListener("input", () => {
-    const texto = inputFiltroRuta.value.toLowerCase();
-    for (const grupoNombre in capasOverlay) {
-      const grupo = capasOverlay[grupoNombre];
-      grupo.eachLayer(capa => {
-        const visible = (capa._nombreArchivo || "").toLowerCase().includes(texto);
-        if (visible) {
-          if (!map.hasLayer(capa)) capa.addTo(map);
-        } else {
-          if (map.hasLayer(capa)) map.removeLayer(capa);
-        }
-      });
-    }
-  });
-}
-
-// 5. CREAR CAMPOS DEL FORMULARIO
+// 5. CAMPOS FORMULARIO
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -172,7 +154,7 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. MOSTRAR PUNTOS EN MAPA
+// 8. MOSTRAR MAPA DE PUNTOS
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -204,7 +186,7 @@ function centrarMapa(data) {
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. FILTRAR PERSONAL
+// 10. FILTRO DE PERSONAL
 const searchInput = document.getElementById("searchInput");
 const filterField = document.getElementById("filterField");
 searchInput.addEventListener("input", filtrarDatos);
@@ -237,7 +219,7 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. LOGIN/LOGOUT
+// 12. LOGIN / LOGOUT
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', function(e) {
@@ -250,7 +232,6 @@ if (loginForm) {
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('addForm').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline-block';
-      // Cambié guardarGitHubBtn por descargarGeoJSONBtn para mostrar el botón de descarga
       const descargarBtn = document.getElementById("descargarGeoJSONBtn");
       if (descargarBtn) descargarBtn.style.display = 'inline-block';
       mostrarTabla(geojsonData);
@@ -336,4 +317,101 @@ function descargarGeoJSON() {
 const descargarBtn = document.getElementById('descargarGeoJSONBtn');
 if (descargarBtn) {
   descargarBtn.addEventListener('click', descargarGeoJSON);
+}
+
+// 15. FILTRO DOBLE AUTOMÁTICO EN RUTAS
+function inicializarFiltrosRutas() {
+  const camposFiltro = ["RUTA", "NUMERO_RUTA", "HORARIO", "DESTINO", "TIPO_UNIDAD", "FRECUENCIA", "TIPO_HORARIO", "KM", "KM_ACT"];
+  const campo1 = document.getElementById("campo1");
+  const campo2 = document.getElementById("campo2");
+  const valor1 = document.getElementById("valor1");
+  const valor2 = document.getElementById("valor2");
+
+  camposFiltro.forEach(c => {
+    const opt1 = document.createElement("option");
+    const opt2 = document.createElement("option");
+    opt1.value = c;
+    opt2.value = c;
+    opt1.textContent = c;
+    opt2.textContent = c;
+    campo1.appendChild(opt1);
+    campo2.appendChild(opt2);
+  });
+
+  campo1.addEventListener("change", () => {
+    actualizarValoresFiltro(campo1.value, valor1, () => {
+      actualizarValoresFiltro(campo2.value, valor2, aplicarFiltroMultiple);
+    });
+  });
+
+  campo2.addEventListener("change", () => {
+    actualizarValoresFiltro(campo2.value, valor2, aplicarFiltroMultiple);
+  });
+
+  valor1.addEventListener("change", () => {
+    actualizarValoresFiltro(campo2.value, valor2, aplicarFiltroMultiple);
+  });
+
+  valor2.addEventListener("change", aplicarFiltroMultiple);
+
+  function actualizarValoresFiltro(campo, selectDestino, callback) {
+    if (!campo) return;
+    const valores = new Set();
+
+    for (const grupo of Object.values(capasOverlay)) {
+      grupo.eachLayer(capa => {
+        if (!capa.feature && capa.eachLayer) {
+          capa.eachLayer(layer => {
+            const props = layer.feature?.properties || {};
+
+            const filtroPrimario = campo1.value;
+            const valorPrimario = valor1.value;
+            if (filtroPrimario && valorPrimario && campo !== filtroPrimario) {
+              const match = (props[filtroPrimario] || "").toLowerCase() === valorPrimario.toLowerCase();
+              if (!match) return;
+            }
+
+            const valor = props[campo];
+            if (valor) valores.add(valor);
+          });
+        }
+      });
+    }
+
+    selectDestino.innerHTML = '<option value="">-- Todos --</option>';
+    [...valores].sort().forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      selectDestino.appendChild(opt);
+    });
+
+    if (callback) callback();
+  }
+
+  function aplicarFiltroMultiple() {
+    const c1 = campo1.value;
+    const v1 = valor1.value;
+    const c2 = campo2.value;
+    const v2 = valor2.value;
+
+    for (const grupo of Object.values(capasOverlay)) {
+      grupo.eachLayer(capa => {
+        if (!capa.feature && capa.eachLayer) {
+          capa.eachLayer(layer => {
+            const props = layer.feature?.properties || {};
+            const visible1 = !v1 || (props[c1] + '').toLowerCase() === v1.toLowerCase();
+            const visible2 = !v2 || (props[c2] + '').toLowerCase() === v2.toLowerCase();
+            const visible = visible1 && visible2;
+
+            if (visible) {
+              if (!map.hasLayer(layer)) layer.addTo(map);
+            } else {
+              if (map.hasLayer(layer)) map.removeLayer(layer);
+            }
+          });
+        }
+      });
+    }
+  }
 }
