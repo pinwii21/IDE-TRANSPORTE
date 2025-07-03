@@ -1,226 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-:root {
-  --color-primario: #004d99;
-  --color-secundario: #e6f0ff;
-  --color-acento: #007bff;
-  --color-exito: #28a745;
-  --color-peligro: #dc3545;
-  --fondo-claro: #f7f9fc;
-  --sombra-suave: rgba(0, 0, 0, 0.1);
-  --radio-borde: 8px;
-  --transicion: 0.3s ease-in-out;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: var(--fondo-claro);
-  color: #2e2e2e;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-header {
-  background: var(--color-primario);
-  color: white;
-  padding: 1.25rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 5px var(--sombra-suave);
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
-}
-
-#loginContainer,
-#logoutBtn {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-#loginForm input,
-#loginForm button,
-#logoutBtn {
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: var(--radio-borde);
-  border: none;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: var(--transicion);
-}
-
-#loginForm input {
-  width: 130px;
-  background: white;
-  color: #444;
-  border: 1px solid #ddd;
-  box-shadow: 0 1px 4px var(--sombra-suave);
-}
-
-#loginForm input:focus {
-  border-color: var(--color-acento);
-  box-shadow: 0 0 8px var(--color-acento);
-}
-
-#loginForm button {
-  background: var(--color-exito);
-  color: white;
-  font-weight: 600;
-}
-
-#loginForm button:hover {
-  background: #218838;
-}
-
-#logoutBtn {
-  background: var(--color-peligro);
-  color: white;
-  font-weight: 600;
-  padding: 8px 18px;
-}
-
-#logoutBtn:hover {
-  background: #b02a37;
-}
-
-main {
-  display: flex;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: var(--fondo-claro);
-  max-width: 100vw;
-  overflow-x: auto;
-  flex-wrap: wrap;
-}
-
-#panelIzquierdo {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-width: 600px;
-}
-
-#map {
-  height: 600px;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 4px 12px var(--sombra-suave);
-  border: 2px solid var(--color-primario);
-}
-
-#panelDerecho {
-  flex: 1;
-  background: white;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 4px 8px var(--sombra-suave);
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  font-size: 0.85rem;
-  min-width: 250px;
-}
-
-#panelDerecho::-webkit-scrollbar {
-  width: 6px;
-}
-#panelDerecho::-webkit-scrollbar-thumb {
-  background: var(--color-primario);
-  border-radius: 10px;
-}
-#panelDerecho::-webkit-scrollbar-thumb:hover {
-  background: var(--color-acento);
-}
-
-.contenedor-filtros {
-  background: var(--color-secundario);
-  padding: 18px 22px;
-  border-radius: var(--radio-borde);
-  box-shadow: inset 0 0 5px rgba(0, 77, 153, 0.15);
-}
-
-.contenedor-filtros h2 {
-  margin: 0 0 12px;
-  color: var(--color-primario);
-  font-weight: 600;
-  font-size: 1.2rem;
-  border-bottom: 2px solid var(--color-acento);
-  padding-bottom: 6px;
-}
-
-.grupo-control {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-}
-
-.grupo-control label {
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #222;
-}
-
-.grupo-control select,
-.grupo-control input[type="search"],
-#camposForm input {
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  border-radius: var(--radio-borde);
-  border: 1.8px solid #bbb;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
-  transition: border-color var(--transicion), box-shadow var(--transicion);
-}
-
-#tabla {
-  max-width: 100%;
-  overflow-x: auto;
-  background: white;
-  padding: 1rem;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 2px 10px var(--sombra-suave);
-}
-
-#tabla table {
-  width: auto;
-  border-collapse: collapse;
-  table-layout: auto;
-}
-
-#tabla th,
-#tabla td {
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-}
-
-#tabla th {
-  background-color: var(--color-secundario);
-  color: var(--color-primario);
-  font-weight: 600;
-}
-
 #addForm {
   background: white;
   padding: 18px 24px;
@@ -229,14 +6,54 @@ main {
   font-size: 0.85rem;
 }
 
+/* Título del formulario */
 #addForm h2 {
   margin-top: 0;
   font-size: 1.2rem;
   color: var(--color-primario);
   font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+/* Grid para alinear etiqueta + input */
+#addForm .form-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px 16px;
+  align-items: center;
+}
+
+/* Etiquetas alineadas a la derecha */
+#addForm label {
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+/* Inputs del formulario */
+#addForm input,
+#addForm select {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: var(--radio-borde);
+  border: 1.8px solid #bbb;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+#addForm input:focus,
+#addForm select:focus {
+  border-color: var(--color-acento);
+  outline: none;
+  box-shadow: 0 0 6px var(--color-acento);
+}
+
+/* Botón de guardar alineado a todo el ancho */
 #addForm button {
+  grid-column: 1 / -1;
   width: 100%;
   background: var(--color-acento);
   border: none;
@@ -246,31 +63,24 @@ main {
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
+  margin-top: 16px;
 }
 
 #addForm button:hover {
   background: #0056b3;
 }
 
-@media (max-width: 900px) {
-  main {
-    flex-direction: column;
-    padding: 1rem;
-    height: auto;
+/* Responsivo para móviles */
+@media (max-width: 600px) {
+  #addForm .form-grid {
+    grid-template-columns: 1fr;
   }
 
-  #panelIzquierdo,
-  #panelDerecho {
-    flex: none;
-    width: 100%;
+  #addForm label {
+    text-align: left;
   }
 
-  #map {
-    height: 400px;
-  }
-
-  #panelDerecho {
-    margin-top: 1.5rem;
-    padding-bottom: 3rem;
+  #addForm button {
+    margin-top: 12px;
   }
 }
