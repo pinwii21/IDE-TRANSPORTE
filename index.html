@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>IDE TRANSPORTE</title>
 
   <!-- Estilos personalizados -->
@@ -16,30 +16,43 @@
 
   <!-- Ajustes extra para mejorar responsividad y evitar zoom -->
   <style>
-    /* Evitar que main se desborde */
     main {
       max-width: 100vw;
       overflow-x: auto;
+      display: flex;
+      gap: 1.5rem;
+      padding: 1rem;
+      box-sizing: border-box;
+      flex-wrap: wrap;
     }
-
-    /* Tabla con layout fijo para mejor control de columnas */
+    #panelIzquierdo, #panelDerecho {
+      flex: 1 1 400px;
+      min-width: 320px;
+      box-sizing: border-box;
+    }
+    /* Tabla fija y que no se desborde */
+    #tabla {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
     #tabla table {
-      table-layout: fixed;
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
+      min-width: 600px;
     }
-
-    /* Que celdas rompan texto largo */
-    #tabla th,
-    #tabla td {
-      word-break: break-word;
+    #tabla th, #tabla td {
+      padding: 0.6rem 0.8rem;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid #ccc;
+      text-align: left;
     }
-
-    /* Opcional: evitar que inputs y selects sean muy anchos */
-    select,
-    input[type="search"] {
-      min-width: 0; /* Para evitar problemas en flexbox */
+    #tabla th {
+      background-color: #e6f0ff;
+      color: #004d99;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -48,14 +61,13 @@
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
 
-  <!-- Login -->
-  <form id="loginForm">
-    <div id="loginContainer">
-      <input id="usuario" type="text" placeholder="Usuario" required />
-      <input id="clave" type="password" placeholder="Clave" required />
-      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+  <form id="loginForm" aria-label="Formulario de inicio de sesión">
+    <div id="loginContainer" style="display:flex; gap:0.5rem; flex-wrap: wrap; align-items:center;">
+      <input id="usuario" name="usuario" type="text" placeholder="Usuario" required aria-required="true" autocomplete="username" />
+      <input id="clave" name="clave" type="password" placeholder="Clave" required aria-required="true" autocomplete="current-password" />
+      <button type="submit" aria-label="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
     </div>
-    <button id="logoutBtn" type="button" style="display:none;">
+    <button id="logoutBtn" type="button" style="display:none;" aria-label="Cerrar sesión">
       <i class="fa-solid fa-right-from-bracket"></i> Salir
     </button>
   </form>
@@ -63,19 +75,17 @@
 
 <main>
   <!-- Panel Izquierdo: Mapa + Tabla -->
-  <div id="panelIzquierdo">
-    <!-- Mapa -->
-    <div id="map" style="height: 400px;"></div>
+  <section id="panelIzquierdo" aria-label="Panel de mapa y tabla de personal">
+    <div id="map" style="height: 400px; border-radius: 8px; border: 2px solid #004d99;"></div>
 
-    <!-- Tabla -->
-    <div id="tabla">
-      <h3><i class="fa-solid fa-table"></i> Personal en Ruta</h3>
-      <table>
+    <div id="tabla" aria-label="Tabla de personal en ruta">
+      <h2><i class="fa-solid fa-table"></i> Personal en Ruta</h2>
+      <table role="grid" aria-readonly="true" tabindex="0">
         <thead>
           <tr>
-            <th>CÓDIGO</th>
-            <th>NOMBRE</th>
-            <th>RUTA</th>
+            <th scope="col">CÓDIGO</th>
+            <th scope="col">NOMBRE</th>
+            <th scope="col">RUTA</th>
           </tr>
         </thead>
         <tbody>
@@ -88,17 +98,16 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <!-- Panel Derecho -->
-  <section id="panelDerecho">
-
+  <!-- Panel Derecho: filtros y formulario -->
+  <aside id="panelDerecho" aria-label="Panel de filtros y formulario de personal">
     <!-- Filtro de personal -->
-    <section class="contenedor-filtros">
-      <h3><i class="fa-solid fa-users"></i> Filtrar Personal</h3>
+    <section class="contenedor-filtros" aria-labelledby="filtro-personal-label">
+      <h2 id="filtro-personal-label"><i class="fa-solid fa-users"></i> Filtrar Personal</h2>
       <div class="grupo-control">
         <label for="filterField">Buscar por campo:</label>
-        <select id="filterField">
+        <select id="filterField" name="filterField">
           <option value="CODIGO">Código</option>
           <option value="NOMBRE" selected>Nombre</option>
           <option value="RUTA">Ruta</option>
@@ -106,41 +115,41 @@
           <option value="HORARIO">Horario</option>
         </select>
       </div>
-      <input id="searchInput" type="search" placeholder="Buscar personal..." />
+      <input id="searchInput" name="searchInput" type="search" placeholder="Buscar personal..." aria-label="Buscar personal" />
     </section>
 
     <!-- Filtro de rutas -->
-    <section class="contenedor-filtros">
-      <h3><i class="fa-solid fa-route"></i> Filtrar Rutas</h3>
+    <section class="contenedor-filtros" aria-labelledby="filtro-rutas-label">
+      <h2 id="filtro-rutas-label"><i class="fa-solid fa-route"></i> Filtrar Rutas</h2>
       <div class="grupo-control">
         <label for="campo1">Campo 1:</label>
-        <select id="campo1"></select>
+        <select id="campo1" name="campo1" aria-label="Seleccionar campo 1 para filtro"></select>
       </div>
       <div class="grupo-control">
         <label for="valor1">Valor 1:</label>
-        <select id="valor1"></select>
+        <select id="valor1" name="valor1" aria-label="Seleccionar valor 1 para filtro"></select>
       </div>
       <div class="grupo-control">
         <label for="campo2">Campo 2:</label>
-        <select id="campo2"></select>
+        <select id="campo2" name="campo2" aria-label="Seleccionar campo 2 para filtro"></select>
       </div>
       <div class="grupo-control">
         <label for="valor2">Valor 2:</label>
-        <select id="valor2"></select>
+        <select id="valor2" name="valor2" aria-label="Seleccionar valor 2 para filtro"></select>
       </div>
     </section>
 
     <!-- Formulario agregar -->
-    <form id="addForm" style="display:none;">
+    <form id="addForm" style="display:none;" aria-label="Formulario para agregar personal">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
       <div id="camposForm"></div>
 
-      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
-      <button type="button" id="descargarGeoJSONBtn" style="display:none;">
+      <button type="submit" aria-label="Agregar personal"><i class="fa-solid fa-plus"></i> Agregar</button>
+      <button type="button" id="descargarGeoJSONBtn" style="display:none;" aria-label="Descargar archivo GeoJSON">
         <i class="fa-solid fa-download"></i> Descargar GeoJSON
       </button>
     </form>
-  </section>
+  </aside>
 </main>
 
 <!-- JS externos -->
