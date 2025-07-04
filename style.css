@@ -136,7 +136,7 @@ main {
   flex-direction: column;
   gap: 1.5rem;
   font-size: 0.85rem;
-  min-width: 250px;
+  min-width: 270px; /* ajustado para dar 1cm aprox más */
 }
 
 #panelDerecho::-webkit-scrollbar {
@@ -268,12 +268,6 @@ main {
   #map {
     height: 400px;
   }
-
-  #panelDerecho {
-    margin-top: 1.5rem;
-    padding-bottom: 3rem;
-  }
-}
 
   #panelDerecho {
     margin-top: 1.5rem;
