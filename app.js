@@ -17,10 +17,31 @@ let geojsonLayer = null;
 const capasOverlay = {};
 
 // 2. INICIALIZACIÓN DEL MAPA LEAFLET
-const map = L.map('map').setView([-0.180653, -78.467838], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
-}).addTo(map);
+
+// Capa base OpenStreetMap
+const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 19
+});
+
+// Capa base satelital de Esri
+const esriBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+  maxZoom: 25
+});
+
+// Crear el mapa con OpenStreetMap como capa base inicial (puedes cambiar a [esriBase] si prefieres satelital)
+const map = L.map('map', {
+  center: [-0.180653, -78.467838],
+  zoom: 13,
+  layers: [osmBase] // Cambia a [esriBase] si quieres que inicie con el satelital
+});
+
+// Definimos las capas base para el control de mapas
+const mapasBase = {
+  "OpenStreetMap": osmBase,
+  "Esri Satelital": esriBase
+};
 
 // 3. CARGAR GEOJSON PRINCIPAL
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
@@ -81,7 +102,7 @@ async function cargarIndexYCapas() {
       console.error(`Error en carpeta ${dir}:`, error.message);
     }
   }
-
+  L.control.layers(null, mapasBase, { collapsed: false }).addTo(map);
   L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
   inicializarFiltrosRutas();
 }
