@@ -102,8 +102,10 @@ async function cargarIndexYCapas() {
       console.error(`Error en carpeta ${dir}:`, error.message);
     }
   }
-  L.control.layers(null, mapasBase, { collapsed: false }).addTo(map);
-  L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+
+  //L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
+  L.control.layers(mapasBase, capasOverlay, { collapsed: false }).addTo(map);
+
   inicializarFiltrosRutas();
 }
 cargarIndexYCapas();
