@@ -24,8 +24,14 @@ const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   maxZoom: 19
 });
 
-// Capa base satelital de Esri
-const esriBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+// Capa base satelital de google
+const googlemaps = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+  maxZoom: 25
+});
+
+// Capa imagen satelital de de google
+const googleBase = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
   attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
   maxZoom: 25
 });
@@ -40,7 +46,8 @@ const map = L.map('map', {
 // Definimos las capas base para el control de mapas
 const mapasBase = {
   "OpenStreetMap": osmBase,
-  "Esri Satelital": esriBase
+  "Google Maps":googlemaps,
+  "Google Satelital":googleBase
 };
 
 // 3. CARGAR GEOJSON PRINCIPAL
