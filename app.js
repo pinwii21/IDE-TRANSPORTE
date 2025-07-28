@@ -295,7 +295,7 @@ if (addForm) {
 
     for (const campo of campos) {
       const val = document.getElementById(campo).value.trim();
-      if (["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
+      if (["CODIGO TRABAJADOR", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
         alert(`El campo ${campo} es obligatorio`);
         valid = false;
         break;
