@@ -1,9 +1,12 @@
-// 1. CONFIGURACIÓN DE USUARIOS Y CAMPOS
+// === CONFIGURACIÓN GENERAL ===
+
+// Usuarios permitidos
 const usuarios = {
   admin: "1234",
   kevin: "admin2025"
 };
 
+// Campos a mostrar en el formulario y tabla
 const campos = [
   "CODIGO TRABAJADOR", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "HORARIO DE TRABAJO - TDH",
   "AREA", "LUGAR DE TRABAJO - DTH", "DIRECCION", "SUBSIDIO DE TRANSPORTE", "LATITUD", "LONGITUD", "UTILIZA TRANSPORTE", 
@@ -16,41 +19,37 @@ let usuarioLogueado = false;
 let geojsonLayer = null;
 const capasOverlay = {};
 
-// 2. INICIALIZACIÓN DEL MAPA LEAFLET
 
-// Capa base OpenStreetMap
+// === INICIALIZACIÓN DEL MAPA LEAFLET ===
+
+// Capas base
 const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors',
-  maxZoom: 19
+  attribution: '© OpenStreetMap contributors', maxZoom: 19
 });
 
-// Capa base satelital de google
 const googlemaps = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
-  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-  maxZoom: 25
+  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community', maxZoom: 25
 });
 
-// Capa imagen satelital de de google
 const googleBase = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-  maxZoom: 25
+  attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community', maxZoom: 25
 });
 
-// Crear el mapa con OpenStreetMap como capa base inicial (puedes cambiar a [esriBase] si prefieres satelital)
+// Crear mapa centrado en Quito
 const map = L.map('map', {
   center: [-0.180653, -78.467838],
   zoom: 13,
-  layers: [osmBase] // Cambia a [esriBase] si quieres que inicie con el satelital
+  layers: [osmBase]
 });
 
-// Definimos las capas base para el control de mapas
 const mapasBase = {
   "OpenStreetMap": osmBase,
-  "Google Maps":googlemaps,
-  "Google Satelital":googleBase
+  "Google Maps": googlemaps,
+  "Google Satelital": googleBase
 };
 
-// 3. CARGAR GEOJSON PRINCIPAL
+
+// === CARGAR DATOS GEOJSON PRINCIPAL ===
 fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson')
   .then(res => res.json())
   .then(data => {
@@ -63,7 +62,8 @@ fetch('https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
     actualizarListaPersonas(data.features);
   });
 
-// 4. CARGAR RUTAS (ENTRADA Y SALIDA)
+
+// === CARGAR RUTAS DE ENTRADA Y SALIDA ===
 const carpetas = [
   { dir: 'Rutas_de_ENTRADA', name: 'Rutas de ENTRADA', color: '#28a745' },
   { dir: 'Rutas_de_SALIDA', name: 'Rutas de SALIDA', color: '#dc3545' }
@@ -110,14 +110,13 @@ async function cargarIndexYCapas() {
     }
   }
 
-  //L.control.layers(null, capasOverlay, { collapsed: false }).addTo(map);
   L.control.layers(mapasBase, capasOverlay, { collapsed: false }).addTo(map);
-
   inicializarFiltrosRutas();
 }
 cargarIndexYCapas();
 
-// 5. CAMPOS FORMULARIO
+
+// === FUNCIONES PARA MOSTRAR FORMULARIO Y TABLA ===
 function crearCamposFormulario() {
   const cont = document.getElementById('camposForm');
   cont.innerHTML = '';
@@ -133,7 +132,6 @@ function crearCamposFormulario() {
   });
 }
 
-// 6. MOSTRAR TABLA
 function mostrarTabla(data) {
   const cont = document.getElementById('tabla');
   if (!data.features) return;
@@ -155,11 +153,12 @@ function mostrarTabla(data) {
 
   html += `</tbody></table>`;
   cont.innerHTML = html;
-
+  crearTogglesColumnas();
   if (usuarioLogueado) asignarEventosEdicion();
 }
 
-// 7. EDICIÓN EN TABLA
+// === 7. EDICIÓN EN TABLA ===
+// Permite editar los valores directamente en la tabla si el usuario está logueado
 function asignarEventosEdicion() {
   document.querySelectorAll('td[contenteditable="true"]').forEach(td => {
     td.addEventListener('input', () => {
@@ -169,8 +168,10 @@ function asignarEventosEdicion() {
       const feature = geojsonData.features.find(f => f._id === id);
       if (!feature) return;
 
+      // Actualiza la propiedad correspondiente
       feature.properties[campo] = valor;
 
+      // Si se edita latitud o longitud, actualizar la geometría del punto y refrescar el mapa
       if (campo === "LATITUD" || campo === "LONGITUD") {
         const lat = parseFloat(feature.properties["LATITUD"]);
         const lng = parseFloat(feature.properties["LONGITUD"]);
@@ -184,11 +185,12 @@ function asignarEventosEdicion() {
   });
 }
 
-// 8. MOSTRAR MAPA DE PUNTOS
+// === 8. MOSTRAR MAPA DE PUNTOS ===
+// Renderiza los puntos del GeoJSON en el mapa usando CircleMarkers
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
-    pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+    pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
       radius: 6,
       fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#004d99',
       color: "#000",
@@ -196,36 +198,75 @@ function mostrarMapa(data) {
       opacity: 1,
       fillOpacity: 0.9
     }),
-    onEachFeature: (f, layer) => {
+    onEachFeature: (feature, layer) => {
       let popup = '';
-      for (const k in f.properties) {
-        popup += `<b>${k}:</b> ${f.properties[k]}<br>`;
+      for (const key in feature.properties) {
+        popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
       }
       layer.bindPopup(popup);
     }
   }).addTo(map);
 }
 
-// 9. CENTRAR MAPA
+// === 9. CENTRAR MAPA EN LOS PUNTOS VISIBLES ===
+// Ajusta la vista para mostrar todos los puntos
 function centrarMapa(data) {
   if (!data.features.length) return;
   const coords = data.features.map(f => f.geometry?.coordinates).filter(c => Array.isArray(c));
+  if (coords.length === 0) return;
   const lats = coords.map(c => c[1]);
   const lngs = coords.map(c => c[0]);
-  const bounds = [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]];
+  const bounds = [
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)]
+  ];
   map.fitBounds(bounds, { padding: [40, 40] });
 }
 
-// 10. FILTRO DE PERSONAL
-const searchInput = document.getElementById("searchInput");
-const filterField = document.getElementById("filterField");
-searchInput.addEventListener("input", filtrarDatos);
-filterField.addEventListener("change", filtrarDatos);
+// === 10. FILTRO DOBLE DE PERSONAL ===
+// Referencias a inputs y select para filtros
+const searchInput1 = document.getElementById("searchInput1");
+const filterField1 = document.getElementById("filterField1");
+const searchInput2 = document.getElementById("searchInput2");
+const filterField2 = document.getElementById("filterField2");
 
+// Referencias a los datalist para autocompletar filtros
+const suggestions1 = document.getElementById("suggestions1");
+const suggestions2 = document.getElementById("suggestions2");
+
+// Escuchar cambios para filtrar datos
+searchInput1.addEventListener("input", filtrarDatos);
+filterField1.addEventListener("change", () => {
+  actualizarSugerencias(filterField1.value, suggestions1);
+  filtrarDatos();
+});
+searchInput2.addEventListener("input", filtrarDatos);
+filterField2.addEventListener("change", () => {
+  actualizarSugerencias(filterField2.value, suggestions2);
+  filtrarDatos();
+});
+
+// Función que filtra los datos según los dos filtros activos
 function filtrarDatos() {
-  const campo = filterField.value;
-  const texto = searchInput.value.toLowerCase();
-  const filtrados = geojsonData.features.filter(f => (f.properties[campo] || "").toLowerCase().includes(texto));
+  const campo1 = filterField1.value;
+  const texto1 = searchInput1.value.toLowerCase();
+
+  const campo2 = filterField2.value;
+  const texto2 = searchInput2.value.toLowerCase();
+
+  const filtrados = geojsonData.features.filter(f => {
+    const valor1 = (f.properties[campo1] || "").toLowerCase();
+    const cumpleFiltro1 = valor1.includes(texto1);
+
+    let cumpleFiltro2 = true;
+    if (campo2 && texto2) {
+      const valor2 = (f.properties[campo2] || "").toLowerCase();
+      cumpleFiltro2 = valor2.includes(texto2);
+    }
+
+    return cumpleFiltro1 && cumpleFiltro2;
+  });
+
   const dataset = { type: "FeatureCollection", features: filtrados };
   mostrarTabla(dataset);
   mostrarMapa(dataset);
@@ -233,7 +274,30 @@ function filtrarDatos() {
   actualizarListaPersonas(filtrados);
 }
 
-// 11. ACTUALIZAR SELECT
+// Actualiza el datalist con valores únicos para ayudar en el autocompletado
+function actualizarSugerencias(campo, datalistElement) {
+  if (!campo || !geojsonData) return;
+
+  // Obtiene valores únicos del campo
+  const valoresUnicos = [...new Set(
+    geojsonData.features.map(f => f.properties[campo]).filter(v => v != null)
+  )].sort();
+
+  // Limpia y rellena el datalist
+  datalistElement.innerHTML = "";
+  valoresUnicos.forEach(valor => {
+    const option = document.createElement("option");
+    option.value = valor;
+    datalistElement.appendChild(option);
+  });
+}
+
+// Inicializa sugerencias al cargar si ya hay campos seleccionados
+if (filterField1.value) actualizarSugerencias(filterField1.value, suggestions1);
+if (filterField2.value) actualizarSugerencias(filterField2.value, suggestions2);
+
+// === 11. ACTUALIZAR SELECT DE PERSONAS ===
+// Llena el select con las personas filtradas o todas
 function actualizarListaPersonas(lista) {
   const select = document.getElementById("personSelect");
   if (!select) return;
@@ -249,7 +313,8 @@ function actualizarListaPersonas(lista) {
   });
 }
 
-// 12. LOGIN / LOGOUT
+// === 12. LOGIN / LOGOUT ===
+// Manejo de formulario de login para mostrar/ocultar funciones según usuario logueado
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', function(e) {
@@ -284,7 +349,8 @@ if (logoutBtn) {
   });
 }
 
-// 13. AGREGAR NUEVO PERSONAL
+// === 13. AGREGAR NUEVO PERSONAL ===
+// Captura datos del formulario, valida y agrega un nuevo punto/persona al GeoJSON y actualiza vistas
 const addForm = document.getElementById('addForm');
 if (addForm) {
   addForm.addEventListener('submit', async (e) => {
@@ -293,6 +359,7 @@ if (addForm) {
     const nuevo = {};
     let valid = true;
 
+    // Recorre todos los campos y valida los obligatorios
     for (const campo of campos) {
       const val = document.getElementById(campo).value.trim();
       if (["CODIGO TRABAJADOR", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
@@ -305,6 +372,7 @@ if (addForm) {
 
     if (!valid) return;
 
+    // Valida latitud y longitud como números
     const lat = parseFloat(nuevo["LATITUD"]);
     const lng = parseFloat(nuevo["LONGITUD"]);
     if (isNaN(lat) || isNaN(lng)) {
@@ -312,6 +380,7 @@ if (addForm) {
       return;
     }
 
+    // Construye la nueva feature
     const nuevoFeature = {
       type: "Feature",
       geometry: { type: "Point", coordinates: [lng, lat] },
@@ -319,18 +388,20 @@ if (addForm) {
       _id: geojsonData.features.length
     };
 
+    // Agrega al dataset y actualiza vistas
     geojsonData.features.push(nuevoFeature);
     mostrarTabla(geojsonData);
     mostrarMapa(geojsonData);
     centrarMapa(geojsonData);
     actualizarListaPersonas(geojsonData.features);
 
-    document.getElementById('addForm').reset();
+    addForm.reset();
     alert("Nuevo personal agregado correctamente. Ahora puedes descargar el archivo actualizado.");
   });
 }
 
-// 14. DESCARGAR GEOJSON
+// === 14. DESCARGAR GEOJSON ACTUALIZADO ===
+// Permite descargar el archivo GeoJSON actualizado con los datos editados o nuevos
 function descargarGeoJSON() {
   if (!geojsonData) return;
   const blob = new Blob([JSON.stringify(geojsonData, null, 2)], { type: "application/geo+json" });
@@ -349,7 +420,8 @@ if (descargarBtn) {
   descargarBtn.addEventListener('click', descargarGeoJSON);
 }
 
-// 15. FILTRO DOBLE AUTOMÁTICO EN RUTAS
+// === 15. FILTRO DOBLE AUTOMÁTICO EN RUTAS ===
+// Inicializa filtros para las capas de rutas (entrada y salida) y permite filtrar según dos atributos y sus valores
 function inicializarFiltrosRutas() {
   const camposFiltro = ["RUTA", "NUMERO_RUTA", "HORARIO", "DESTINO", "TIPO_UNIDAD", "FRECUENCIA", "TIPO_HORARIO", "KM", "KM_ACT"];
   const campo1 = document.getElementById("campo1");
@@ -357,6 +429,7 @@ function inicializarFiltrosRutas() {
   const valor1 = document.getElementById("valor1");
   const valor2 = document.getElementById("valor2");
 
+  // Llena los selects con las opciones de campos disponibles
   camposFiltro.forEach(c => {
     const opt1 = document.createElement("option");
     const opt2 = document.createElement("option");
@@ -368,6 +441,7 @@ function inicializarFiltrosRutas() {
     campo2.appendChild(opt2);
   });
 
+  // Eventos para actualizar opciones y aplicar filtros encadenados
   campo1.addEventListener("change", () => {
     actualizarValoresFiltro(campo1.value, valor1, () => {
       actualizarValoresFiltro(campo2.value, valor2, aplicarFiltroMultiple);
@@ -384,16 +458,19 @@ function inicializarFiltrosRutas() {
 
   valor2.addEventListener("change", aplicarFiltroMultiple);
 
+  // Actualiza los valores posibles para un campo dado, tomando en cuenta el filtro primario
   function actualizarValoresFiltro(campo, selectDestino, callback) {
     if (!campo) return;
     const valores = new Set();
 
     for (const grupo of Object.values(capasOverlay)) {
       grupo.eachLayer(capa => {
+        // Algunos grupos pueden tener subcapas, iteramos recursivamente
         if (!capa.feature && capa.eachLayer) {
           capa.eachLayer(layer => {
             const props = layer.feature?.properties || {};
 
+            // Aplicar filtro primario para refinar valores posibles en el segundo filtro
             const filtroPrimario = campo1.value;
             const valorPrimario = valor1.value;
             if (filtroPrimario && valorPrimario && campo !== filtroPrimario) {
@@ -419,6 +496,7 @@ function inicializarFiltrosRutas() {
     if (callback) callback();
   }
 
+  // Aplica el filtro para mostrar solo las capas que coinciden con ambos filtros
   function aplicarFiltroMultiple() {
     const c1 = campo1.value;
     const v1 = valor1.value;
@@ -445,3 +523,43 @@ function inicializarFiltrosRutas() {
     }
   }
 }
+
+// === 16. FUNCIONES PARA TOGGLE DE COLUMNAS EN TABLA ===
+// Muestra u oculta el menú de columnas
+function toggleColumnMenu() {
+  const menu = document.getElementById("columnMenu");
+  menu.style.display = menu.style.display === "none" || !menu.style.display ? "block" : "none";
+}
+
+// Crea un listado de checkboxes para mostrar/ocultar columnas en la tabla
+function crearTogglesColumnas() {
+  const contenedor = document.getElementById("columnToggles");
+  if (!contenedor) return;
+  contenedor.innerHTML = "";
+
+  campos.forEach((campo, i) => {
+    const label = document.createElement("label");
+    label.style.display = "flex";
+    label.style.alignItems = "center";
+    label.style.gap = "8px";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = true;
+    checkbox.dataset.colIndex = i + 1; // +1 porque la primera columna es #
+
+    // Al cambiar checkbox se oculta o muestra la columna respectiva
+    checkbox.addEventListener("change", () => {
+      const colIndex = parseInt(checkbox.dataset.colIndex);
+      document.querySelectorAll(`#tabla table tr`).forEach(row => {
+        const celda = row.children[colIndex];
+        if (celda) celda.style.display = checkbox.checked ? "" : "none";
+      });
+    });
+
+    label.appendChild(checkbox);
+    label.append(document.createTextNode(campo));
+    contenedor.appendChild(label);
+  });
+}
+
