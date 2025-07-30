@@ -295,3 +295,19 @@ main {
   gap: 6px;
   cursor: pointer;
 }
+
+/* Estilo para resaltar la fila seleccionada desde el mapa */
+#tabla tr.resaltado {
+  background-color: #fff3cd !important; /* Amarillo suave */
+  animation: resaltarFila 1s ease;
+}
+
+/* Animación suave de entrada */
+@keyframes resaltarFila {
+  from {
+    background-color: #ffeeba;
+  }
+  to {
+    background-color: #fff3cd;
+  }
+}
