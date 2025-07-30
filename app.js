@@ -186,7 +186,6 @@ function asignarEventosEdicion() {
 }
 // === 8. MOSTRAR MAPA DE PUNTOS ===
 // === 8. MOSTRAR MAPA DE PUNTOS ===
-// Renderiza los puntos del GeoJSON en el mapa usando CircleMarkers
 function mostrarMapa(data) {
   if (geojsonLayer) map.removeLayer(geojsonLayer);
   geojsonLayer = L.geoJSON(data, {
@@ -199,86 +198,24 @@ function mostrarMapa(data) {
       fillOpacity: 0.9
     }),
     onEachFeature: (feature, layer) => {
-      // === Caso: Usuario NO logueado, solo mostrar popup básico ===
-      if (!usuarioLogueado) {
-        let popup = '';
-        for (const key in feature.properties) {
-          popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
-        }
-        layer.bindPopup(popup);
-        return;
+      let popup = '';
+      for (const key in feature.properties) {
+        popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
       }
+      layer.bindPopup(popup);
 
-      // === Caso: Usuario logueado, mostrar formulario editable ===
-      let form = `<div style="max-height:300px; overflow:auto;"><form data-id="${feature._id}">`;
-
-      campos.forEach(campo => {
-        const valor = feature.properties[campo] || "";
-        form += `
-          <label style="font-weight:bold; display:block; margin-top:4px;">
-            ${campo}:
-            <input type="text" name="${campo}" value="${valor}" style="width:100%;" />
-          </label>`;
-      });
-
-      form += `
-        <label style="font-weight:bold; display:block; margin-top:4px;">
-          LATITUD:
-          <input type="number" step="any" name="LATITUD" value="${feature.geometry?.coordinates[1] || ""}" />
-        </label>
-        <label style="font-weight:bold; display:block;">
-          LONGITUD:
-          <input type="number" step="any" name="LONGITUD" value="${feature.geometry?.coordinates[0] || ""}" />
-        </label>
-      </form></div>`;
-
-      layer.bindPopup(form);
-
-      // Evento cuando se abre el popup
-      layer.on('popupopen', () => {
-        const formEl = document.querySelector(`form[data-id='${feature._id}']`);
-        if (!formEl) return;
-
-        const handleChange = () => {
-          const formData = new FormData(formEl);
-
-          // Actualizar atributos
-          for (const [campo, valor] of formData.entries()) {
-            if (["LATITUD", "LONGITUD"].includes(campo)) continue;
-            feature.properties[campo] = valor.trim().toUpperCase();
-          }
-
-          // Actualizar coordenadas
-          const lat = parseFloat(formData.get("LATITUD"));
-          const lng = parseFloat(formData.get("LONGITUD"));
-          if (!isNaN(lat) && !isNaN(lng)) {
-            feature.geometry = { type: "Point", coordinates: [lng, lat] };
-          }
-
-          // Actualiza la vista (sin borrar filtros)
-          mostrarTabla(geojsonData); // si estás filtrando, esta función debe respetar filtros activos
-          centrarMapa(geojsonData);
-          actualizarListaPersonas(geojsonData.features);
-        };
-
-        // Agrega evento de edición a cada input
-        formEl.querySelectorAll("input").forEach(input => {
-          input.addEventListener("input", () => {
-            clearTimeout(input._timer);
-            input._timer = setTimeout(handleChange, 500); // Autoguardado
-          });
-        });
-      });
-
-      // Evento cuando se cierra el popup
-      layer.on("popupclose", () => {
-        // Opcional: podrías guardar automáticamente todo aquí si quisieras sincronizar
-        mostrarTabla(geojsonData);
+      layer.on('click', () => {
+        const row = document.querySelector(`td[data-feature-id='${feature._id}']`);
+        if (row) {
+          const tr = row.closest('tr');
+          document.querySelectorAll("#tabla tr").forEach(r => r.classList.remove("resaltado"));
+          tr.classList.add("resaltado");
+          tr.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       });
     }
   }).addTo(map);
 }
-
 
 // === 9. CENTRAR MAPA EN LOS PUNTOS VISIBLES ===
 // Ajusta la vista para mostrar todos los puntos
