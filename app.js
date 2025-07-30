@@ -184,7 +184,7 @@ function asignarEventosEdicion() {
     });
   });
 }
-
+// === 8. MOSTRAR MAPA DE PUNTOS ===
 // === 8. MOSTRAR MAPA DE PUNTOS ===
 // Renderiza los puntos del GeoJSON en el mapa usando CircleMarkers
 function mostrarMapa(data) {
@@ -199,8 +199,8 @@ function mostrarMapa(data) {
       fillOpacity: 0.9
     }),
     onEachFeature: (feature, layer) => {
+      // === Caso: Usuario NO logueado, solo mostrar popup básico ===
       if (!usuarioLogueado) {
-        // Si no está logueado, mostrar popup solo de lectura
         let popup = '';
         for (const key in feature.properties) {
           popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
@@ -209,16 +209,16 @@ function mostrarMapa(data) {
         return;
       }
 
-      // Si está logueado, crear formulario editable
+      // === Caso: Usuario logueado, mostrar formulario editable ===
       let form = `<div style="max-height:300px; overflow:auto;"><form data-id="${feature._id}">`;
+
       campos.forEach(campo => {
         const valor = feature.properties[campo] || "";
         form += `
           <label style="font-weight:bold; display:block; margin-top:4px;">
             ${campo}:
             <input type="text" name="${campo}" value="${valor}" style="width:100%;" />
-          </label>
-        `;
+          </label>`;
       });
 
       form += `
@@ -230,37 +230,50 @@ function mostrarMapa(data) {
           LONGITUD:
           <input type="number" step="any" name="LONGITUD" value="${feature.geometry?.coordinates[0] || ""}" />
         </label>
-        <button type="submit" style="margin-top:10px; background:#28a745; color:white; padding:4px 8px;">Guardar</button>
       </form></div>`;
 
       layer.bindPopup(form);
 
+      // Evento cuando se abre el popup
       layer.on('popupopen', () => {
         const formEl = document.querySelector(`form[data-id='${feature._id}']`);
         if (!formEl) return;
-        formEl.addEventListener('submit', e => {
-          e.preventDefault();
+
+        const handleChange = () => {
           const formData = new FormData(formEl);
+
+          // Actualizar atributos
           for (const [campo, valor] of formData.entries()) {
-            if (["LATITUD", "LONGITUD"].includes(campo)) continue; // Se actualizan aparte
+            if (["LATITUD", "LONGITUD"].includes(campo)) continue;
             feature.properties[campo] = valor.trim().toUpperCase();
           }
 
-          // Actualizar geometría
+          // Actualizar coordenadas
           const lat = parseFloat(formData.get("LATITUD"));
           const lng = parseFloat(formData.get("LONGITUD"));
           if (!isNaN(lat) && !isNaN(lng)) {
             feature.geometry = { type: "Point", coordinates: [lng, lat] };
           }
 
-          // Refrescar vistas
-          mostrarMapa(geojsonData);
-          mostrarTabla(geojsonData);
+          // Actualiza la vista (sin borrar filtros)
+          mostrarTabla(geojsonData); // si estás filtrando, esta función debe respetar filtros activos
           centrarMapa(geojsonData);
           actualizarListaPersonas(geojsonData.features);
+        };
 
-          layer.closePopup();
+        // Agrega evento de edición a cada input
+        formEl.querySelectorAll("input").forEach(input => {
+          input.addEventListener("input", () => {
+            clearTimeout(input._timer);
+            input._timer = setTimeout(handleChange, 500); // Autoguardado
+          });
         });
+      });
+
+      // Evento cuando se cierra el popup
+      layer.on("popupclose", () => {
+        // Opcional: podrías guardar automáticamente todo aquí si quisieras sincronizar
+        mostrarTabla(geojsonData);
       });
     }
   }).addTo(map);
