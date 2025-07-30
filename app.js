@@ -24,7 +24,7 @@ const capasOverlay = {};
 
 // Capas base
 const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors', maxZoom: 19
+  attribution: '© OpenStreetMap contributors', maxZoom: 15
 });
 
 const googlemaps = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
@@ -199,14 +199,73 @@ function mostrarMapa(data) {
       fillOpacity: 0.9
     }),
     onEachFeature: (feature, layer) => {
-      let popup = '';
-      for (const key in feature.properties) {
-        popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+      if (!usuarioLogueado) {
+        // Si no está logueado, mostrar popup solo de lectura
+        let popup = '';
+        for (const key in feature.properties) {
+          popup += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+        }
+        layer.bindPopup(popup);
+        return;
       }
-      layer.bindPopup(popup);
+
+      // Si está logueado, crear formulario editable
+      let form = `<div style="max-height:300px; overflow:auto;"><form data-id="${feature._id}">`;
+      campos.forEach(campo => {
+        const valor = feature.properties[campo] || "";
+        form += `
+          <label style="font-weight:bold; display:block; margin-top:4px;">
+            ${campo}:
+            <input type="text" name="${campo}" value="${valor}" style="width:100%;" />
+          </label>
+        `;
+      });
+
+      form += `
+        <label style="font-weight:bold; display:block; margin-top:4px;">
+          LATITUD:
+          <input type="number" step="any" name="LATITUD" value="${feature.geometry?.coordinates[1] || ""}" />
+        </label>
+        <label style="font-weight:bold; display:block;">
+          LONGITUD:
+          <input type="number" step="any" name="LONGITUD" value="${feature.geometry?.coordinates[0] || ""}" />
+        </label>
+        <button type="submit" style="margin-top:10px; background:#28a745; color:white; padding:4px 8px;">Guardar</button>
+      </form></div>`;
+
+      layer.bindPopup(form);
+
+      layer.on('popupopen', () => {
+        const formEl = document.querySelector(`form[data-id='${feature._id}']`);
+        if (!formEl) return;
+        formEl.addEventListener('submit', e => {
+          e.preventDefault();
+          const formData = new FormData(formEl);
+          for (const [campo, valor] of formData.entries()) {
+            if (["LATITUD", "LONGITUD"].includes(campo)) continue; // Se actualizan aparte
+            feature.properties[campo] = valor.trim().toUpperCase();
+          }
+
+          // Actualizar geometría
+          const lat = parseFloat(formData.get("LATITUD"));
+          const lng = parseFloat(formData.get("LONGITUD"));
+          if (!isNaN(lat) && !isNaN(lng)) {
+            feature.geometry = { type: "Point", coordinates: [lng, lat] };
+          }
+
+          // Refrescar vistas
+          mostrarMapa(geojsonData);
+          mostrarTabla(geojsonData);
+          centrarMapa(geojsonData);
+          actualizarListaPersonas(geojsonData.features);
+
+          layer.closePopup();
+        });
+      });
     }
   }).addTo(map);
 }
+
 
 // === 9. CENTRAR MAPA EN LOS PUNTOS VISIBLES ===
 // Ajusta la vista para mostrar todos los puntos
@@ -562,4 +621,3 @@ function crearTogglesColumnas() {
     contenedor.appendChild(label);
   });
 }
-
