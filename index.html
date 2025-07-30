@@ -12,6 +12,7 @@
 
 <header>
   <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+  <!-- Formulario de inicio/cierre de sesión -->
   <form id="loginForm">
     <div id="loginContainer">
       <input id="usuario" type="text" placeholder="Usuario" required />
@@ -25,34 +26,72 @@
 </header>
 
 <main>
-  <!-- Panel izquierdo: mapa + tabla -->
+  <!-- Panel izquierdo: Mapa + tabla + control columnas -->
   <section id="panelIzquierdo">
     <div id="map"></div>
+
+    <!-- Control para mostrar/ocultar columnas de la tabla -->
+    <section class="contenedor-filtros">
+      <div class="card-toggle">
+        <button class="toggle-btn" onclick="toggleColumnMenu()">
+          <i class="fa-solid fa-eye"></i> Mostrar/Ocultar Columnas
+        </button>
+        <div id="columnMenu" class="toggle-content">
+          <div id="columnToggles" class="form-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenedor de tabla -->
     <div id="tabla"></div>
   </section>
 
-  <!-- Panel derecho: filtros + formulario -->
+  <!-- Panel derecho: filtros y formularios -->
   <aside id="panelDerecho">
-    <!-- Filtro por campos -->
+
+    <!-- Filtro doble de personal -->
     <section class="contenedor-filtros">
       <h2><i class="fa-solid fa-filter"></i> Filtrar Personal</h2>
+
+      <!-- Primer filtro -->
       <div class="grupo-control">
-        <label for="filterField">Campo:</label>
-        <select id="filterField">
+        <label for="filterField1">Campo 1:</label>
+        <select id="filterField1">
           <option value="CODIGO TRABAJADOR">Codigo</option>
           <option value="NOMBRE" selected>Nombre</option>
           <option value="RUTA">Ruta</option>
           <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
           <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
           <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
-          <option value="LUGAR TRABAJO - TRANS">lugar Trabajo recorrido</option>
+          <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
           <option value="FRECUENCIA">Frecuencia transporte</option>
         </select>
+        <!-- Input con sugerencias -->
+        <input id="searchInput1" list="suggestions1" placeholder="Buscar...">
+        <datalist id="suggestions1"></datalist>
       </div>
-      <input type="search" id="searchInput" placeholder="Buscar..." />
+
+      <!-- Segundo filtro -->
+      <div class="grupo-control">
+        <label for="filterField2">Campo 2:</label>
+        <select id="filterField2">
+          <option value="">(Ninguno)</option>
+          <option value="CODIGO TRABAJADOR">Codigo</option>
+          <option value="NOMBRE">Nombre</option>
+          <option value="RUTA">Ruta</option>
+          <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
+          <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
+          <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
+          <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
+          <option value="FRECUENCIA">Frecuencia transporte</option>
+        </select>
+        <!-- Input con sugerencias -->
+        <input id="searchInput2" list="suggestions2" placeholder="Buscar...">
+        <datalist id="suggestions2"></datalist>
+      </div>
     </section>
 
-    <!-- Filtros de rutas -->
+    <!-- Filtro doble de rutas -->
     <section class="contenedor-filtros">
       <h2><i class="fa-solid fa-road"></i> Filtro de Rutas</h2>
       <div class="grupo-control">
@@ -69,7 +108,7 @@
       </div>
     </section>
 
-    <!-- Formulario agregar (solo visible al iniciar sesión) -->
+    <!-- Formulario de agregar personal (solo al iniciar sesión) -->
     <form id="addForm" style="display:none;">
       <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
       <div id="camposForm" class="form-grid"></div>
@@ -81,10 +120,10 @@
   </aside>
 </main>
 
+<!-- Scripts de Leaflet y lógica principal -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="app.js"></script>
 
 </body>
 </html>
-
