@@ -24,7 +24,7 @@ const capasOverlay = {};
 
 // Capas base
 const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors', maxZoom: 15
+  attribution: '© OpenStreetMap contributors', maxZoom: 19
 });
 
 const googlemaps = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
