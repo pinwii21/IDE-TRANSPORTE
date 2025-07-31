@@ -4,33 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IDE TRANSPORTE</title>
-  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header con título y login -->
+  <header>
+    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+    <form id="loginForm">
+      <div id="loginContainer">
+        <input id="usuario" type="text" placeholder="Usuario" required />
+        <input id="clave" type="password" placeholder="Clave" required />
+        <button type="submit"><i class="fa-solid fa-right-to-bracket"></i></button>
+      </div>
+      <button id="logoutBtn" type="button" style="display:none;">
+        <i class="fa-solid fa-right-from-bracket"></i> Salir
+      </button>
+    </form>
+  </header>
 
-<header>
-  <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
-  <!-- Formulario de inicio/cierre de sesión -->
-  <form id="loginForm">
-    <div id="loginContainer">
-      <input id="usuario" type="text" placeholder="Usuario" required />
-      <input id="clave" type="password" placeholder="Clave" required />
-      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i></button>
-    </div>
-    <button id="logoutBtn" type="button" style="display:none;">
-      <i class="fa-solid fa-right-from-bracket"></i> Salir
-    </button>
-  </form>
-</header>
+  <!-- Contenedor principal con sidebar lateral y mapa -->
+  <div id="contenedorPrincipal">
+    <!-- Sidebar lateral con filtros y formulario -->
+    <aside id="panelFiltros">
+      <section class="contenedor-filtros">
+        <!-- Filtro personal: doble campo -->
+        <h2><i class="fa-solid fa-filter"></i> Filtrar Personal</h2>
+        <div class="grupo-control">
+          <label for="filterField1">Campo 1:</label>
+          <select id="filterField1">
+            <option value="CODIGO TRABAJADOR">Codigo</option>
+            <option value="NOMBRE" selected>Nombre</option>
+            <option value="RUTA">Ruta</option>
+            <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
+            <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
+            <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
+            <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
+            <option value="FRECUENCIA">Frecuencia transporte</option>
+          </select>
+          <input id="searchInput1" list="suggestions1" placeholder="Buscar..." />
+          <datalist id="suggestions1"></datalist>
+        </div>
 
-<main>
-  <!-- Panel izquierdo: Mapa + tabla + control columnas -->
-  <section id="panelIzquierdo">
+        <div class="grupo-control">
+          <label for="filterField2">Campo 2:</label>
+          <select id="filterField2">
+            <option value="">(Ninguno)</option>
+            <option value="CODIGO TRABAJADOR">Codigo</option>
+            <option value="NOMBRE">Nombre</option>
+            <option value="RUTA">Ruta</option>
+            <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
+            <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
+            <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
+            <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
+            <option value="FRECUENCIA">Frecuencia transporte</option>
+          </select>
+          <input id="searchInput2" list="suggestions2" placeholder="Buscar..." />
+          <datalist id="suggestions2"></datalist>
+        </div>
+      </section>
+
+      <!-- Filtro de rutas -->
+      <section class="contenedor-filtros">
+        <h2><i class="fa-solid fa-road"></i> Filtro de Rutas</h2>
+        <div class="grupo-control">
+          <label for="campo1">Campo 1:</label>
+          <select id="campo1"></select>
+          <label for="valor1">Valor 1:</label>
+          <select id="valor1"></select>
+        </div>
+        <div class="grupo-control">
+          <label for="campo2">Campo 2:</label>
+          <select id="campo2"></select>
+          <label for="valor2">Valor 2:</label>
+          <select id="valor2"></select>
+        </div>
+      </section>
+
+      <!-- Formulario para agregar personal -->
+      <form id="addForm" style="display:none;">
+        <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
+        <div id="camposForm" class="form-grid"></div>
+        <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
+        <button type="button" id="descargarGeoJSONBtn" style="display:none;">
+          <i class="fa-solid fa-download"></i> Descargar GeoJSON
+        </button>
+      </form>
+    </aside>
+
+    <!-- Mapa principal -->
     <div id="map"></div>
+  </div>
 
-    <!-- Control para mostrar/ocultar columnas de la tabla -->
+  <!-- Tabla fija abajo -->
+  <section id="panelTabla">
     <section class="contenedor-filtros">
       <div class="card-toggle">
         <button class="toggle-btn" onclick="toggleColumnMenu()">
@@ -41,89 +109,19 @@
         </div>
       </div>
     </section>
-
-    <!-- Contenedor de tabla -->
     <div id="tabla"></div>
   </section>
 
-  <!-- Panel derecho: filtros y formularios -->
-  <aside id="panelDerecho">
+  <!-- Scripts externos -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script src="app.js"></script>
 
-    <!-- Filtro doble de personal -->
-    <section class="contenedor-filtros">
-      <h2><i class="fa-solid fa-filter"></i> Filtrar Personal</h2>
-
-      <!-- Primer filtro -->
-      <div class="grupo-control">
-        <label for="filterField1">Campo 1:</label>
-        <select id="filterField1">
-          <option value="CODIGO TRABAJADOR">Codigo</option>
-          <option value="NOMBRE" selected>Nombre</option>
-          <option value="RUTA">Ruta</option>
-          <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
-          <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
-          <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
-          <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
-          <option value="FRECUENCIA">Frecuencia transporte</option>
-        </select>
-        <!-- Input con sugerencias -->
-        <input id="searchInput1" list="suggestions1" placeholder="Buscar...">
-        <datalist id="suggestions1"></datalist>
-      </div>
-
-      <!-- Segundo filtro -->
-      <div class="grupo-control">
-        <label for="filterField2">Campo 2:</label>
-        <select id="filterField2">
-          <option value="">(Ninguno)</option>
-          <option value="CODIGO TRABAJADOR">Codigo</option>
-          <option value="NOMBRE">Nombre</option>
-          <option value="RUTA">Ruta</option>
-          <option value="HORARIO DE TRABAJO - TDH">Horario Trabajo DTH</option>
-          <option value="LUGAR DE TRABAJO - DTH">Lugar Trabajo DTH</option>
-          <option value="HORARIO - TRANSPORTE">Horario recorrido</option>
-          <option value="LUGAR TRABAJO - TRANS">Lugar Trabajo recorrido</option>
-          <option value="FRECUENCIA">Frecuencia transporte</option>
-        </select>
-        <!-- Input con sugerencias -->
-        <input id="searchInput2" list="suggestions2" placeholder="Buscar...">
-        <datalist id="suggestions2"></datalist>
-      </div>
-    </section>
-
-    <!-- Filtro doble de rutas -->
-    <section class="contenedor-filtros">
-      <h2><i class="fa-solid fa-road"></i> Filtro de Rutas</h2>
-      <div class="grupo-control">
-        <label for="campo1">Campo 1:</label>
-        <select id="campo1"></select>
-        <label for="valor1">Valor 1:</label>
-        <select id="valor1"></select>
-      </div>
-      <div class="grupo-control">
-        <label for="campo2">Campo 2:</label>
-        <select id="campo2"></select>
-        <label for="valor2">Valor 2:</label>
-        <select id="valor2"></select>
-      </div>
-    </section>
-
-    <!-- Formulario de agregar personal (solo al iniciar sesión) -->
-    <form id="addForm" style="display:none;">
-      <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
-      <div id="camposForm" class="form-grid"></div>
-      <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
-      <button type="button" id="descargarGeoJSONBtn" style="display:none;">
-        <i class="fa-solid fa-download"></i> Descargar GeoJSON
-      </button>
-    </form>
-  </aside>
-</main>
-
-<!-- Scripts de Leaflet y lógica principal -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-<script src="app.js"></script>
-
+  <script>
+    function toggleColumnMenu() {
+      const menu = document.getElementById("columnMenu");
+      menu.classList.toggle("active");
+    }
+  </script>
 </body>
 </html>
