@@ -8,8 +8,8 @@ const usuarios = {
 
 // Campos a mostrar en el formulario y tabla
 const campos = [
-  "CODIGO TRABAJADOR", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "HORARIO DE TRABAJO",
-  "LUGAR DE TRABAJO","AREA", "DIRECCION", "SUBSIDIO DE TRANSPORTE", "LATITUD", "LONGITUD", "VERIFICACION", 
+  "CODIGO TRABAJADOR", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "HORARIO TRABAJO",
+  "LUGAR TRABAJO","AREA", "DIRECCION", "SUBSIDIO DE TRANSPORTE", "LATITUD", "LONGITUD", "VERIFICACION", 
 ];
 
 // Variables globales
@@ -570,4 +570,5 @@ function crearTogglesColumnas() {
     contenedor.appendChild(label);
   });
 }
+
 
