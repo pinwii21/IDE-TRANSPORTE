@@ -1,6 +1,14 @@
 /* Fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+:root {
+  --color-primario: #004d99;
+  --color-secundario: #007bff;
+  --color-exito: #28a745;
+  --color-peligro: #dc3545;
+  --color-fondo: #f9fafb;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,16 +17,16 @@ body, html {
   height: 100%;
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background-color: #f9fafb;
+  background-color: var(--color-fondo);
   color: #333;
-  overflow: hidden;
+  overflow: auto;
 }
 
 header {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 60px;
-  background-color: #004d99;
+  background-color: var(--color-primario);
   color: white;
   display: flex;
   align-items: center;
@@ -51,7 +59,7 @@ header form {
 }
 
 #loginContainer button {
-  background-color: #007bff;
+  background-color: var(--color-secundario);
   border: none;
   color: white;
   padding: 7px 12px;
@@ -65,7 +73,7 @@ header form {
 }
 
 #logoutBtn {
-  background-color: #dc3545;
+  background-color: var(--color-peligro);
   border: none;
   color: white;
   padding: 7px 12px;
@@ -81,11 +89,11 @@ header form {
 
 #map {
   position: fixed;
-  top: 60px; /* debajo del header */
-  left: 300px; /* ancho sidebar */
+  top: 60px; 
+  left: 300px; 
   right: 0;
-  bottom: 150px; /* espacio para tabla debajo */
-  z-index: 500;
+  bottom: 150px; 
+  z-index: 400;
 }
 
 #contenedorPrincipal {
@@ -93,7 +101,7 @@ header form {
   top: 60px;
   left: 0;
   width: 300px;
-  bottom: 150px; /* arriba de la tabla */
+  bottom: 150px;
   background-color: #ffffff;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   display: flex;
@@ -102,20 +110,20 @@ header form {
   z-index: 1000;
 }
 
-
 #panelFiltros {
-  max-height: 367px; /* o cualquier valor que desees */
+  max-height: 367px;
   padding: 10px 20px;
   overflow-y: auto;
   flex: 1 1 auto;
   border-bottom: 1px solid #ddd;
+  -webkit-overflow-scrolling: touch;
 }
 
 #panelFiltros h2 {
   font-size: 1.1rem;
   margin-bottom: 10px;
   font-weight: 600;
-  color: var(--color-primario, #004d99);
+  color: var(--color-primario);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -148,13 +156,13 @@ header form {
 
 .grupo-control select:focus,
 .grupo-control input:focus {
-  border-color: var(--color-primario, #004d99);
+  border-color: var(--color-primario);
 }
 
 #addForm {
   padding: 15px 20px;
   border-top: 1px solid #ddd;
-  display: none; /* Mostrar solo con login */
+  display: none;
   flex-shrink: 0;
 }
 
@@ -165,7 +173,7 @@ header form {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-primario, #004d99);
+  color: var(--color-primario);
 }
 
 .form-grid {
@@ -193,12 +201,12 @@ header form {
 }
 
 #addForm input:focus {
-  border-color: var(--color-primario, #004d99);
+  border-color: var(--color-primario);
 }
 
 #addForm button {
   padding: 10px 15px;
-  background-color: var(--color-primario, #004d99);
+  background-color: var(--color-primario);
   border: none;
   border-radius: 4px;
   color: white;
@@ -212,8 +220,12 @@ header form {
   background-color: #003366;
 }
 
+#addForm button + button {
+  margin-top: 8px;
+}
+
 #descargarGeoJSONBtn {
-  background-color: #28a745;
+  background-color: var(--color-exito);
   border: none;
   color: white;
   padding: 10px 15px;
@@ -227,18 +239,19 @@ header form {
   background-color: #1e7e34;
 }
 
-/* Tabla en la parte inferior */
+/* Panel inferior */
 #panelTabla {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 250px; /* altura fija para tabla */
+  height: 250px;
   background-color: #f7f9fc;
   box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
   overflow-y: auto;
   padding: 10px 15px;
   z-index: 1000;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card-toggle {
@@ -248,7 +261,7 @@ header form {
 }
 
 .toggle-btn {
-  background-color: var(--color-primario, #004d99);
+  background-color: var(--color-primario);
   border: none;
   color: white;
   padding: 6px 12px;
@@ -283,12 +296,18 @@ header form {
 
 .toggle-content.active {
   display: block;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 #tabla {
   flex: 1;
   overflow-y: auto;
-  max-height: 250px; /* altura limitada con scroll */
+  max-height: 250px;
   font-size: 0.75rem;
   border-top: 1px solid #ccc;
 }
@@ -315,9 +334,8 @@ header form {
   z-index: 10;
 }
 
-
 #tabla tr.resaltado {
-  background-color: #ffffcc;
+  background-color: #fffb91 !important;
 }
 
 #tabla td[contenteditable="true"] {
@@ -330,13 +348,7 @@ header form {
   cursor: pointer;
 }
 
-/* Scroll para select y datalist si necesario */
-select, input[list] {
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-/* Scrollbar custom (opcional) */
+/* Scroll custom */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -348,4 +360,28 @@ select, input[list] {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  #contenedorPrincipal {
+    width: 100%;
+    position: relative;
+    height: auto;
+    bottom: auto;
+    box-shadow: none;
+  }
+
+  #map {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 400px;
+  }
+
+  #panelTabla {
+    position: relative;
+    height: auto;
+  }
 }
