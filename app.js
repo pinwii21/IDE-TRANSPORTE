@@ -8,7 +8,7 @@ const usuarios = {
 
 // Campos a mostrar en el formulario y tabla
 const campos = [
-  "CODIGO TRABAJADOR", "NOMBRE", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "HORARIO DE TRABAJO",
+  "CODIGO TRABAJADOR", "NOMBRES", "RUTA", "CEDULA", "TELEFONO", "DISCAPACIDAD", "HORARIO DE TRABAJO",
   "LUGAR DE TRABAJO","AREA", "DIRECCION", "SUBSIDIO DE TRANSPORTE", "LATITUD", "LONGITUD", "VERIFICACION", 
 ];
 
@@ -570,6 +570,7 @@ function crearTogglesColumnas() {
     contenedor.appendChild(label);
   });
 }
+
 
 
 
