@@ -160,28 +160,71 @@ function mostrarTabla(data) {
   const cont = document.getElementById("tabla");
   if (!cont || !data?.features) return;
 
-  let html = `<table><thead><tr><th>#</th>`;
-  campos.forEach((c) => (html += `<th>${c}</th>`));
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>#</th>`;
+
+  // Encabezados
+  campos.forEach((c) => {
+    html += `<th>${c}</th>`;
+  });
+
   html += `</tr></thead><tbody>`;
 
+  // Filas
   data.features.forEach((f, i) => {
-    html += `<tr><td>${i + 1}</td>`;
+    html += `<tr data-id="${f._id}">
+      <td>${i + 1}</td>`;
+
     campos.forEach((campo) => {
       let val = f.properties?.[campo] || "";
       if (campo === "LATITUD") val = f.geometry?.coordinates?.[1] ?? "";
       if (campo === "LONGITUD") val = f.geometry?.coordinates?.[0] ?? "";
+
       html += `<td ${
         usuarioLogueado ? 'contenteditable="true"' : ""
-      } data-feature-id="${f._id}" data-attr="${campo}">${val}</td>`;
+      } data-feature-id="${f._id}" data-attr="${campo}">
+        ${val}
+      </td>`;
     });
+
     html += `</tr>`;
   });
 
   html += `</tbody></table>`;
+
+  // Insertar tabla en el DOM
   cont.innerHTML = html;
+
+  // ===============================
+  // CLICK EN FILA → ZOOM EN EL MAPA
+  // ===============================
+  document.querySelectorAll("#tabla tbody tr").forEach((tr) => {
+    tr.addEventListener("click", () => {
+      const id = parseInt(tr.dataset.id);
+      const feature = geojsonData.features.find((f) => f._id === id);
+      if (!feature || !feature.geometry) return;
+
+      const lng = feature.geometry.coordinates[0];
+      const lat = feature.geometry.coordinates[1];
+
+      // Zoom al punto
+      map.setView([lat, lng], 17, { animate: true });
+
+      // Resaltar fila seleccionada
+      document.querySelectorAll("#tabla tr").forEach((r) =>
+        r.classList.remove("resaltado")
+      );
+      tr.classList.add("resaltado");
+    });
+  });
+
+  // Columnas y edición
   crearTogglesColumnas();
   if (usuarioLogueado) asignarEventosEdicion();
 }
+
 
 // === EDICIÓN EN TABLA ===
 function asignarEventosEdicion() {
@@ -612,3 +655,54 @@ function crearTogglesColumnas() {
     contenedor.appendChild(label);
   });
 }
+
+// === TOGGLE TABLA FLOTANTE ===
+function toggleTabla() {
+  const panel = document.getElementById("panelTabla");
+  if (!panel) return;
+
+  panel.classList.toggle("oculto");
+
+  // Forzar a Leaflet a recalcular tamaño
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 300);
+}
+
+
+// Botón flotante
+const toggleTablaBtn = document.getElementById("toggleTablaBtn");
+if (toggleTablaBtn) {
+  toggleTablaBtn.addEventListener("click", toggleTabla);
+}
+
+// === DRAG TABLA ===
+(function hacerTablaDraggable() {
+  const panel = document.getElementById("panelTabla");
+  const header = document.getElementById("tablaHeader");
+  if (!panel || !header) return;
+
+  let offsetX = 0, offsetY = 0, isDragging = false;
+
+  header.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    const rect = panel.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    panel.style.transition = "none";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    panel.style.left = `${e.clientX - offsetX}px`;
+    panel.style.top = `${e.clientY - offsetY}px`;
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    panel.style.transition = "";
+  });
+})();
+
