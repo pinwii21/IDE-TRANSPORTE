@@ -2,12 +2,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 :root {
-  --color-primario: #004d99;
-  --color-secundario: #007bff;
-  --color-exito: #28a745;
-  --color-peligro: #dc3545;
-  --color-fondo: #f9fafb;
+  /* Base técnica (grafito) */
+  --color-fondo: #eef1f4;        /* Gris técnico claro */
+  --color-panel: #ffffff;       /* Panel limpio */
+  --color-borde: #cfd8dc;        /* Bordes suaves */
+
+  /* Color protagonista */
+  --color-primario: #263238;     /* Grafito profundo */
+  --color-secundario: #006d77;   /* Teal tecnológico */
+
+  /* Estados */
+  --color-exito: #2e7d32;        /* Verde controlado */
+  --color-peligro: #c62828;      /* Rojo alerta */
+
+  /* Texto */
+  --color-texto: #102027;        /* Texto principal */
+  --color-texto-sec: #546e7a;    /* Texto secundario */
 }
+/* ===== ACENTO FUTURISTA SUTIL ===== */
+
+header,
+.tabla-header {
+  background: linear-gradient(
+    to right,
+    #263238,
+    #006d77
+  );
+}
+
+.tabla-flotante {
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.15),
+    0 0 0 1px rgba(0,109,119,0.15);
+}
+
+.grupo-control select:focus,
+.grupo-control input:focus {
+  border-color: var(--color-secundario);
+}
+
+
+
 
 * {
   box-sizing: border-box;
@@ -92,16 +127,16 @@ header form {
   top: 60px; 
   left: 300px; 
   right: 0;
-  bottom: 150px; 
+  bottom: 0px; 
   z-index: 400;
 }
 
 #contenedorPrincipal {
   position: fixed;
-  top: 60px;
+  top: 60px;                 /* debajo del header */
   left: 0;
   width: 300px;
-  bottom: 150px;
+  bottom: 0;                 /* ✅ ocupa todo el alto */
   background-color: #ffffff;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   display: flex;
@@ -110,8 +145,9 @@ header form {
   z-index: 1000;
 }
 
+
 #panelFiltros {
-  max-height: 367px;
+  max-height: 999px;
   padding: 10px 20px;
   overflow-y: auto;
   flex: 1 1 auto;
@@ -239,20 +275,7 @@ header form {
   background-color: #1e7e34;
 }
 
-/* Panel inferior */
-#panelTabla {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 250px;
-  background-color: #f7f9fc;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-  overflow-y: auto;
-  padding: 10px 15px;
-  z-index: 1000;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 .card-toggle {
   display: flex;
@@ -312,7 +335,7 @@ header form {
   border-top: 1px solid #ccc;
 }
 
-#tabla table {
+#tabla  {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
@@ -385,3 +408,166 @@ header form {
     height: auto;
   }
 }
+
+/* =======================
+   TABLA FLOTANTE
+======================= */
+
+.tabla-flotante {
+  
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 75%;
+  max-width: 1100px;
+  height: 300px;
+  background: #ffffff;  
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  border-radius: 10px;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.tabla-flotante.oculto {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(40px);
+}
+
+/* Botón flotante FAB */
+.tabla-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--color-primario);
+  color: white;
+  border: none;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1600;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.tabla-fab:hover {
+  background: #003366;
+}
+
+/* Ajuste tabla interna */
+#tabla {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Botón cerrar */
+.toggle-btn.danger {
+  background: var(--color-peligro);
+}
+.toggle-btn.danger:hover {
+  background: #a71d2a;
+}
+
+.tabla-header {
+  cursor: move;
+  padding: 8px 12px;
+  background: var(--color-primario);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  #contenedorPrincipal {
+    width: 100%;
+    position: relative;
+    height: auto;
+    bottom: auto;
+    box-shadow: none;
+  }
+
+  #map {
+    position: relative;
+    top: 0;
+    left: 360;
+    right: 0;
+    height: 400px;
+  }
+
+  #panelTabla {
+    position: relative;
+    height: auto;
+  }
+}
+
+/* ===== TABLA FLOTANTE REDIMENSIONABLE ===== */
+.tabla-flotante {
+  resize: both;
+  overflow: auto;
+  min-width: 500px;
+  min-height: 180px;
+  max-width: 95vw;
+  max-height: 90vh;
+}
+/* ===== AJUSTES VISUALES PROFESIONALES ===== */
+
+/* Texto general */
+body, html {
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+}
+
+/* Panel izquierdo */
+#contenedorPrincipal {
+  background-color: var(--color-panel);
+  border-right: 1px solid var(--color-borde);
+}
+
+/* Títulos filtros */
+#panelFiltros h2 {
+  color: var(--color-primario);
+}
+
+/* Inputs */
+.grupo-control select,
+.grupo-control input {
+  border: 1px solid var(--color-borde);
+  background-color: #fff;
+  color: var(--color-texto);
+}
+
+.grupo-control select:focus,
+.grupo-control input:focus {
+  border-color: var(--color-secundario);
+}
+
+/* Header tabla */
+.tabla-header {
+  background: var(--color-primario);
+}
+
+/* Tabla */
+#tabla th {
+  background-color: #e5e9f0;
+  color: var(--color-texto);
+}
+
+#tabla tr:hover {
+  background-color: #eaf2fb;
+}
+
+/* Botón flotante */
+.tabla-fab {
+  background: var(--color-secundario);
+}
+
+.tabla-fab:hover {
+  background: #155a96;
+}
+/*--- END AJUSTES PROFESIONALES -- */
