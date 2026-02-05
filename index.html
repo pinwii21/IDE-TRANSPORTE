@@ -84,19 +84,30 @@
     <div id="map"></div>
   </div>
 
-  <section id="panelTabla">
-    <section class="contenedor-filtros">
-      <div class="card-toggle">
-        <button class="toggle-btn" onclick="toggleColumnMenu()">
-          <i class="fa-solid fa-eye"></i> Mostrar/Ocultar Columnas
-        </button>
-        <div id="columnMenu" class="toggle-content">
-          <div id="columnToggles" class="form-grid"></div>
-        </div>
-      </div>
-    </section>
-    <div id="tabla"></div>
+<!-- BOTÓN FLOTANTE -->
+<button id="toggleTablaBtn" class="tabla-fab" title="Mostrar/Ocultar tabla">
+  <i class="fa-solid fa-table"></i>
+</button>
+
+<!-- PANEL TABLA FLOTANTE -->
+<section id="panelTabla" class="tabla-flotante oculto">
+  <div class="tabla-header" id="tablaHeader">
+  <i class="fa-solid fa-grip-lines"></i>
+  <span>Tabla de Personal</span>
+</div>
+
+  <section class="contenedor-filtros">
+    <div class="card-toggle">
+      <button class="toggle-btn" onclick="toggleColumnMenu()">
+        <i class="fa-solid fa-eye"></i> Columnas
+      </button>
+      <button class="toggle-btn danger" onclick="toggleTabla()">
+        <i class="fa-solid fa-xmark"></i> Cerrar
+      </button>
+    </div>
   </section>
+  <div id="tabla"></div>
+</section>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
