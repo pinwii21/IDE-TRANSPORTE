@@ -1,47 +1,63 @@
 /* Fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+/* VARIABLES DE COLOR */
 :root {
-  /* Base técnica (grafito) */
-  --color-fondo: #eef1f4;        /* Gris técnico claro */
-  --color-panel: #ffffff;       /* Panel limpio */
-  --color-borde: #cfd8dc;        /* Bordes suaves */
+  /* Superficies */
+  --color-fondo: #f4f5f7;        /* gris operativo */
+  --color-panel: #ffffff;
+  --color-borde: #cfd3d8;
 
-  /* Color protagonista */
-  --color-primario: #263238;     /* Grafito profundo */
-  --color-secundario: #006d77;   /* Teal tecnológico */
+  /* Núcleo */
+  --color-primario: #204287;     /* grafito duro */
+  --color-secundario: #091f51;   /* ámbar de alerta */
 
   /* Estados */
-  --color-exito: #2e7d32;        /* Verde controlado */
-  --color-peligro: #c62828;      /* Rojo alerta */
+  --color-exito: #0f7c6d;        /* verde control */
+  --color-peligro: #1f14bc;      /* rojo alarma */
 
   /* Texto */
-  --color-texto: #102027;        /* Texto principal */
-  --color-texto-sec: #546e7a;    /* Texto secundario */
+  --color-texto: #000000;        /* casi negro técnico */
+  --color-texto-sec: #041435;
 }
-/* ===== ACENTO FUTURISTA SUTIL ===== */
-
-header,
-.tabla-header {
+header {
   background: linear-gradient(
-    to right,
-    #263238,
-    #006d77
+    180deg,
+    #103159,
+    #265184
   );
 }
 
-.tabla-flotante {
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.15),
-    0 0 0 1px rgba(0,109,119,0.15);
+.toggle-btn,
+.tabla-fab,
+#loginContainer button {
+  background: linear-gradient(
+    100deg,
+    #0e0e42,
+    #225e995d
+  );
+  color: #4c5aa4;
+  font-weight: 600;
 }
 
-.grupo-control select:focus,
-.grupo-control input:focus {
-  border-color: var(--color-secundario);
+.toggle-btn:hover,
+.tabla-fab:hover {
+  filter: contrast(1.1) brightness(1.05);
 }
 
+#tabla tr.resaltado {
+  background-color: rgba(99, 115, 149, 0.35);
+}
 
+L.circleMarker(latlng, {
+  radius: 6,
+  fillColor: "#f59e0b",   // ámbar = activo
+  color: "#1f2328",       // grafito = estructura
+  weight: 1.5,
+  fillOpacity: 0.9
+});
+
+/*FIN VARIABLES DE COLOR*/
 
 
 * {
@@ -571,3 +587,4 @@ body, html {
   background: #155a96;
 }
 /*--- END AJUSTES PROFESIONALES -- */
+
