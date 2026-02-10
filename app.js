@@ -19,6 +19,7 @@ const campos = [
   "ROL",
   "AREA",
   "DIRECCION",
+  "MODALIDAD DE CONTRATO",
   "SUBSIDIO DE TRANSPORTE",
   "LATITUD",
   "LONGITUD",
@@ -66,7 +67,7 @@ const mapasBase = {
 
 // === CARGAR DATOS GEOJSON PRINCIPAL ===
 fetch(
-  "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE_2025.geojson"
+  "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE.geojson"
 )
   .then((res) => res.json())
   .then((data) => {
@@ -79,7 +80,7 @@ fetch(
     actualizarListaPersonas(data.features || []);
   })
   .catch((err) => {
-    console.error("Error cargando BASE_DATOS_TRANSPORTE_2025.geojson:", err);
+    console.error("Error cargando BASE_DATOS_TRANSPORTE.geojson:", err);
   });
 
 // === CARGAR RUTAS DE ENTRADA Y SALIDA ===
@@ -705,3 +706,4 @@ if (toggleTablaBtn) {
     panel.style.transition = "";
   });
 })();
+
