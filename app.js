@@ -20,6 +20,7 @@ const campos = [
   "PUESTO",
   "AREA",
   "DIRECCION",
+  "MODALIDAD DE CONTRATO",
   "SUBSIDIO DE TRANSPORTE",
   "LATITUD",
   "LONGITUD",
@@ -706,5 +707,6 @@ if (toggleTablaBtn) {
     panel.style.transition = "";
   });
 })();
+
 
 
