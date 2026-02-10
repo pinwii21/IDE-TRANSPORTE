@@ -66,9 +66,7 @@ const mapasBase = {
 };
 
 // === CARGAR DATOS GEOJSON PRINCIPAL ===
-fetch(
-  "https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE.geojson"
-)
+fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS_TRANSPORTE.geojson")
   .then((res) => res.json())
   .then((data) => {
     data.features?.forEach((f, i) => (f._id = i));
@@ -706,5 +704,6 @@ if (toggleTablaBtn) {
     panel.style.transition = "";
   });
 })();
+
 
 
