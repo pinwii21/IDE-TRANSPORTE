@@ -383,7 +383,7 @@ function actualizarListaPersonas(lista) {
   select.innerHTML = '<option value="">-- Selecciona persona --</option>';
   lista.forEach((f) => {
     const nombre = f.properties?.["NOMBRE"] || "SIN NOMBRE";
-    const codigo = f.properties?.["CODIGO TRABAJADOR"] || "SIN CÓDIGO";
+    const codigo = f.properties?.["CODIGO"] || "SIN CÓDIGO";
     const value = f._id;
     const option = document.createElement("option");
     option.value = value;
@@ -440,7 +440,7 @@ if (addForm) {
     for (const campo of campos) {
       const inputEl = document.getElementById(campo);
       const val = (inputEl?.value || "").trim();
-      if (["CODIGO TRABAJADOR", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
+      if (["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(campo) && !val) {
         alert(`El campo ${campo} es obligatorio`);
         valid = false;
         break;
