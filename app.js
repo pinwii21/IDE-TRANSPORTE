@@ -8,7 +8,7 @@ const usuarios = {
 
 // Campos del formulario y tabla (coinciden con tu dataset)
 const campos = [
-  "CODIGO TRABAJADOR",
+  "CODIGO",
   "NOMBRE",
   "RUTA",
   "CEDULA",
@@ -147,7 +147,7 @@ function crearCamposFormulario() {
     const input = document.createElement("input");
     input.id = campo;
     input.type = "text";
-    input.required = ["CODIGO TRABAJADOR", "NOMBRE", "LATITUD", "LONGITUD"].includes(
+    input.required = ["CODIGO", "NOMBRE", "LATITUD", "LONGITUD"].includes(
       campo
     );
     label.appendChild(input);
