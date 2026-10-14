@@ -112,8 +112,16 @@ async function cargarIndexYCapas() {
       await Promise.allSettled(
         lista.map(async (fichero) => {
           try {
-            const geojsonUrl =`https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/` + `${encodeURIComponent(dir)}/${encodeURIComponent(fichero)}.geojson`;
-            const res = await fetch(geojsonUrl);
+
+            const nombreArchivo = fichero.toLowerCase().endsWith(".geojson")
+              ? fichero
+              : `${fichero}.geojson`;
+            
+            const geojsonUrl =
+              `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/` +
+              `${encodeURIComponent(dir)}/${encodeURIComponent(nombreArchivo)}`;
+            
+           const res = await fetch(geojsonUrl);
             if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
             const data = await res.json();
 
