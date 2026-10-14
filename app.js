@@ -83,63 +83,61 @@ fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
 
 // === CARGAR RUTAS DE ENTRADA Y SALIDA ===
 
-const carpetas = [
-  {
-    dir: "RUTAS INGRESO",
-    name: "RUTAS INGRESO",
-    sufijo: "_RUTA_INGRESO",
-    color: "#28a745"
-  },
-  {
-    dir: "RUTAS SALIDA",
-    name: "RUTAS SALIDA",
-    sufijo: "_RUTA_SALIDA",
-    color: "#dc3545"
-  }
-];
 
+const carpetas = [
+  { dir: "RUTAS INGRESO", name: "RUTAS INGRESO", color: "#28a745" },
+  { dir: "RUTAS SALIDA", name: "RUTAS SALIDA", color: "#dc3545" }
+];
 
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
     try {
-      const indexUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/index.json`;
+      const indexUrl =
+        `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/` +
+        `${encodeURIComponent(dir)}/index.json`;
+
       const idxRes = await fetch(indexUrl);
-      if (!idxRes.ok) throw new Error(`No se pudo cargar: ${indexUrl}`);
+      if (!idxRes.ok) {
+        throw new Error(`No se pudo cargar el índice: ${indexUrl}`);
+      }
+
       const lista = await idxRes.json();
       const grupo = L.layerGroup();
 
-      // Cargar cada archivo de la lista (continue on error)
       await Promise.allSettled(
         lista.map(async (fichero) => {
           try {
-
             const nombreArchivo = fichero.toLowerCase().endsWith(".geojson")
               ? fichero
               : `${fichero}.geojson`;
-            
+
             const geojsonUrl =
               `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/` +
               `${encodeURIComponent(dir)}/${encodeURIComponent(nombreArchivo)}`;
-            
-           const res = await fetch(geojsonUrl);
-            if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
-            const data = await res.json();
 
+            const res = await fetch(geojsonUrl);
+
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}: ${geojsonUrl}`);
+            }
+
+            const data = await res.json();
             const capa = L.geoJSON(data, {
               style: { color, weight: 3 },
               onEachFeature: (feature, layer) => {
-                let popup = `<b>${fichero}</b><br>`;
-                for (const k in feature.properties) {
-                  popup += `<b>${k}:</b> ${feature.properties[k]}<br>`;
-                }
-                layer.bindPopup(popup);
-              },
+                layer.bindPopup(
+                  `<b>${fichero}</b><br>` +
+                  Object.entries(feature.properties || {})
+                    .map(([k, v]) => `<b>${k}:</b> ${v}<br>`)
+                    .join("")
+                );
+              }
             });
 
             capa._nombreArchivo = fichero;
             capa.addTo(grupo);
           } catch (error) {
-            console.warn(`Error en ${fichero}:`, error.message);
+            console.error(`Error cargando ${fichero} desde ${dir}:`, error);
           }
         })
       );
@@ -147,14 +145,16 @@ async function cargarIndexYCapas() {
       capasOverlay[name] = grupo;
       grupo.addTo(map);
     } catch (error) {
-      console.error(`Error en carpeta ${dir}:`, error.message);
+      console.error(`Error en carpeta ${dir}:`, error);
     }
   }
 
   L.control.layers(mapasBase, capasOverlay, { collapsed: false }).addTo(map);
   inicializarFiltrosRutas();
 }
+
 cargarIndexYCapas();
+
 
 // === FORMULARIO Y TABLA ===
 function crearCamposFormulario() {
