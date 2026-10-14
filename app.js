@@ -82,10 +82,22 @@ fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
   });
 
 // === CARGAR RUTAS DE ENTRADA Y SALIDA ===
+
 const carpetas = [
-  { dir: "RUTAS INGRESO", name: "RUTAS INGRESO", color: "#28a745" },
-  { dir: "RUTAS SALIDA", name: "RUTAS SALIDA", color: "#dc3545" },
+  {
+    dir: "RUTAS INGRESO",
+    name: "RUTAS INGRESO",
+    sufijo: "_RUTA_INGRESO",
+    color: "#28a745"
+  },
+  {
+    dir: "RUTAS SALIDA",
+    name: "RUTAS SALIDA",
+    sufijo: "_RUTA_SALIDA",
+    color: "#dc3545"
+  }
 ];
+
 
 async function cargarIndexYCapas() {
   for (const { dir, name, color } of carpetas) {
@@ -100,7 +112,7 @@ async function cargarIndexYCapas() {
       await Promise.allSettled(
         lista.map(async (fichero) => {
           try {
-            const geojsonUrl = `https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/${dir}/${fichero}`;
+            const geojsonUrl =`https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/` + `${encodeURIComponent(dir)}/${encodeURIComponent(fichero)}.geojson`;
             const res = await fetch(geojsonUrl);
             if (!res.ok) throw new Error(`Error al cargar: ${geojsonUrl}`);
             const data = await res.json();
