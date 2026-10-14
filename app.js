@@ -83,8 +83,8 @@ fetch("https://raw.githubusercontent.com/pinwii21/IDE-TRANSPORTE/main/BASE_DATOS
 
 // === CARGAR RUTAS DE ENTRADA Y SALIDA ===
 const carpetas = [
-  { dir: "RUTAS ENTRADA", name: "Rutas de ENTRADA", color: "#28a745" },
-  { dir: "RUTAS SALIDA", name: "Rutas de SALIDA", color: "#dc3545" },
+  { dir: "RUTAS INGRESO", name: "RUTAS INGRESO", color: "#28a745" },
+  { dir: "RUTAS SALIDA", name: "RUTAS SALIDA", color: "#dc3545" },
 ];
 
 async function cargarIndexYCapas() {
