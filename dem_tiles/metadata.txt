@@ -1,0 +1,6 @@
+Terrarium RGB PNG en estructura XYZ (z/x/y.png)
+Zoom mínimo: 6
+Zoom máximo: 11
+Extensión WGS84: -80.000138889,-1.999861111,-77.000138889,1.000138889
+Altura (m) = (R*256 + G + B/256) - 32768
+El canal alfa indica píxeles con elevación válida.
