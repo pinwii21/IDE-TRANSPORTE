@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDE TRANSPORTE</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1><i class="fa-solid fa-map-location-dot"></i> IDE TRANSPORTE</h1>
+    <div class="view-switch" role="group" aria-label="Modo de visualización">
+      <button id="view2dBtn" type="button" class="active">2D</button>
+      <button id="view3dBtn" type="button">3D</button>
+    </div>
+    <form id="loginForm">
+      <div id="loginContainer">
+        <input id="usuario" type="text" placeholder="Usuario" required aria-label="Usuario" />
+        <input id="clave" type="password" placeholder="Clave" required aria-label="Clave" />
+        <button type="submit" title="Iniciar sesión"><i class="fa-solid fa-right-to-bracket"></i></button>
+      </div>
+      <button id="logoutBtn" type="button" style="display:none;">
+        <i class="fa-solid fa-right-from-bracket"></i> Salir
+      </button>
+    </form>
+  </header>
+
+  <div id="contenedorPrincipal">
+    <aside id="panelFiltros">
+      <section class="contenedor-filtros">
+        <h2><i class="fa-solid fa-filter"></i> Filtrar Personal</h2>
+        <div class="grupo-control">
+          <label for="filterField1">Campo 1:</label>
+          <select id="filterField1">
+            <option value="CODIGO">Código</option>
+            <option value="NOMBRE" selected>Nombre</option>
+            <option value="RUTA">Ruta</option>
+            <option value="HORARIO DE TRABAJO">Horario de Trabajo</option>
+            <option value="LUGAR DE TRABAJO">Lugar de Trabajo</option>
+          </select>
+          <input id="searchInput1" list="suggestions1" placeholder="Buscar..." />
+          <datalist id="suggestions1"></datalist>
+        </div>
+
+        <div class="grupo-control">
+          <label for="filterField2">Campo 2:</label>
+          <select id="filterField2">
+            <option value="">(Ninguno)</option>
+            <option value="CODIGO">Código</option>
+            <option value="NOMBRE">Nombre</option>
+            <option value="RUTA">Ruta</option>
+            <option value="HORARIO DE TRABAJO">Horario de Trabajo</option>
+            <option value="LUGAR DE TRABAJO">Lugar de Trabajo</option>
+          </select>
+          <input id="searchInput2" list="suggestions2" placeholder="Buscar..." />
+          <datalist id="suggestions2"></datalist>
+        </div>
+      </section>
+
+      <section class="contenedor-filtros">
+        <h2><i class="fa-solid fa-road"></i> Filtro de Rutas</h2>
+        <div class="grupo-control">
+          <label for="campo1">Campo 1:</label>
+          <select id="campo1"></select>
+          <label for="valor1">Valor 1:</label>
+          <select id="valor1"></select>
+        </div>
+        <div class="grupo-control">
+          <label for="campo2">Campo 2:</label>
+          <select id="campo2"></select>
+          <label for="valor2">Valor 2:</label>
+          <select id="valor2"></select>
+        </div>
+      </section>
+
+      <form id="addForm" style="display:none;">
+        <h2><i class="fa-solid fa-user-plus"></i> Agregar Personal</h2>
+        <div id="camposForm" class="form-grid"></div>
+        <button type="submit"><i class="fa-solid fa-plus"></i> Agregar</button>
+        <button type="button" id="descargarGeoJSONBtn" style="display:none;">
+          <i class="fa-solid fa-download"></i> Descargar GeoJSON
+        </button>
+      </form>
+    </aside>
+
+    <div id="mapWorkspace">
+      <div id="map"></div>
+      <div id="map3d" aria-label="Visualizador geoespacial 3D" hidden></div>
+      <div id="controls3d" class="controls3d" hidden>
+        <div class="controls3d-title">IDE TRANSPORTE · 3D</div>
+        <label for="routeSelect3d">Ruta para analizar</label>
+        <select id="routeSelect3d"><option value="">Selecciona una ruta…</option></select>
+        <div class="buttons3d">
+          <button id="showAllRoutes3d" type="button">Todas las rutas</button>
+          <button id="fitRoute3d" type="button">Enfocar ruta</button>
+        </div>
+        <div id="status3d" role="status">Cargando rutas…</div>
+        <div class="stats3d" id="stats3d">
+          <div><span>Distancia</span><strong id="distance3d">—</strong></div>
+          <div><span>Desnivel +</span><strong id="gain3d">—</strong></div>
+          <div><span>Desnivel −</span><strong id="loss3d">—</strong></div>
+          <div><span>Pendiente máx.</span><strong id="slope3d">—</strong></div>
+        </div>
+        <canvas id="profile3d" width="520" height="180" aria-label="Perfil de elevación"></canvas>
+        <p class="hint3d">El perfil requiere un DEM propio publicado como teselas Terrain-RGB. Consulta README-3D.txt.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- BOTÓN FLOTANTE -->
+<button id="toggleTablaBtn" class="tabla-fab" title="Mostrar/Ocultar tabla">
+  <i class="fa-solid fa-table"></i>
+</button>
+
+<!-- PANEL TABLA FLOTANTE -->
+<section id="panelTabla" class="tabla-flotante oculto">
+  <div class="tabla-header" id="tablaHeader">
+  <i class="fa-solid fa-grip-lines"></i>
+  <span>Tabla de Personal</span>
+</div>
+
+  <section class="contenedor-filtros">
+    <div class="card-toggle">
+      <button class="toggle-btn" onclick="toggleColumnMenu()">
+        <i class="fa-solid fa-eye"></i> Columnas
+      </button>
+      <button class="toggle-btn danger" onclick="toggleTabla()">
+        <i class="fa-solid fa-xmark"></i> Cerrar
+      </button>
+    </div>
+  </section>
+  <div id="tabla"></div>
+</section>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+  <script src="ide3d.js"></script>
+</body>
+</html>
